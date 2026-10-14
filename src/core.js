@@ -121,16 +121,30 @@ var WP = (function () {
     if (src.kind === 'osint' && CITER) {
       var st = Object.assign({}, src.st, { locator: loc || '' });
       var seg = first ? CITER.build(st).seg : CITER.shortForms(st).short;
-      return smartHtml(CITER.toHTML(seg));
+      return linkUrls(smartHtml(CITER.toHTML(seg)));
     }
     var raw = first || !clean(src.short) ? src.full : src.short;
-    return fmtText(withLocator(raw, loc && CITER ? CITER.normLocator(loc) : loc));
+    return linkUrls(fmtText(withLocator(raw, loc && CITER ? CITER.normLocator(loc) : loc)));
+  }
+  // Web addresses in a citation become links, so a reader of the PDF can open the source.
+  // Only text outside tags is touched; a closing period or comma stays outside the link.
+  function linkUrls(h) {
+    var depth = 0;
+    return String(h).split(/(<[^>]*>)/).map(function (part, i) {
+      if (i % 2) { if (/^<a[\s>]/i.test(part)) depth++; else if (/^<\/a>/i.test(part)) depth--; return part; }
+      if (depth > 0) return part;
+      return part.replace(/\bhttps?:\/\/[^\s<>"\u201C\u201D]+/g, function (u) {
+        var tail = (u.match(/[.,;:)\]\u2019]+$/) || [''])[0], href = u.slice(0, u.length - tail.length);
+        return href ? '<a class="url" href="' + href.replace(/"/g, '%22') + '">' + href + '</a>' + tail : u;
+      });
+    }).join('');
   }
 
   // ------------------------------------------------------------------ inline text with notes and citations
   // ^[note text] is a footnote; [@key, p. 4; @other] cites sources in a footnote of their own,
-  // or inline when it sits inside a note. In a brief, citations print nothing where they
-  // stand: they only enter the source list at the end.
+  // or inline when it sits inside a note. In a brief, a citation prints as a small raised
+  // number where it stands, linked to that source's entry in the numbered list at the end
+  // (or as nothing at all, when the brief turns the numbers off).
   function matching(s, i) {
     var depth = 0;
     for (var j = i; j < s.length; j++) {
@@ -161,7 +175,7 @@ var WP = (function () {
         if (end > 0) { buf = buf.replace(/\s+$/, ''); flush(); out += ctx.note(inline(s.slice(i + 2, end), ctx, true)); i = end + 1; continue; }
       }
       if (s[i] === '[') {
-        var e2 = citeEnd(s, i);
+        var e2 = citeEnd(s, i), i0 = i;
         if (e2 > 0) {
           if (!inNote) buf = buf.replace(/\s+$/, '');
           flush();
@@ -174,6 +188,7 @@ var WP = (function () {
             else if (/\.\u201D$/.test(html.replace(/<[^>]+>/g, '')) && s[i] === '.') i++;
             out += html;
           } else if (!ctx.silent) out += ctx.note(html);
+          else if (ctx.mark) out += ctx.mark(parseCites(s.slice(i0 + 1, e2)));
           continue;
         }
       }
@@ -412,7 +427,7 @@ var WP = (function () {
   function defaults() {
     return {
       meta: {
-        kind: 'paper', briefName: '', colophon: '', matterLabel: 'So, why does this matter?', sourcesNote: SOURCES_NOTE,
+        kind: 'paper', briefName: '', colophon: '', citeMarks: true, matterLabel: 'So, why does this matter?', sourcesNote: SOURCES_NOTE,
         series: 'White paper series', masthead: 'White Paper', tagline: 'Cybersecurity\nGeopolitics\nMilitary affairs',
         number: '001', date: '', version: '1.0', versionNote: 'first edition', title: '', subtitle: '', author: '', shortTitle: '',
         publisher: '', site: '', url: '', accent: '', paper: 'tinted', coverImage: '', coverCaption: '', sectionBreaks: true
@@ -459,7 +474,7 @@ var WP = (function () {
     var visById = {}; doc.visuals.forEach(function (v) { visById[v.id] = v; });
     function problem(level, msg, where) { if (!problems.some(function (p) { return p.msg === msg; })) problems.push({ level: level, msg: msg, where: where || '' }); }
     var ctx = {
-      note: function (html) { notes++; return '<span class="fn"><span class="fn-n">' + notes + '</span> ' + html + '</span><sup class="fn-call">' + notes + '</sup>'; },
+      note: function (html) { notes++; var lab = ctx.noteLabel ? ctx.noteLabel(notes) : String(notes); return '<span class="fn"><span class="fn-n">' + lab + '</span> ' + html + '</span><sup class="fn-call' + (/^\d+$/.test(lab) ? '' : ' sym') + '">' + lab + '</sup>'; },
       cite: function (list) {
         return list.map(function (c, n) {
           if (c.text !== undefined) return fmtText(c.text);
@@ -635,6 +650,15 @@ var WP = (function () {
     // why-it-matters box after each, and the sources at the end in order of appearance.
     function renderBrief() {
       ctx.silent = true;
+      if (m.citeMarks) {
+        // Source numbers go in the text, so notes use symbols: *, †, ‡, §, ‖, ¶, then doubled.
+        ctx.mark = function (list) {
+          var nums = [];
+          list.forEach(function (c) { var at = c.key ? order.indexOf(c.key) : -1; if (at !== -1 && nums.indexOf(at + 1) === -1) nums.push(at + 1); });
+          return nums.length ? '<sup class="src-call">' + nums.map(function (n) { return '<a href="#src-' + n + '">' + n + '</a>'; }).join(',') + '</sup>' : '';
+        };
+        ctx.noteLabel = function (n) { var sy = ['*', '\u2020', '\u2021', '\u00A7', '\u2016', '\u00B6'], k = (n - 1) % 6; return new Array(Math.floor((n - 1) / 6) + 2).join(sy[k]); };
+      }
       var name = clean(m.briefName), no = clean(m.number) || '000', dateTxt = clean(m.date), img = safeImage(m.coverImage);
       if (!name) problem('fix', 'The brief has no name yet. Fill it in under Brief.', 'paper');
       if (!dateTxt) problem('check', 'No date is given for the cover. Fill it in under Brief.', 'paper');
@@ -680,7 +704,7 @@ var WP = (function () {
         + (clean(m.sourcesNote) ? '<p class="bs-note">' + fmtText(m.sourcesNote) + '</p>' : '')
         + '<ol class="bsrc">' + order.map(function (k, i) {
           var s = srcByKey[k], loc = firstLoc[k] || (s.kind === 'osint' ? s.st.locator : '');
-          return '<li><span class="n">' + pad2(i + 1) + '</span><div class="se">' + (labelOf[k] ? '<b class="pre">' + fmtText(labelOf[k]) + '</b> ' : '') + citeHtml(s, loc, true) + '</div></li>';
+          return '<li id="src-' + (i + 1) + '"><span class="n">' + pad2(i + 1) + '</span><div class="se">' + (labelOf[k] ? '<b class="pre">' + fmtText(labelOf[k]) + '</b> ' : '') + citeHtml(s, loc, true) + '</div></li>';
         }).join('') + '</ol></section>' : '';
 
       var foot = (name ? name + ' · ' : '') + 'Brief ' + no;

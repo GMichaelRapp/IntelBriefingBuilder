@@ -180,7 +180,7 @@ body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-si
 <body>
 <div id="app">
   <header class="bar">
-    <h1><span class="mk"></span>White Paper Builder <span class="ver">v1.1</span></h1>
+    <h1><span class="mk"></span>White Paper Builder <span class="ver">v1.2</span></h1>
     <span class="seg kind" role="radiogroup" aria-label="What you are making">
       <label><input type="radio" name="kind" id="kindPaper" value="paper" checked><span>White paper</span></label>
       <label><input type="radio" name="kind" id="kindBrief" value="brief"><span>Intelligence brief</span></label>
@@ -228,6 +228,7 @@ body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-si
           <div class="field"><label for="m-colophon">Colophon, under "In this brief"</label><textarea id="m-colophon" data-k="meta.colophon" rows="3" placeholder="Who publishes the brief, alongside what, and the copyright line."></textarea></div>
           <div class="field"><label for="m-matterLabel">Heading of the why-it-matters box</label><input type="text" id="m-matterLabel" data-k="meta.matterLabel" placeholder="So, why does this matter?"></div>
           <div class="field"><label for="m-sourcesNote">Note under "Sources"</label><textarea id="m-sourcesNote" data-k="meta.sourcesNote" rows="2"></textarea><p class="hint">The sources print on the last page, numbered in the order they are first cited.</p></div>
+          <label class="check"><input type="checkbox" id="m-citeMarks" data-k="meta.citeMarks"> <span>Show each citation's source number in the text, linked to its entry under Sources. Notes are then marked *, †, ‡ so the two are not confused.</span></label>
           <h2>Look</h2>
           <div class="field"><label for="m-baccent">Accent color</label><input type="color" id="m-baccent" data-k="meta.accent"></div>
           </div>
@@ -300,7 +301,7 @@ body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-si
         <div class="pane" data-pane="sources" hidden>
           <p class="hint">Cite sources from your OSINT Citation Generator lists. In the generator, save your list to a file; open that file here. Each source gets a short key.</p>
           <p class="hint" data-only="paper">Write [@key] or [@key, p. 45] in the text: the first citation of a source prints in full in a footnote, later ones in short form.</p>
-          <p class="hint" data-only="brief" hidden>Write [@key] in a story where you use the source. Nothing prints there: the source joins the numbered list on the last page, in order of first citation. [ORIGINAL STORY: @key] puts that label in front of its entry.</p>
+          <p class="hint" data-only="brief" hidden>Write [@key] in a story where you use the source. A small source number prints there, linked to the source's entry in the numbered list on the last page; sources are numbered in order of first citation. [ORIGINAL STORY: @key] puts that label in front of its entry. You can turn the numbers off under Brief.</p>
           <div class="row" style="grid-template-columns:auto auto 1fr;align-items:center">
             <button type="button" class="btn" id="srcOpen">Open an OSINT list file</button>
             <button type="button" class="btn quiet" id="srcAddTyped">Add a source by hand</button>
@@ -366,6 +367,7 @@ body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-si
 .wp * { box-sizing: border-box; }
 .wp a { color: inherit; text-decoration: none; }
 .wp p a, .wp li a, .fn a { text-decoration: underline; text-decoration-thickness: 0.5px; text-underline-offset: 2px; }
+.wp a.url, .fn a.url { text-decoration: none; }
 .wp b { font-weight: 600; }
 
 /* Everything in the text column sits 160 px in; the margin column holds labels. */
@@ -560,6 +562,11 @@ a.fn[data-footnote-call] { display: inline; margin: 0; padding: 0; float: none; 
 .wb a { color: inherit; text-decoration: none; }
 .wb p a, .wb li a, .wb .se a, .fn a { text-decoration: underline; text-decoration-thickness: 0.5px; text-underline-offset: 2px; }
 .wb b { font-weight: 600; }
+.wb a.url, .fn a.url { text-decoration: none; }
+
+/* A citation in the text: a small raised source number, linked to its entry under Sources. */
+.wb .src-call { font-size: 1.3em; line-height: 0; vertical-align: baseline; font-feature-settings: 'numr' 1; color: var(--wb-gold); font-weight: 600; margin-left: 1px; letter-spacing: 0.02em; white-space: nowrap; }
+.wb .src-call a, .wb p .src-call a, .wb li .src-call a { color: inherit; text-decoration: none; }
 
 /* Text. */
 .wb p, .wb ul, .wb ol, .wb blockquote { margin: 0 0 13px; }
@@ -674,6 +681,7 @@ a.fn[data-footnote-call] { display: inline; margin: 0; padding: 0; float: none; 
 a.fn[data-footnote-call] { display: inline; margin: 0; padding: 0; float: none; }
 .fn .fn-n { display: inline-block; min-width: 22px; color: var(--wb-gold); font-weight: 600; }
 .wb .fn-call { font-size: 10.5px; line-height: 0; color: var(--wb-gold); vertical-align: super; margin-left: 1px; font-weight: 600; }
+.wb .fn-call.sym { font-size: 19px; vertical-align: 0; margin-left: 1px; font-weight: 400; }
 .pagedjs_footnote_content { padding-top: 12px; }
 .pagedjs_footnote_content::before { content: ''; display: block; width: 140px; margin-bottom: 8px; border-top: 1px solid var(--wp-accent); }
 .pagedjs_footnote_content.pagedjs_footnote_empty { padding-top: 0; }
@@ -1486,16 +1494,30 @@ var WP = (function () {
     if (src.kind === 'osint' && CITER) {
       var st = Object.assign({}, src.st, { locator: loc || '' });
       var seg = first ? CITER.build(st).seg : CITER.shortForms(st).short;
-      return smartHtml(CITER.toHTML(seg));
+      return linkUrls(smartHtml(CITER.toHTML(seg)));
     }
     var raw = first || !clean(src.short) ? src.full : src.short;
-    return fmtText(withLocator(raw, loc && CITER ? CITER.normLocator(loc) : loc));
+    return linkUrls(fmtText(withLocator(raw, loc && CITER ? CITER.normLocator(loc) : loc)));
+  }
+  // Web addresses in a citation become links, so a reader of the PDF can open the source.
+  // Only text outside tags is touched; a closing period or comma stays outside the link.
+  function linkUrls(h) {
+    var depth = 0;
+    return String(h).split(/(<[^>]*>)/).map(function (part, i) {
+      if (i % 2) { if (/^<a[\s>]/i.test(part)) depth++; else if (/^<\/a>/i.test(part)) depth--; return part; }
+      if (depth > 0) return part;
+      return part.replace(/\bhttps?:\/\/[^\s<>"\u201C\u201D]+/g, function (u) {
+        var tail = (u.match(/[.,;:)\]\u2019]+$/) || [''])[0], href = u.slice(0, u.length - tail.length);
+        return href ? '<a class="url" href="' + href.replace(/"/g, '%22') + '">' + href + '</a>' + tail : u;
+      });
+    }).join('');
   }
 
   // ------------------------------------------------------------------ inline text with notes and citations
   // ^[note text] is a footnote; [@key, p. 4; @other] cites sources in a footnote of their own,
-  // or inline when it sits inside a note. In a brief, citations print nothing where they
-  // stand: they only enter the source list at the end.
+  // or inline when it sits inside a note. In a brief, a citation prints as a small raised
+  // number where it stands, linked to that source's entry in the numbered list at the end
+  // (or as nothing at all, when the brief turns the numbers off).
   function matching(s, i) {
     var depth = 0;
     for (var j = i; j < s.length; j++) {
@@ -1526,7 +1548,7 @@ var WP = (function () {
         if (end > 0) { buf = buf.replace(/\s+$/, ''); flush(); out += ctx.note(inline(s.slice(i + 2, end), ctx, true)); i = end + 1; continue; }
       }
       if (s[i] === '[') {
-        var e2 = citeEnd(s, i);
+        var e2 = citeEnd(s, i), i0 = i;
         if (e2 > 0) {
           if (!inNote) buf = buf.replace(/\s+$/, '');
           flush();
@@ -1539,6 +1561,7 @@ var WP = (function () {
             else if (/\.\u201D$/.test(html.replace(/<[^>]+>/g, '')) && s[i] === '.') i++;
             out += html;
           } else if (!ctx.silent) out += ctx.note(html);
+          else if (ctx.mark) out += ctx.mark(parseCites(s.slice(i0 + 1, e2)));
           continue;
         }
       }
@@ -1777,7 +1800,7 @@ var WP = (function () {
   function defaults() {
     return {
       meta: {
-        kind: 'paper', briefName: '', colophon: '', matterLabel: 'So, why does this matter?', sourcesNote: SOURCES_NOTE,
+        kind: 'paper', briefName: '', colophon: '', citeMarks: true, matterLabel: 'So, why does this matter?', sourcesNote: SOURCES_NOTE,
         series: 'White paper series', masthead: 'White Paper', tagline: 'Cybersecurity\nGeopolitics\nMilitary affairs',
         number: '001', date: '', version: '1.0', versionNote: 'first edition', title: '', subtitle: '', author: '', shortTitle: '',
         publisher: '', site: '', url: '', accent: '', paper: 'tinted', coverImage: '', coverCaption: '', sectionBreaks: true
@@ -1824,7 +1847,7 @@ var WP = (function () {
     var visById = {}; doc.visuals.forEach(function (v) { visById[v.id] = v; });
     function problem(level, msg, where) { if (!problems.some(function (p) { return p.msg === msg; })) problems.push({ level: level, msg: msg, where: where || '' }); }
     var ctx = {
-      note: function (html) { notes++; return '<span class="fn"><span class="fn-n">' + notes + '</span> ' + html + '</span><sup class="fn-call">' + notes + '</sup>'; },
+      note: function (html) { notes++; var lab = ctx.noteLabel ? ctx.noteLabel(notes) : String(notes); return '<span class="fn"><span class="fn-n">' + lab + '</span> ' + html + '</span><sup class="fn-call' + (/^\d+$/.test(lab) ? '' : ' sym') + '">' + lab + '</sup>'; },
       cite: function (list) {
         return list.map(function (c, n) {
           if (c.text !== undefined) return fmtText(c.text);
@@ -2000,6 +2023,15 @@ var WP = (function () {
     // why-it-matters box after each, and the sources at the end in order of appearance.
     function renderBrief() {
       ctx.silent = true;
+      if (m.citeMarks) {
+        // Source numbers go in the text, so notes use symbols: *, †, ‡, §, ‖, ¶, then doubled.
+        ctx.mark = function (list) {
+          var nums = [];
+          list.forEach(function (c) { var at = c.key ? order.indexOf(c.key) : -1; if (at !== -1 && nums.indexOf(at + 1) === -1) nums.push(at + 1); });
+          return nums.length ? '<sup class="src-call">' + nums.map(function (n) { return '<a href="#src-' + n + '">' + n + '</a>'; }).join(',') + '</sup>' : '';
+        };
+        ctx.noteLabel = function (n) { var sy = ['*', '\u2020', '\u2021', '\u00A7', '\u2016', '\u00B6'], k = (n - 1) % 6; return new Array(Math.floor((n - 1) / 6) + 2).join(sy[k]); };
+      }
       var name = clean(m.briefName), no = clean(m.number) || '000', dateTxt = clean(m.date), img = safeImage(m.coverImage);
       if (!name) problem('fix', 'The brief has no name yet. Fill it in under Brief.', 'paper');
       if (!dateTxt) problem('check', 'No date is given for the cover. Fill it in under Brief.', 'paper');
@@ -2045,7 +2077,7 @@ var WP = (function () {
         + (clean(m.sourcesNote) ? '<p class="bs-note">' + fmtText(m.sourcesNote) + '</p>' : '')
         + '<ol class="bsrc">' + order.map(function (k, i) {
           var s = srcByKey[k], loc = firstLoc[k] || (s.kind === 'osint' ? s.st.locator : '');
-          return '<li><span class="n">' + pad2(i + 1) + '</span><div class="se">' + (labelOf[k] ? '<b class="pre">' + fmtText(labelOf[k]) + '</b> ' : '') + citeHtml(s, loc, true) + '</div></li>';
+          return '<li id="src-' + (i + 1) + '"><span class="n">' + pad2(i + 1) + '</span><div class="se">' + (labelOf[k] ? '<b class="pre">' + fmtText(labelOf[k]) + '</b> ' : '') + citeHtml(s, loc, true) + '</div></li>';
         }).join('') + '</ol></section>' : '';
 
       var foot = (name ? name + ' · ' : '') + 'Brief ' + no;
@@ -2167,7 +2199,7 @@ if (typeof module !== 'undefined') module.exports = WP;
       colophon: '[Colophon: who publishes the brief, alongside what, and the copyright line. For example: The [Brief name] Intelligence Briefing is a product of [Publisher]. Copyright ' + new Date().getFullYear() + '.]' });
     d.body = [
       '# [Story title: what happened, in one line]', '',
-      '[Open with who reported it, and where: "Writing in *Proceedings*, ..." Then the claim, in a sentence or two. Cite the source where you use it, as Sources explains. Nothing prints in the text: the source joins the numbered list at the end of the brief.]', '',
+      '[Open with who reported it, and where: "Writing in *Proceedings*, ..." Then the claim, in a sentence or two. Cite the source where you use it, as Sources explains. A small number prints in the text, linked to the source in the numbered list at the end of the brief.]', '',
       '> [A passage quoted from the source, in its own words. It is indented and set smaller.]', '',
       '[What else the source shows, and what the reader needs in order to follow it. Leave a blank line between paragraphs.]', '',
       '?> [So, why does this matter? What this changes, for whom, and what to watch next.]',
@@ -2266,7 +2298,7 @@ if (typeof module !== 'undefined') module.exports = WP;
     ['Subhead', function (ta) { lineStart(ta, '## ', 'Subheading'); }, '## starts a subheading inside a story'],
     ['Why it matters', function (ta) { lineStart(ta, '?> ', 'Why this matters to the reader.'); }, 'The "So, why does this matter?" box'],
     ['Quote', function (ta) { lineStart(ta, '> ', 'Quoted text'); }, 'A quotation, indented'],
-    ['Cite', function (ta) { lastTarget = ta; showTab('sources'); setStatus('Pick a source and click Cite. It goes where your cursor was.'); }, 'Add a source to the list at the end'],
+    ['Cite', function (ta) { lastTarget = ta; showTab('sources'); setStatus('Pick a source and click Cite. It goes where your cursor was.'); }, 'Cite a source: its number prints here and it joins the list at the end'],
     ['Note', function (ta) { insert(ta, '^[', ']', 'note text'); }, 'A footnote at the cursor'],
     ['Bold', function (ta) { insert(ta, '**', '**', 'bold text'); }, 'Bold: **text**'],
     ['Italic', function (ta) { insert(ta, '*', '*', 'italic text'); }, 'Italic: *text*'],
@@ -2330,8 +2362,8 @@ if (typeof module !== 'undefined') module.exports = WP;
     ['*italic*  **bold**', 'Italic and bold. [text](https://...) makes a link.'],
     ['> text', 'A quotation, indented and set smaller.'],
     ['?> text', 'The "So, why does this matter?" box. A line with only ?> starts a new paragraph inside it.'],
-    ['[@key]', 'Adds a source from Sources to the numbered list on the last page, in order of first citation. Nothing prints in the text. [ORIGINAL STORY: @key] labels the entry.'],
-    ['^[note text]', 'A footnote at the foot of the page, when a story needs one.'],
+    ['[@key]', 'Prints the source\'s number in the text, linked to its entry in the numbered list on the last page. Sources are numbered in order of first citation. [@a; @b] gives both numbers. [ORIGINAL STORY: @key] labels the entry.'],
+    ['^[note text]', 'A footnote at the foot of the page, when a story needs one. Notes are marked *, \u2020, \u2021 so they are not confused with source numbers.'],
     ['- item  /  1. item', 'Bulleted and numbered lists.'],
     ['[[name]]', 'Places the chart, table, or image with that name from Visuals.'],
     ['---', 'Starts a new page.']

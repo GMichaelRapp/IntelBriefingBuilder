@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2 — October 2026
+
+- **Source numbers in the brief's text.** A citation, `[@key]`, now prints the source's number, raised and in gold, where it stands. The number matches the source's entry on the Sources page and links to it in the PDF. A source keeps its number each time it is cited; `[@one; @two]` prints both numbers.
+- In a brief, footnotes are marked \*, †, ‡, §, ‖, ¶ (then doubled), so they are not confused with source numbers.
+- The numbers can be turned off under Brief. The brief then prints as in 1.1: citations print nothing in the text, and notes are numbered.
+- Web addresses in citations are now links in the PDF, both in white paper footnotes and on the brief's Sources page.
+
 ## 1.1 — October 2026
 
 - **Intelligence briefs.** A switch at the top now chooses between a white paper and an intelligence brief. The brief has its own design:

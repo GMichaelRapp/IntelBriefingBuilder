@@ -20,7 +20,7 @@ function eq(got, want, label) {
   failed++; console.log('FAIL  ' + label + '\n  got : ' + JSON.stringify(got) + '\n  want: ' + JSON.stringify(want));
 }
 const strip = (h) => h.replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
-const notesOf = (h) => (h.match(/<span class="fn">[\s\S]*?<\/span><sup class="fn-call">/g) || []).map((x) => strip(x.replace(/<sup[\s\S]*$/, '')).trim());
+const notesOf = (h) => (h.match(/<span class="fn">[\s\S]*?<\/span><sup class="fn-call[^"]*">/g) || []).map((x) => strip(x.replace(/<sup[\s\S]*$/, '')).trim());
 
 // ---- 1. Blocks ----
 const bs = WP.blocks('# One\n\nPara line one\nline two.\n\n## Sub\n\n- a\n- b\ncontinued\n\n1. x\n2. y\n\n> quote\n> more\n\n!> key\n\n>> side\n\n{R1} do this\n{R2} do that\n\n[[fig-1]]\n\n---\n\n### Minor');
@@ -115,6 +115,8 @@ eq(back.doc.meta.title + '|' + back.doc.sources.length + '|' + back.doc.visuals.
 eq(!!WP.parseProject('not json').error && !!WP.parseProject(list).error, true, 'project file: refuses other files, including OSINT lists');
 eq(/Open it under Sources/.test(WP.parseProject(list).error), true, 'project file: says what an OSINT list file is for');
 
+eq(/<a class="url" href="https:\/\/example\.com\/x">https:\/\/example\.com\/x<\/a>\./.test(WP.render(paper({ body: '# A\n\nText [@doe-drones].' })).html), true, 'citation: a web address is a link, with the closing period outside it');
+
 // ---- 7. The intelligence brief ----
 const mb = WP.blocks('?> One\n?> more\n?>\n?> Two');
 eq(mb.length + ':' + mb[0].t + ':' + JSON.stringify(mb[0].text), '1:matter:"One more\\n\\nTwo"', 'blocks: ?> lines join, and a bare ?> starts a new paragraph');
@@ -127,12 +129,17 @@ r = brief('# First story\n\nSaid so [@doe-drones]. More [@beckley-unrivaled, 12]
 eq(/class="bcover/.test(r.html) && !/class="wp"/.test(r.html), true, 'brief: its own cover, not the white paper');
 eq((r.html.match(/<li><span class="n">0[12]<\/span><a href="#story-[12]">/g) || []).length, 2, 'brief: stories numbered 01, 02 and listed under In this brief');
 eq(strip((r.html.match(/<section class="stories">[\s\S]*?<\/section>/) || [''])[0]).includes('Jane Doe'), false, 'brief: citations print nothing in the stories');
-eq(/Said so\. More\./.test(strip(r.html)), true, 'brief: no gap is left where a citation was');
+eq(/Said so<sup class="src-call"><a href="#src-1">1<\/a><\/sup>\. More<sup class="src-call"><a href="#src-2">2<\/a><\/sup>\./.test(r.html), true, 'brief: each citation prints its source number in the text, linked to the entry');
+eq(/Again<sup class="src-call"><a href="#src-1">1<\/a><\/sup>; then<sup class="src-call"><a href="#src-3">3<\/a><\/sup>/.test(r.html), true, 'brief: a source cited again keeps its first number');
+eq(/<li id="src-1"><span class="n">01<\/span>/.test(r.html), true, 'brief: each source entry is the target of its numbers');
+eq(/<sup class="src-call"><a href="#src-1">1<\/a>,<a href="#src-2">2<\/a><\/sup>/.test(brief('# A\n\nTwo at once [@doe-drones; @beckley-unrivaled].').html), true, 'brief: two sources in one citation print both numbers');
+const off = brief('# A\n\nSaid so [@doe-drones]. A note.^[Only a note.]', { citeMarks: false });
+eq(/Said so\. A note\./.test(strip(off.html)) && notesOf(off.html)[0] === '1 Only a note.', true, 'brief: with the numbers turned off, citations print nothing and notes are numbered');
 const srcs = (r.html.match(/<ol class="bsrc">([\s\S]*?)<\/ol>/) || ['', ''])[1].split('</li>').filter(Boolean).map((x) => strip(x));
 eq(srcs.length, 3, 'brief: each source listed once');
 eq(srcs[0].startsWith('01Jane Doe, “Drones Over the Front,”') && srcs[1].startsWith('02Michael Beckley') && srcs[2].startsWith('03ORIGINAL STORY: Example Agency'), true, 'brief: sources in order of first citation, with their labels');
 eq(/: p\. 12\.$/.test(srcs[1]), true, 'brief: the first citation\'s page is kept in the entry');
-eq(notesOf(r.html)[0], '1 Only a note.', 'brief: written notes still print as footnotes');
+eq(notesOf(r.html)[0], '* Only a note.', 'brief: written notes print as footnotes, marked with symbols so they are not confused with source numbers');
 eq((r.html.match(/<div class="matter">[\s\S]*?<\/div><\/div>|<div class="matter">[\s\S]*?<p>Second\.<\/p><\/div>/) || [''])[0].split('<p>').length - 1, 2, 'brief: why-it-matters box with two paragraphs');
 eq(/@bottom-left\{content:"Global Warning · Brief 030"/.test(r.vars) && /--wp-accent:#D9B063/.test(r.vars), true, 'brief: footer reads name and number; gold accent by default');
 eq(/Formatted to the OSINT Style Guide v1\.5/.test(r.html) && /Colophon text\./.test(r.html), true, 'brief: sources note and colophon');

@@ -133,7 +133,7 @@ body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-si
 <body>
 <div id="app">
   <header class="bar">
-    <h1><span class="mk"></span>White Paper Builder <span class="ver">v1.1</span></h1>
+    <h1><span class="mk"></span>White Paper Builder <span class="ver">v1.2</span></h1>
     <span class="seg kind" role="radiogroup" aria-label="What you are making">
       <label><input type="radio" name="kind" id="kindPaper" value="paper" checked><span>White paper</span></label>
       <label><input type="radio" name="kind" id="kindBrief" value="brief"><span>Intelligence brief</span></label>
@@ -181,6 +181,7 @@ body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-si
           <div class="field"><label for="m-colophon">Colophon, under "In this brief"</label><textarea id="m-colophon" data-k="meta.colophon" rows="3" placeholder="Who publishes the brief, alongside what, and the copyright line."></textarea></div>
           <div class="field"><label for="m-matterLabel">Heading of the why-it-matters box</label><input type="text" id="m-matterLabel" data-k="meta.matterLabel" placeholder="So, why does this matter?"></div>
           <div class="field"><label for="m-sourcesNote">Note under "Sources"</label><textarea id="m-sourcesNote" data-k="meta.sourcesNote" rows="2"></textarea><p class="hint">The sources print on the last page, numbered in the order they are first cited.</p></div>
+          <label class="check"><input type="checkbox" id="m-citeMarks" data-k="meta.citeMarks"> <span>Show each citation's source number in the text, linked to its entry under Sources. Notes are then marked *, †, ‡ so the two are not confused.</span></label>
           <h2>Look</h2>
           <div class="field"><label for="m-baccent">Accent color</label><input type="color" id="m-baccent" data-k="meta.accent"></div>
           </div>
@@ -253,7 +254,7 @@ body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-si
         <div class="pane" data-pane="sources" hidden>
           <p class="hint">Cite sources from your OSINT Citation Generator lists. In the generator, save your list to a file; open that file here. Each source gets a short key.</p>
           <p class="hint" data-only="paper">Write [@key] or [@key, p. 45] in the text: the first citation of a source prints in full in a footnote, later ones in short form.</p>
-          <p class="hint" data-only="brief" hidden>Write [@key] in a story where you use the source. Nothing prints there: the source joins the numbered list on the last page, in order of first citation. [ORIGINAL STORY: @key] puts that label in front of its entry.</p>
+          <p class="hint" data-only="brief" hidden>Write [@key] in a story where you use the source. A small source number prints there, linked to the source's entry in the numbered list on the last page; sources are numbered in order of first citation. [ORIGINAL STORY: @key] puts that label in front of its entry. You can turn the numbers off under Brief.</p>
           <div class="row" style="grid-template-columns:auto auto 1fr;align-items:center">
             <button type="button" class="btn" id="srcOpen">Open an OSINT list file</button>
             <button type="button" class="btn quiet" id="srcAddTyped">Add a source by hand</button>

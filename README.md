@@ -1,4 +1,4 @@
-# Intel Briefing Builder
+# White Paper Builder
 
 Write a white paper or an intelligence brief and get print-ready pages. You fill in the details and write the text with light markup. The tool lays it all out as US Letter pages. You save the result as a PDF through your browser's print dialog.
 
@@ -68,6 +68,8 @@ The toolbar above the text inserts the most-used of these: sections, notes, bold
 
 The first time a source is cited, its footnote is the full OSINT Style Guide citation. Every later citation is the short form, as the guide prefers to "Ibid." You can use more than one list file, and you can rename a key; the text follows the change.
 
+Web addresses in the notes are links in the PDF, so a reader can open the source.
+
 Two sources in one footnote go in the same brackets: `[@one, p. 4; @two]`. Inside a footnote you write yourself, a citation prints in the note's own text: `^[On sea days, see [@two].]`.
 
 You can also add a source by hand, with its full and short forms.
@@ -109,7 +111,7 @@ Choose **Intelligence brief** at the top. The brief is a short companion publica
 - a cover photo running to every edge, with the brief's name, number, and date on a dark fade
 - an "In this brief" page listing the stories, with the colophon below
 - numbered stories that run on, one after another, each ending in a "So, why does this matter?" box
-- a Sources page at the end, numbered in the order the sources are first cited
+- a Sources page at the end, numbered in the order the sources are first cited, with a small matching number in the text wherever a source is cited
 
 Every page after the cover carries the brief's name and number at the foot, with the page number.
 
@@ -123,11 +125,14 @@ In brief mode the tabs are **Brief** (name, number, date, cover photo and credit
 | `## Title` | A subheading inside a story |
 | `> text` | A quotation, indented and set smaller |
 | `?> text` | The "So, why does this matter?" box. A line with only `?>` starts a new paragraph inside it. |
-| `[@key]` | Adds the source to the numbered list on the Sources page. Nothing prints in the text. |
+| `[@key]` | Prints the source's number, raised, where you cite it, and adds the source to the numbered list on the Sources page |
+| `[@one; @two]` | Both numbers, as in ³,⁵ |
 | `[ORIGINAL STORY: @key]` | The same, with that label in bold before the source's entry |
-| `^[note text]` | A footnote, when a story needs one |
+| `^[note text]` | A footnote, when a story needs one. Notes are marked \*, †, ‡ so they are not confused with source numbers. |
 
-Italic, bold, links, lists, visuals (`[[name]]`), and page breaks (`---`) work as in the white paper. Each source appears once on the Sources page, as its full OSINT Style Guide citation; a page given in its first citation, as in `[@key, p. 4]`, is kept.
+Italic, bold, links, lists, visuals (`[[name]]`), and page breaks (`---`) work as in the white paper. Each source appears once on the Sources page, as its full OSINT Style Guide citation, and keeps the same number every time it is cited; a page given in its first citation, as in `[@key, p. 4]`, is kept.
+
+In the PDF, each number in the text is a link to its source's entry, and each web address on the Sources page is a link to the source itself. The stories listed under "In this brief" link to their pages too. To print the brief without the numbers in the text, untick **Show each citation's source number in the text** under Brief; notes are then numbered 1, 2, 3 again.
 
 `?>` also works in a white paper, where it prints as a box with the heading in the margin.
 

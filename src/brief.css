@@ -22,6 +22,11 @@
 .wb a { color: inherit; text-decoration: none; }
 .wb p a, .wb li a, .wb .se a, .fn a { text-decoration: underline; text-decoration-thickness: 0.5px; text-underline-offset: 2px; }
 .wb b { font-weight: 600; }
+.wb a.url, .fn a.url { text-decoration: none; }
+
+/* A citation in the text: a small raised source number, linked to its entry under Sources. */
+.wb .src-call { font-size: 1.3em; line-height: 0; vertical-align: baseline; font-feature-settings: 'numr' 1; color: var(--wb-gold); font-weight: 600; margin-left: 1px; letter-spacing: 0.02em; white-space: nowrap; }
+.wb .src-call a, .wb p .src-call a, .wb li .src-call a { color: inherit; text-decoration: none; }
 
 /* Text. */
 .wb p, .wb ul, .wb ol, .wb blockquote { margin: 0 0 13px; }
@@ -136,6 +141,7 @@
 a.fn[data-footnote-call] { display: inline; margin: 0; padding: 0; float: none; }
 .fn .fn-n { display: inline-block; min-width: 22px; color: var(--wb-gold); font-weight: 600; }
 .wb .fn-call { font-size: 10.5px; line-height: 0; color: var(--wb-gold); vertical-align: super; margin-left: 1px; font-weight: 600; }
+.wb .fn-call.sym { font-size: 19px; vertical-align: 0; margin-left: 1px; font-weight: 400; }
 .pagedjs_footnote_content { padding-top: 12px; }
 .pagedjs_footnote_content::before { content: ''; display: block; width: 140px; margin-bottom: 8px; border-top: 1px solid var(--wp-accent); }
 .pagedjs_footnote_content.pagedjs_footnote_empty { padding-top: 0; }

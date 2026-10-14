@@ -62,7 +62,7 @@
       colophon: '[Colophon: who publishes the brief, alongside what, and the copyright line. For example: The [Brief name] Intelligence Briefing is a product of [Publisher]. Copyright ' + new Date().getFullYear() + '.]' });
     d.body = [
       '# [Story title: what happened, in one line]', '',
-      '[Open with who reported it, and where: "Writing in *Proceedings*, ..." Then the claim, in a sentence or two. Cite the source where you use it, as Sources explains. Nothing prints in the text: the source joins the numbered list at the end of the brief.]', '',
+      '[Open with who reported it, and where: "Writing in *Proceedings*, ..." Then the claim, in a sentence or two. Cite the source where you use it, as Sources explains. A small number prints in the text, linked to the source in the numbered list at the end of the brief.]', '',
       '> [A passage quoted from the source, in its own words. It is indented and set smaller.]', '',
       '[What else the source shows, and what the reader needs in order to follow it. Leave a blank line between paragraphs.]', '',
       '?> [So, why does this matter? What this changes, for whom, and what to watch next.]',
@@ -161,7 +161,7 @@
     ['Subhead', function (ta) { lineStart(ta, '## ', 'Subheading'); }, '## starts a subheading inside a story'],
     ['Why it matters', function (ta) { lineStart(ta, '?> ', 'Why this matters to the reader.'); }, 'The "So, why does this matter?" box'],
     ['Quote', function (ta) { lineStart(ta, '> ', 'Quoted text'); }, 'A quotation, indented'],
-    ['Cite', function (ta) { lastTarget = ta; showTab('sources'); setStatus('Pick a source and click Cite. It goes where your cursor was.'); }, 'Add a source to the list at the end'],
+    ['Cite', function (ta) { lastTarget = ta; showTab('sources'); setStatus('Pick a source and click Cite. It goes where your cursor was.'); }, 'Cite a source: its number prints here and it joins the list at the end'],
     ['Note', function (ta) { insert(ta, '^[', ']', 'note text'); }, 'A footnote at the cursor'],
     ['Bold', function (ta) { insert(ta, '**', '**', 'bold text'); }, 'Bold: **text**'],
     ['Italic', function (ta) { insert(ta, '*', '*', 'italic text'); }, 'Italic: *text*'],
@@ -225,8 +225,8 @@
     ['*italic*  **bold**', 'Italic and bold. [text](https://...) makes a link.'],
     ['> text', 'A quotation, indented and set smaller.'],
     ['?> text', 'The "So, why does this matter?" box. A line with only ?> starts a new paragraph inside it.'],
-    ['[@key]', 'Adds a source from Sources to the numbered list on the last page, in order of first citation. Nothing prints in the text. [ORIGINAL STORY: @key] labels the entry.'],
-    ['^[note text]', 'A footnote at the foot of the page, when a story needs one.'],
+    ['[@key]', 'Prints the source\'s number in the text, linked to its entry in the numbered list on the last page. Sources are numbered in order of first citation. [@a; @b] gives both numbers. [ORIGINAL STORY: @key] labels the entry.'],
+    ['^[note text]', 'A footnote at the foot of the page, when a story needs one. Notes are marked *, \u2020, \u2021 so they are not confused with source numbers.'],
     ['- item  /  1. item', 'Bulleted and numbered lists.'],
     ['[[name]]', 'Places the chart, table, or image with that name from Visuals.'],
     ['---', 'Starts a new page.']

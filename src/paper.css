@@ -23,6 +23,7 @@
 .wp * { box-sizing: border-box; }
 .wp a { color: inherit; text-decoration: none; }
 .wp p a, .wp li a, .fn a { text-decoration: underline; text-decoration-thickness: 0.5px; text-underline-offset: 2px; }
+.wp a.url, .fn a.url { text-decoration: none; }
 .wp b { font-weight: 600; }
 
 /* Everything in the text column sits 160 px in; the margin column holds labels. */
