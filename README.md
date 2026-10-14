@@ -1,4 +1,4 @@
-# White Paper Builder
+# Intel Briefing Builder
 
 Write a white paper or an intelligence brief and get print-ready pages. You fill in the details and write the text with light markup. The tool lays it all out as US Letter pages. You save the result as a PDF through your browser's print dialog.
 
