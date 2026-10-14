@@ -129,6 +129,13 @@ body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-si
 #app .card .top { display: flex; align-items: center; gap: 8px; }
 #app .card .top .k { font-family: var(--mono); font-size: 12px; color: var(--muted); }
 #app .card .top .grow { flex: 1; }
+#app .authors { display: flex; flex-direction: column; gap: 8px; }
+#app .authors:empty { display: none; }
+#app .author { border: 1px solid var(--line); border-radius: 6px; background: var(--surface); padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+#app .author .top { display: flex; align-items: center; gap: 6px; }
+#app .author .top .nm { flex: 1 1 auto; }
+#app .author .top .num { font-family: var(--mono); font-size: 12px; color: var(--muted); min-width: 16px; }
+#app .author .check { font-size: 12.5px; }
 #app .srcs { display: flex; flex-direction: column; gap: 8px; }
 #app .src { border: 1px solid var(--line); border-radius: 6px; background: var(--surface); padding: 8px 10px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 10px; align-items: start; }
 #app .src .key { font-family: var(--mono); font-size: 12.5px; width: 100%; padding: 3px 6px; }
@@ -180,7 +187,7 @@ body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-si
 <body>
 <div id="app">
   <header class="bar">
-    <h1><span class="mk"></span>White Paper Builder <span class="ver">v1.2</span></h1>
+    <h1><span class="mk"></span>White Paper Builder <span class="ver">v1.3</span></h1>
     <span class="seg kind" role="radiogroup" aria-label="What you are making">
       <label><input type="radio" name="kind" id="kindPaper" value="paper" checked><span>White paper</span></label>
       <label><input type="radio" name="kind" id="kindBrief" value="brief"><span>Intelligence brief</span></label>
@@ -237,11 +244,12 @@ body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-si
           <h2>Cover</h2>
           <div class="field"><label for="m-title">Title</label><input type="text" id="m-title" data-k="meta.title" placeholder="The question or the claim, in ten words or fewer"></div>
           <div class="field"><label for="m-subtitle">Subtitle</label><input type="text" id="m-subtitle" data-k="meta.subtitle" placeholder="The scope, the period, or the method"></div>
+          <div class="field"><span class="label">Authors</span>
+            <div class="authors" id="authorList"></div>
+            <div><button type="button" class="btn small" id="addAuthor">+ Add an author</button></div>
+            <p class="hint">In the order they appear on the cover and in "Cite as". Biographies print on the "About this paper" page.</p></div>
           <div class="row">
-            <div class="field"><label for="m-author">Author</label><input type="text" id="m-author" data-k="meta.author" placeholder="G. Michael Rapp"></div>
             <div class="field"><label for="m-date">Date</label><input type="text" id="m-date" data-k="meta.date" placeholder="October 2026"></div>
-          </div>
-          <div class="row">
             <div class="field"><label for="m-number">Paper number</label><input type="text" id="m-number" data-k="meta.number" placeholder="001"></div>
             <div class="field"><label for="m-version">Version</label><input type="text" id="m-version" data-k="meta.version" placeholder="1.0"></div>
             <div class="field"><label for="m-versionNote">Version note</label><input type="text" id="m-versionNote" data-k="meta.versionNote" placeholder="first edition"></div>
@@ -322,11 +330,11 @@ body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-si
 
         <div class="pane" data-pane="back" hidden>
           <label class="check"><input type="checkbox" id="b-include" data-k="back.include"> <span>Add the "About this paper" page at the end</span></label>
-          <div class="field"><label for="b-bio">Author biography</label><textarea id="b-bio" data-k="back.bio" rows="3" placeholder="Two sentences: background, and what qualifies the author to write this paper."></textarea></div>
+          <p class="hint">Each author's biography is written under Paper, with the author's name.</p>
           <div class="field"><label for="b-history">Version history, one per line: version | date | change</label><textarea id="b-history" data-k="back.history" class="code" rows="3" placeholder="1.0 | October 13, 2026 | First publication"></textarea></div>
           <div class="field"><label for="b-series">In this series, one per line: number | title | status or date</label><textarea id="b-series" data-k="back.series" class="code" rows="4" placeholder="001 | This paper's title | This paper"></textarea></div>
           <div class="field"><label for="b-license">Reuse and licensing terms</label><input type="text" id="b-license" data-k="back.license" placeholder="© 2026 Publisher name. All rights reserved."></div>
-          <p class="hint">The "Cite as" line is built from the title, author, number, version, publisher, date, and link under Paper.</p>
+          <p class="hint">The "Cite as" line is built from the title, authors, number, version, publisher, date, and link under Paper.</p>
         </div>
       </div>
     </section>
@@ -448,6 +456,10 @@ a.fn[data-footnote-call] { display: inline; margin: 0; padding: 0; float: none; 
 .wp .cv-meta { margin-top: 28px; display: flex; gap: 48px; }
 .wp .cv-meta .k { font-family: 'Plex Mono', monospace; font-size: 12px; line-height: 18px; letter-spacing: 0.08em; text-transform: uppercase; color: #565C61; }
 .wp .cv-meta .v { margin-top: 4px; font-size: 17px; line-height: 24px; }
+.wp .cv-meta .who { flex: 0 1 auto; max-width: 430px; }
+.wp .cv-meta .who .v { text-wrap: balance; }
+.wp .cv-meta .who .nm { white-space: nowrap; }
+.wp .cv-meta > div:not(.who) { flex: none; }
 .wp .cv-img { margin: 32px 0 0; }
 .wp .cv-img img { display: block; width: 100%; max-height: 330px; object-fit: cover; border: 1px solid #15181B; }
 .wp .cv-img figcaption { margin-top: 6px; font-family: 'Plex Mono', monospace; font-size: 11px; line-height: 16px; color: #565C61; }
@@ -529,6 +541,7 @@ a.fn[data-footnote-call] { display: inline; margin: 0; padding: 0; float: none; 
 .wp .brow { display: grid; grid-template-columns: 136px minmax(0, 1fr); column-gap: 24px; margin-bottom: 24px; break-inside: avoid; }
 .wp .brow .gut { font-weight: 700; line-height: 23px; letter-spacing: 0.08em; color: var(--wp-accent); }
 .wp .brow .bt { font-size: 15px; line-height: 23px; text-wrap: pretty; }
+.wp .brow .bt .au + .au { margin-top: 10px; }
 .wp .brow .dtable { font-size: 14px; }
 .wp .series .sr { display: grid; grid-template-columns: 72px minmax(0, 1fr) auto; column-gap: 16px; padding: 6px 0; border-bottom: 1px solid #9BA09A; }
 .wp .series .sr:first-child { border-top: 1px solid #15181B; }
@@ -1802,13 +1815,15 @@ var WP = (function () {
       meta: {
         kind: 'paper', briefName: '', colophon: '', citeMarks: true, matterLabel: 'So, why does this matter?', sourcesNote: SOURCES_NOTE,
         series: 'White paper series', masthead: 'White Paper', tagline: 'Cybersecurity\nGeopolitics\nMilitary affairs',
-        number: '001', date: '', version: '1.0', versionNote: 'first edition', title: '', subtitle: '', author: '', shortTitle: '',
+        number: '001', date: '', version: '1.0', versionNote: 'first edition', title: '', subtitle: '', shortTitle: '',
         publisher: '', site: '', url: '', accent: '', paper: 'tinted', coverImage: '', coverCaption: '', sectionBreaks: true
       },
       summary: { lead: '', findings: '', recommendations: '' },
+      // Each author: { name, bio, org }. org keeps an organization's name as written in "Cite as".
+      authors: [],
       aboutSeries: '',
       body: '', appendix: '',
-      back: { include: true, bio: '', history: '', series: '', license: '' },
+      back: { include: true, history: '', series: '', license: '' },
       visuals: [], sources: []
     };
   }
@@ -1820,6 +1835,14 @@ var WP = (function () {
       Object.keys(d[k]).forEach(function (f) { if (typeof src[f] === typeof d[k][f]) d[k][f] = src[f]; });
     });
     if (d.meta.kind !== 'brief') d.meta.kind = 'paper';
+    if (Array.isArray(doc.authors)) d.authors = doc.authors.filter(function (a) { return a && typeof a === 'object'; }).map(function (a) {
+      return { name: String(a.name == null ? '' : a.name), bio: String(a.bio == null ? '' : a.bio), org: !!a.org };
+    }).filter(function (a) { return clean(a.name) || clean(a.bio); }).slice(0, 40);
+    // Projects from before version 1.3 had one author under Paper and one biography on the back page.
+    if (!d.authors.length) {
+      var oldName = doc.meta && typeof doc.meta.author === 'string' ? doc.meta.author : '', oldBio = doc.back && typeof doc.back.bio === 'string' ? doc.back.bio : '';
+      if (clean(oldName) || clean(oldBio)) d.authors = [{ name: oldName, bio: oldBio, org: false }];
+    }
     ['aboutSeries', 'body', 'appendix'].forEach(function (k) { if (typeof doc[k] === 'string') d[k] = doc[k]; });
     if (Array.isArray(doc.visuals)) d.visuals = doc.visuals.filter(function (v) { return v && typeof v.id === 'string' && VISUAL_KINDS[v.kind]; }).map(function (v) {
       return { id: v.id.slice(0, 60), kind: v.kind, title: String(v.title || ''), subtitle: String(v.subtitle || ''), source: String(v.source || ''), note: String(v.note || ''),
@@ -1940,7 +1963,10 @@ var WP = (function () {
 
     var title = clean(m.title) || 'Untitled paper', shortTitle = clean(m.shortTitle) || title;
     if (!clean(m.title)) problem('fix', 'The paper has no title yet. Fill it in under Paper.', 'paper');
-    if (!clean(m.author)) problem('check', 'No author is given. Fill it in under Paper.', 'paper');
+    var authors = doc.authors.filter(function (a) { return clean(a.name); }), names = authors.map(function (a) { return clean(a.name); });
+    if (!authors.length) problem('check', 'No author is given. Add one under Paper.', 'paper');
+    if (doc.back.include) authors.forEach(function (a) { if (!clean(a.bio)) problem('note', 'No biography for ' + clean(a.name) + '. Add one under Paper, or leave it: the back page then gives the name alone.', 'paper'); });
+    if (doc.authors.some(function (a) { return !clean(a.name) && clean(a.bio); })) problem('check', 'A biography under Paper has no author name with it.', 'paper');
     if (!clean(m.date)) problem('check', 'No date is given for the cover. Fill it in under Paper.', 'paper');
     if (clean(m.title) && words(m.title) > 12) problem('note', 'The template suggests a title of about ten words or fewer.', 'paper');
 
@@ -1961,7 +1987,6 @@ var WP = (function () {
     if (!clean(doc.body)) problem('fix', 'The body is empty.', 'body');
     var appHtml = clean(doc.appendix) ? flow(doc.appendix, true) : '';
     doc.visuals.forEach(function (v) { if (!usedVis[v.id]) problem('note', 'The visual [[' + v.id + ']] is not placed in the text yet.', 'visuals'); });
-    doc.sources.forEach(function (s) { if (!usedKeys[s.key]) problem('note', 'Source @' + s.key + ' is not cited.', 'sources'); });
 
     // Cover.
     var tag = lines(m.tagline).slice(0, 4), mast = clean(m.masthead);
@@ -1975,7 +2000,7 @@ var WP = (function () {
       + '<div class="cv-no">White paper No. ' + esc(clean(m.number) || '000') + '</div>'
       + '<h1 class="cv-title">' + fmtText(title) + '</h1>'
       + (clean(m.subtitle) ? '<div class="cv-sub">' + fmtText(m.subtitle) + '</div>' : '')
-      + '<div class="cv-meta">' + (clean(m.author) ? '<div><div class="k">Author</div><div class="v">' + fmtText(clean(m.author)) + '</div></div>' : '')
+      + '<div class="cv-meta">' + (authors.length ? '<div class="who"><div class="k">' + (authors.length > 1 ? 'Authors' : 'Author') + '</div><div class="v">' + andList(names.map(function (x) { return '<span class="nm">' + fmtText(x) + '</span>'; })) + '</div></div>' : '')
       + (clean(ver) ? '<div><div class="k">Version</div><div class="v">' + esc(ver) + '</div></div>' : '')
       + '<div><div class="k">Length</div><div class="v"><span class="cover-length">—</span> pages</div></div></div>'
       + (m.coverImage && safeImage(m.coverImage) ? '<figure class="cv-img"><img src="' + safeImage(m.coverImage) + '" alt="">' + (clean(m.coverCaption) ? '<figcaption>' + fmtText(m.coverCaption) + '</figcaption>' : '') + '</figure>' : '')
@@ -1987,10 +2012,12 @@ var WP = (function () {
     if (b.include) {
       var hist = lines(b.history).map(function (l) { return l.split('|').map(clean); });
       var ser = lines(b.series).map(function (l) { return l.split('|').map(clean); });
-      var cite = (clean(m.author) ? fmtText(invertName(m.author)) + '. ' : '') + '“' + fmtText(title) + '.” <i>White Paper</i> No. ' + esc(clean(m.number) || '000') + ', version ' + esc(clean(m.version) || '1.0') + '. '
+      var cite = (authors.length ? fmtText(citeNames(authors)).replace(/\.$/, '') + '. ' : '') + '“' + fmtText(title) + '.” <i>White Paper</i> No. ' + esc(clean(m.number) || '000') + ', version ' + esc(clean(m.version) || '1.0') + '. '
         + (clean(m.publisher) ? esc(clean(m.publisher)) + ', ' : '') + esc(dateTxt || 'n.d.') + '.' + (safeUrl(m.url) ? ' ' + esc(safeUrl(m.url)) + '.' : (clean(m.site) ? ' ' + esc(clean(m.site)) + '.' : ''));
       backHtml = '<section class="back"><h2 class="front" id="about" data-run="About this paper">About this paper</h2>'
-        + (clean(m.author) || clean(b.bio) ? '<div class="brow"><div class="gut">Author</div><div class="bt"><b>' + fmtText(clean(m.author)) + '</b>' + (clean(b.bio) ? ' ' + inline(b.bio, ctx, false) : '') + '</div></div>' : '')
+        + (authors.length ? '<div class="brow"><div class="gut">' + (authors.length > 1 ? 'Authors' : 'Author') + '</div><div class="bt">' + authors.map(function (a) {
+          return '<div class="au"><b>' + fmtText(clean(a.name)) + '</b>' + (clean(a.bio) ? ' ' + inline(a.bio, ctx, false) : '') + '</div>';
+        }).join('') + '</div></div>' : '')
         + '<div class="brow"><div class="gut">Cite as</div><div class="bt">' + cite + '</div></div>'
         + (hist.length ? '<div class="brow"><div class="gut">Version history</div><div class="bt"><table class="dtable"><thead><tr><th>Version</th><th>Date</th><th>Change</th></tr></thead><tbody>' + hist.map(function (r) { return '<tr><td class="code">' + esc(r[0] || '') + '</td><td>' + esc(r[1] || '') + '</td><td>' + fmtText(r[2] || '') + '</td></tr>'; }).join('') + '</tbody></table></div></div>' : '')
         + (ser.length ? '<div class="brow"><div class="gut">In this series</div><div class="bt series">' + ser.map(function (r) { return '<div class="sr"><span class="code">No. ' + esc(r[0] || '') + '</span><span class="st">' + fmtText(r[1] || '') + '</span><span class="sw">' + fmtText(r[2] || '') + '</span></div>'; }).join('') + '</div></div>' : '')
@@ -2000,6 +2027,8 @@ var WP = (function () {
       toc.push({ level: 0, num: '', title: 'About this paper', anchor: 'about' });
     }
 
+    // Checked after the back page, whose biographies can cite sources too.
+    doc.sources.forEach(function (s) { if (!usedKeys[s.key]) problem('note', 'Source @' + s.key + ' is not cited.', 'sources'); });
     // Contents, built last because it needs every heading and figure.
     var tocRows = (hasSummary ? [{ level: 0, num: '', title: 'Executive summary', anchor: 'summary' }] : []).concat(toc);
     var contents = '<section class="contents' + (!hasSummary && !m.sectionBreaks ? ' endbreak' : '') + '"><h2 class="front" id="contents" data-run="Contents">Contents</h2><ol class="toc">'
@@ -2095,7 +2124,7 @@ var WP = (function () {
     var html = '<div class="wp">' + cover + contents + sumHtml + '<section class="wp-body">' + bodyHtml + '</section>' + (appHtml ? '<section class="wp-appendix">' + appHtml + '</section>' : '') + backHtml + '</div>';
     return {
       html: html, vars: vars + running, problems: problems,
-      stats: { notes: notes, words: words(doc.body) + words(doc.summary.lead) + words(doc.appendix), figures: figs.length, cited: Object.keys(usedKeys).length },
+      stats: { authors: authors.length, notes: notes, words: words(doc.body) + words(doc.summary.lead) + words(doc.appendix), figures: figs.length, cited: Object.keys(usedKeys).length },
       runningLeft: 'White paper No. ' + (clean(m.number) || '000'), shortTitle: shortTitle
     };
   }
@@ -2110,6 +2139,19 @@ var WP = (function () {
   }
   function pad2x(n) { var h = Math.max(0, Math.min(255, n)).toString(16); return h.length < 2 ? '0' + h : h; }
   function cssStr(s) { return String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, ' '); }
+  // Jane Doe; Jane Doe and John Roe; Jane Doe, John Roe, and Ann Lee.
+  function andList(list) {
+    if (list.length < 3) return list.join(' and ');
+    return list.slice(0, -1).join(', ') + ', and ' + list[list.length - 1];
+  }
+  // Authors for "Cite as", in Chicago bibliography form: the first name inverted, the rest as
+  // written; more than six authors give the first three and "et al."
+  function citeNames(list) {
+    var n = list.map(function (a, i) { return i === 0 && !a.org ? invertName(a.name) : clean(a.name); });
+    if (n.length > 6) return n.slice(0, 3).join(', ') + ', et al.';
+    if (n.length === 1) return n[0];
+    return n.slice(0, -1).join(', ') + ', and ' + n[n.length - 1];
+  }
   function invertName(name) {
     var n = clean(name);
     if (!n || /[,\[\]&]| and /.test(n)) return n;
@@ -2130,7 +2172,7 @@ var WP = (function () {
   return {
     useCiter: useCiter, defaults: defaults, normalize: normalize, render: render, blocks: blocks, inline: inline, parseData: parseData, parseNumber: parseNumber,
     chartSvg: chartSvg, plainText: plainText, splitLead: splitLead, importOsintList: importOsintList, keyFor: keyFor, sourceLabel: sourceLabel, projectFile: projectFile, parseProject: parseProject,
-    VISUAL_KINDS: VISUAL_KINDS, MONTHS: MONTHS, PAPER_ACCENT: PAPER_ACCENT, BRIEF_ACCENT: BRIEF_ACCENT, SOURCES_NOTE: SOURCES_NOTE, slug: slug, words: words, invertName: invertName
+    andList: andList, citeNames: citeNames, VISUAL_KINDS: VISUAL_KINDS, MONTHS: MONTHS, PAPER_ACCENT: PAPER_ACCENT, BRIEF_ACCENT: BRIEF_ACCENT, SOURCES_NOTE: SOURCES_NOTE, slug: slug, words: words, invertName: invertName
   };
 })();
 if (typeof module !== 'undefined') module.exports = WP;
@@ -2147,7 +2189,7 @@ if (typeof module !== 'undefined') module.exports = WP;
   function monthYear() { var d = new Date(); return WP.MONTHS[d.getMonth()] + ' ' + d.getFullYear(); }
   function starter() {
     var d = WP.defaults();
-    Object.assign(d.meta, { title: '[Paper title: the question or the claim, in ten words or fewer]', subtitle: '[Subtitle: the scope, the period, or the method.]', author: '[Author name]', date: monthYear(), shortTitle: '[Short title]', publisher: '[Publisher]', site: '[Website]' });
+    Object.assign(d.meta, { title: '[Paper title: the question or the claim, in ten words or fewer]', subtitle: '[Subtitle: the scope, the period, or the method.]', date: monthYear(), shortTitle: '[Short title]', publisher: '[Publisher]', site: '[Website]' });
     d.aboutSeries = '[Two or three sentences: what the papers cover, who writes them, and how often a new one appears.]\n\nEach paper is numbered, dated, and versioned. When a paper is revised, its version number changes and the change is logged on the back page.';
     d.summary = {
       lead: '[The problem in two sentences: what is happening, and why it will still matter in five years.]',
@@ -2187,7 +2229,8 @@ if (typeof module !== 'undefined') module.exports = WP;
       { id: 'key-numbers', kind: 'stats', title: '', subtitle: '', source: '', note: '', data: '[00], [What this number measures, with unit and year]\n[00], [A second figure that puts the first in proportion]\n[00], [A third figure, or the comparison that surprised you]', highlight: '', image: '', wide: false },
       { id: 'table-compare', kind: 'table', title: '[Table title: what is being compared]', subtitle: '', source: '[Source: dataset or document, publisher, year. Note any gaps.]', note: '', data: 'Actor or system,Attribute,Year,Count\n[Row label],[Text value],[YYYY],[000]\n[Row label],[Text value],[YYYY],[000]\n[Row label],[Text value],[YYYY],[000]', highlight: '', image: '', wide: false }
     ];
-    d.back = { include: true, bio: '[Two-sentence biography: background, and what qualifies the author to write this paper.]', history: '1.0 | [Month DD, YYYY] | First publication', series: '001 | [This paper\'s title] | This paper\n002 | [Forthcoming title] | [Month YYYY]\n003 | [Forthcoming title] | [Month YYYY]', license: '[Reuse and licensing terms]' };
+    d.authors = [{ name: '[Author name]', bio: '[Two-sentence biography: background, and what qualifies the author to write this paper.]', org: false }];
+    d.back = { include: true, history: '1.0 | [Month DD, YYYY] | First publication', series: '001 | [This paper\'s title] | This paper\n002 | [Forthcoming title] | [Month YYYY]\n003 | [Forthcoming title] | [Month YYYY]', license: '[Reuse and licensing terms]' };
     return d;
   }
 
@@ -2251,7 +2294,7 @@ if (typeof module !== 'undefined') module.exports = WP;
     $('coverInfo').textContent = doc.meta.coverImage ? 'Image chosen.' : 'No image.';
     $('bcoverInfo').textContent = doc.meta.coverImage ? 'Photo chosen.' : 'No photo yet.';
     applyKind();
-    renderVisualList(); renderSources();
+    renderAuthors(); renderVisualList(); renderSources();
   }
   Array.prototype.forEach.call(document.querySelectorAll('[data-k]'), function (el) {
     el.addEventListener(el.type === 'checkbox' || el.tagName === 'SELECT' || el.type === 'color' ? 'change' : 'input', function () {
@@ -2271,7 +2314,7 @@ if (typeof module !== 'undefined') module.exports = WP;
 
   // ------------------------------------------------------------------ writing toolbar
   function insert(ta, before, after, placeholder) {
-    ta = ta || lastTarget || $('t-body');
+    ta = ta || (lastTarget && document.contains(lastTarget) ? lastTarget : $('t-body'));
     var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value, sel = v.slice(s, e) || placeholder || '';
     ta.focus();
     ta.setRangeText(before + sel + (after || ''), s, e, 'end');
@@ -2402,6 +2445,7 @@ if (typeof module !== 'undefined') module.exports = WP;
           Object.keys(next.summary).forEach(function (f) { if (!doc.summary[f].trim()) doc.summary[f] = next.summary[f]; });
           ['appendix', 'aboutSeries'].forEach(function (f) { if (!doc[f].trim()) doc[f] = next[f]; });
           Object.keys(next.back).forEach(function (f) { if (doc.back[f] === '' || f === 'include') doc.back[f] = next.back[f]; });
+          if (!doc.authors.length) doc.authors = next.authors;
         }
       }
       var was = String(doc.meta.accent || '').toUpperCase();
@@ -2439,6 +2483,45 @@ if (typeof module !== 'undefined') module.exports = WP;
   $('coverClear').addEventListener('click', function () { doc.meta.coverImage = ''; $('coverInfo').textContent = 'No image.'; changed(true); });
   $('bcoverPick').addEventListener('click', function () { $('coverFile').click(); });
   $('bcoverClear').addEventListener('click', function () { doc.meta.coverImage = ''; $('bcoverInfo').textContent = 'No photo yet.'; changed(true); });
+
+  // ------------------------------------------------------------------ authors
+  function renderAuthors() {
+    var box = $('authorList'), focusName = null; box.textContent = '';
+    doc.authors.forEach(function (a, i) {
+      var card = document.createElement('div'); card.className = 'author';
+      var top = document.createElement('div'); top.className = 'top';
+      var num = document.createElement('span'); num.className = 'num'; num.textContent = String(i + 1);
+      var name = document.createElement('input'); name.type = 'text'; name.className = 'nm'; name.value = a.name; name.placeholder = 'Name, as it should print';
+      name.setAttribute('aria-label', 'Author ' + (i + 1) + ' name');
+      name.addEventListener('input', function () { a.name = name.value; changed(); });
+      var btn = function (label, title, fn, dis) { var b = document.createElement('button'); b.type = 'button'; b.className = 'btn small quiet'; b.textContent = label; b.title = title; b.disabled = !!dis; b.addEventListener('click', fn); return b; };
+      var move = function (d) { return function () { var j = i + d; doc.authors.splice(i, 1); doc.authors.splice(j, 0, a); renderAuthors(); changed(true); var c = $('authorList').children[j]; if (c) c.querySelector('.nm').focus(); }; };
+      var up = btn('\u2191', 'Move up', move(-1), i === 0), down = btn('\u2193', 'Move down', move(1), i === doc.authors.length - 1);
+      up.setAttribute('aria-label', 'Move ' + (a.name || 'author ' + (i + 1)) + ' up'); down.setAttribute('aria-label', 'Move ' + (a.name || 'author ' + (i + 1)) + ' down');
+      var del = btn('Remove', 'Remove this author', null); del.classList.add('danger');
+      var armed = false;
+      del.addEventListener('click', function () {
+        if (!armed) { armed = true; del.textContent = 'Click again to remove'; setTimeout(function () { armed = false; del.textContent = 'Remove'; }, 3000); return; }
+        doc.authors.splice(doc.authors.indexOf(a), 1); renderAuthors(); changed(true);
+      });
+      top.appendChild(num); top.appendChild(name); top.appendChild(up); top.appendChild(down); top.appendChild(del);
+      var bio = document.createElement('textarea'); bio.rows = 3; bio.value = a.bio; bio.placeholder = 'Biography: two sentences on background, and what qualifies this author to write the paper.';
+      bio.setAttribute('aria-label', 'Biography of ' + (a.name || 'author ' + (i + 1)));
+      bio.addEventListener('input', function () { a.bio = bio.value; changed(); });
+      bio.addEventListener('focus', function () { lastTarget = bio; });
+      var orgL = document.createElement('label'); orgL.className = 'check';
+      var org = document.createElement('input'); org.type = 'checkbox'; org.checked = !!a.org;
+      org.addEventListener('change', function () { a.org = org.checked; changed(true); });
+      var orgS = document.createElement('span'); orgS.textContent = 'An organization: keep the name as written in "Cite as"';
+      orgL.appendChild(org); orgL.appendChild(orgS);
+      card.appendChild(top); card.appendChild(bio); card.appendChild(orgL);
+      box.appendChild(card);
+    });
+  }
+  $('addAuthor').addEventListener('click', function () {
+    doc.authors.push({ name: '', bio: '', org: false }); renderAuthors();
+    var cards = $('authorList').children; cards[cards.length - 1].querySelector('.nm').focus();
+  });
 
   // ------------------------------------------------------------------ visuals
   var KIND_HELP = {
@@ -2555,14 +2638,14 @@ if (typeof module !== 'undefined') module.exports = WP;
         ['body', 'appendix'].forEach(function (k) { doc[k] = doc[k].replace(re, '@' + nk); });
         ['lead', 'findings', 'recommendations'].forEach(function (k) { doc.summary[k] = doc.summary[k].replace(re, '@' + nk); });
         doc.visuals.forEach(function (v) { ['title', 'subtitle', 'source', 'note', 'data'].forEach(function (k) { v[k] = String(v[k] || '').replace(re, '@' + nk); }); });
-        doc.back.bio = doc.back.bio.replace(re, '@' + nk);
+        doc.authors.forEach(function (a) { a.bio = a.bio.replace(re, '@' + nk); });
         s.key = nk; fillFields(); changed();
       });
       var acts = document.createElement('div'); acts.className = 'acts';
       var cite = document.createElement('button'); cite.type = 'button'; cite.className = 'btn small primary'; cite.textContent = 'Cite';
       cite.title = 'Insert [@' + s.key + '] where your cursor was';
       cite.addEventListener('click', function () {
-        var ta = lastTarget || $('t-body');
+        var ta = lastTarget && document.contains(lastTarget) ? lastTarget : $('t-body');
         var tab = ta.closest('[data-pane]').getAttribute('data-pane'); showTab(tab);
         insert(ta, '[@' + s.key + ']', '');
         setStatus('Cited @' + s.key + '. Add a page inside the brackets: [@' + s.key + ', p. 12].');

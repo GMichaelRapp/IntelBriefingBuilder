@@ -429,13 +429,15 @@ var WP = (function () {
       meta: {
         kind: 'paper', briefName: '', colophon: '', citeMarks: true, matterLabel: 'So, why does this matter?', sourcesNote: SOURCES_NOTE,
         series: 'White paper series', masthead: 'White Paper', tagline: 'Cybersecurity\nGeopolitics\nMilitary affairs',
-        number: '001', date: '', version: '1.0', versionNote: 'first edition', title: '', subtitle: '', author: '', shortTitle: '',
+        number: '001', date: '', version: '1.0', versionNote: 'first edition', title: '', subtitle: '', shortTitle: '',
         publisher: '', site: '', url: '', accent: '', paper: 'tinted', coverImage: '', coverCaption: '', sectionBreaks: true
       },
       summary: { lead: '', findings: '', recommendations: '' },
+      // Each author: { name, bio, org }. org keeps an organization's name as written in "Cite as".
+      authors: [],
       aboutSeries: '',
       body: '', appendix: '',
-      back: { include: true, bio: '', history: '', series: '', license: '' },
+      back: { include: true, history: '', series: '', license: '' },
       visuals: [], sources: []
     };
   }
@@ -447,6 +449,14 @@ var WP = (function () {
       Object.keys(d[k]).forEach(function (f) { if (typeof src[f] === typeof d[k][f]) d[k][f] = src[f]; });
     });
     if (d.meta.kind !== 'brief') d.meta.kind = 'paper';
+    if (Array.isArray(doc.authors)) d.authors = doc.authors.filter(function (a) { return a && typeof a === 'object'; }).map(function (a) {
+      return { name: String(a.name == null ? '' : a.name), bio: String(a.bio == null ? '' : a.bio), org: !!a.org };
+    }).filter(function (a) { return clean(a.name) || clean(a.bio); }).slice(0, 40);
+    // Projects from before version 1.3 had one author under Paper and one biography on the back page.
+    if (!d.authors.length) {
+      var oldName = doc.meta && typeof doc.meta.author === 'string' ? doc.meta.author : '', oldBio = doc.back && typeof doc.back.bio === 'string' ? doc.back.bio : '';
+      if (clean(oldName) || clean(oldBio)) d.authors = [{ name: oldName, bio: oldBio, org: false }];
+    }
     ['aboutSeries', 'body', 'appendix'].forEach(function (k) { if (typeof doc[k] === 'string') d[k] = doc[k]; });
     if (Array.isArray(doc.visuals)) d.visuals = doc.visuals.filter(function (v) { return v && typeof v.id === 'string' && VISUAL_KINDS[v.kind]; }).map(function (v) {
       return { id: v.id.slice(0, 60), kind: v.kind, title: String(v.title || ''), subtitle: String(v.subtitle || ''), source: String(v.source || ''), note: String(v.note || ''),
@@ -567,7 +577,10 @@ var WP = (function () {
 
     var title = clean(m.title) || 'Untitled paper', shortTitle = clean(m.shortTitle) || title;
     if (!clean(m.title)) problem('fix', 'The paper has no title yet. Fill it in under Paper.', 'paper');
-    if (!clean(m.author)) problem('check', 'No author is given. Fill it in under Paper.', 'paper');
+    var authors = doc.authors.filter(function (a) { return clean(a.name); }), names = authors.map(function (a) { return clean(a.name); });
+    if (!authors.length) problem('check', 'No author is given. Add one under Paper.', 'paper');
+    if (doc.back.include) authors.forEach(function (a) { if (!clean(a.bio)) problem('note', 'No biography for ' + clean(a.name) + '. Add one under Paper, or leave it: the back page then gives the name alone.', 'paper'); });
+    if (doc.authors.some(function (a) { return !clean(a.name) && clean(a.bio); })) problem('check', 'A biography under Paper has no author name with it.', 'paper');
     if (!clean(m.date)) problem('check', 'No date is given for the cover. Fill it in under Paper.', 'paper');
     if (clean(m.title) && words(m.title) > 12) problem('note', 'The template suggests a title of about ten words or fewer.', 'paper');
 
@@ -588,7 +601,6 @@ var WP = (function () {
     if (!clean(doc.body)) problem('fix', 'The body is empty.', 'body');
     var appHtml = clean(doc.appendix) ? flow(doc.appendix, true) : '';
     doc.visuals.forEach(function (v) { if (!usedVis[v.id]) problem('note', 'The visual [[' + v.id + ']] is not placed in the text yet.', 'visuals'); });
-    doc.sources.forEach(function (s) { if (!usedKeys[s.key]) problem('note', 'Source @' + s.key + ' is not cited.', 'sources'); });
 
     // Cover.
     var tag = lines(m.tagline).slice(0, 4), mast = clean(m.masthead);
@@ -602,7 +614,7 @@ var WP = (function () {
       + '<div class="cv-no">White paper No. ' + esc(clean(m.number) || '000') + '</div>'
       + '<h1 class="cv-title">' + fmtText(title) + '</h1>'
       + (clean(m.subtitle) ? '<div class="cv-sub">' + fmtText(m.subtitle) + '</div>' : '')
-      + '<div class="cv-meta">' + (clean(m.author) ? '<div><div class="k">Author</div><div class="v">' + fmtText(clean(m.author)) + '</div></div>' : '')
+      + '<div class="cv-meta">' + (authors.length ? '<div class="who"><div class="k">' + (authors.length > 1 ? 'Authors' : 'Author') + '</div><div class="v">' + andList(names.map(function (x) { return '<span class="nm">' + fmtText(x) + '</span>'; })) + '</div></div>' : '')
       + (clean(ver) ? '<div><div class="k">Version</div><div class="v">' + esc(ver) + '</div></div>' : '')
       + '<div><div class="k">Length</div><div class="v"><span class="cover-length">—</span> pages</div></div></div>'
       + (m.coverImage && safeImage(m.coverImage) ? '<figure class="cv-img"><img src="' + safeImage(m.coverImage) + '" alt="">' + (clean(m.coverCaption) ? '<figcaption>' + fmtText(m.coverCaption) + '</figcaption>' : '') + '</figure>' : '')
@@ -614,10 +626,12 @@ var WP = (function () {
     if (b.include) {
       var hist = lines(b.history).map(function (l) { return l.split('|').map(clean); });
       var ser = lines(b.series).map(function (l) { return l.split('|').map(clean); });
-      var cite = (clean(m.author) ? fmtText(invertName(m.author)) + '. ' : '') + '“' + fmtText(title) + '.” <i>White Paper</i> No. ' + esc(clean(m.number) || '000') + ', version ' + esc(clean(m.version) || '1.0') + '. '
+      var cite = (authors.length ? fmtText(citeNames(authors)).replace(/\.$/, '') + '. ' : '') + '“' + fmtText(title) + '.” <i>White Paper</i> No. ' + esc(clean(m.number) || '000') + ', version ' + esc(clean(m.version) || '1.0') + '. '
         + (clean(m.publisher) ? esc(clean(m.publisher)) + ', ' : '') + esc(dateTxt || 'n.d.') + '.' + (safeUrl(m.url) ? ' ' + esc(safeUrl(m.url)) + '.' : (clean(m.site) ? ' ' + esc(clean(m.site)) + '.' : ''));
       backHtml = '<section class="back"><h2 class="front" id="about" data-run="About this paper">About this paper</h2>'
-        + (clean(m.author) || clean(b.bio) ? '<div class="brow"><div class="gut">Author</div><div class="bt"><b>' + fmtText(clean(m.author)) + '</b>' + (clean(b.bio) ? ' ' + inline(b.bio, ctx, false) : '') + '</div></div>' : '')
+        + (authors.length ? '<div class="brow"><div class="gut">' + (authors.length > 1 ? 'Authors' : 'Author') + '</div><div class="bt">' + authors.map(function (a) {
+          return '<div class="au"><b>' + fmtText(clean(a.name)) + '</b>' + (clean(a.bio) ? ' ' + inline(a.bio, ctx, false) : '') + '</div>';
+        }).join('') + '</div></div>' : '')
         + '<div class="brow"><div class="gut">Cite as</div><div class="bt">' + cite + '</div></div>'
         + (hist.length ? '<div class="brow"><div class="gut">Version history</div><div class="bt"><table class="dtable"><thead><tr><th>Version</th><th>Date</th><th>Change</th></tr></thead><tbody>' + hist.map(function (r) { return '<tr><td class="code">' + esc(r[0] || '') + '</td><td>' + esc(r[1] || '') + '</td><td>' + fmtText(r[2] || '') + '</td></tr>'; }).join('') + '</tbody></table></div></div>' : '')
         + (ser.length ? '<div class="brow"><div class="gut">In this series</div><div class="bt series">' + ser.map(function (r) { return '<div class="sr"><span class="code">No. ' + esc(r[0] || '') + '</span><span class="st">' + fmtText(r[1] || '') + '</span><span class="sw">' + fmtText(r[2] || '') + '</span></div>'; }).join('') + '</div></div>' : '')
@@ -627,6 +641,8 @@ var WP = (function () {
       toc.push({ level: 0, num: '', title: 'About this paper', anchor: 'about' });
     }
 
+    // Checked after the back page, whose biographies can cite sources too.
+    doc.sources.forEach(function (s) { if (!usedKeys[s.key]) problem('note', 'Source @' + s.key + ' is not cited.', 'sources'); });
     // Contents, built last because it needs every heading and figure.
     var tocRows = (hasSummary ? [{ level: 0, num: '', title: 'Executive summary', anchor: 'summary' }] : []).concat(toc);
     var contents = '<section class="contents' + (!hasSummary && !m.sectionBreaks ? ' endbreak' : '') + '"><h2 class="front" id="contents" data-run="Contents">Contents</h2><ol class="toc">'
@@ -722,7 +738,7 @@ var WP = (function () {
     var html = '<div class="wp">' + cover + contents + sumHtml + '<section class="wp-body">' + bodyHtml + '</section>' + (appHtml ? '<section class="wp-appendix">' + appHtml + '</section>' : '') + backHtml + '</div>';
     return {
       html: html, vars: vars + running, problems: problems,
-      stats: { notes: notes, words: words(doc.body) + words(doc.summary.lead) + words(doc.appendix), figures: figs.length, cited: Object.keys(usedKeys).length },
+      stats: { authors: authors.length, notes: notes, words: words(doc.body) + words(doc.summary.lead) + words(doc.appendix), figures: figs.length, cited: Object.keys(usedKeys).length },
       runningLeft: 'White paper No. ' + (clean(m.number) || '000'), shortTitle: shortTitle
     };
   }
@@ -737,6 +753,19 @@ var WP = (function () {
   }
   function pad2x(n) { var h = Math.max(0, Math.min(255, n)).toString(16); return h.length < 2 ? '0' + h : h; }
   function cssStr(s) { return String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, ' '); }
+  // Jane Doe; Jane Doe and John Roe; Jane Doe, John Roe, and Ann Lee.
+  function andList(list) {
+    if (list.length < 3) return list.join(' and ');
+    return list.slice(0, -1).join(', ') + ', and ' + list[list.length - 1];
+  }
+  // Authors for "Cite as", in Chicago bibliography form: the first name inverted, the rest as
+  // written; more than six authors give the first three and "et al."
+  function citeNames(list) {
+    var n = list.map(function (a, i) { return i === 0 && !a.org ? invertName(a.name) : clean(a.name); });
+    if (n.length > 6) return n.slice(0, 3).join(', ') + ', et al.';
+    if (n.length === 1) return n[0];
+    return n.slice(0, -1).join(', ') + ', and ' + n[n.length - 1];
+  }
   function invertName(name) {
     var n = clean(name);
     if (!n || /[,\[\]&]| and /.test(n)) return n;
@@ -757,7 +786,7 @@ var WP = (function () {
   return {
     useCiter: useCiter, defaults: defaults, normalize: normalize, render: render, blocks: blocks, inline: inline, parseData: parseData, parseNumber: parseNumber,
     chartSvg: chartSvg, plainText: plainText, splitLead: splitLead, importOsintList: importOsintList, keyFor: keyFor, sourceLabel: sourceLabel, projectFile: projectFile, parseProject: parseProject,
-    VISUAL_KINDS: VISUAL_KINDS, MONTHS: MONTHS, PAPER_ACCENT: PAPER_ACCENT, BRIEF_ACCENT: BRIEF_ACCENT, SOURCES_NOTE: SOURCES_NOTE, slug: slug, words: words, invertName: invertName
+    andList: andList, citeNames: citeNames, VISUAL_KINDS: VISUAL_KINDS, MONTHS: MONTHS, PAPER_ACCENT: PAPER_ACCENT, BRIEF_ACCENT: BRIEF_ACCENT, SOURCES_NOTE: SOURCES_NOTE, slug: slug, words: words, invertName: invertName
   };
 })();
 if (typeof module !== 'undefined') module.exports = WP;

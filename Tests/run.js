@@ -108,6 +108,24 @@ eq(WP.invertName('Jane Q. Doe') + '|' + WP.invertName('Doe, Jane') + '|' + WP.in
 eq(['Highly Reliable', 'Not Usually Reliable', 'Unknown', 'Confirmed', 'Probable', 'Possible', 'No basis for judging the claim either way.'].every((x) => WP.render(paper({ appendix: '# M\n\n[[rating-key]]' })).html.includes(x)), true, 'rating key: uses the OSINT Style Guide\'s grades and wording');
 eq(/Published by/.test(WP.render(Object.assign(paper(), { meta: Object.assign(WP.defaults().meta, { title: 'T' }) })).html), false, 'cover: no publisher line unless one is given');
 
+// ---- 5b. Several authors ----
+const three = [{ name: 'Jane Doe', bio: 'Jane writes on navies [@typed].' }, { name: 'John Roe', bio: 'John studies logistics.' }, { name: 'RAND Corporation', bio: '', org: true }];
+r = WP.render(paper({ authors: three, body: '# A\n\nText.', back: { include: true, history: '', series: '', license: '' } }));
+eq(strip((r.html.match(/<div class="who">([\s\S]*?)<\/div><\/div>/) || ['', ''])[1]), 'AuthorsJane Doe, John Roe, and RAND Corporation', 'authors: the cover lists every author, joined with "and"');
+eq(strip((r.html.match(/Cite as<\/div><div class="bt">([\s\S]*?)<\/div>/) || [])[1] || '').startsWith('Doe, Jane, John Roe, and RAND Corporation. “Test Paper.”'), true, 'authors: cite as inverts only the first name, and never an organization');
+const aus = (r.html.match(/<div class="au">[\s\S]*?<\/div>/g) || []).map(strip);
+eq(aus.length + '|' + aus[1] + '|' + aus[2], '3|John Roe John studies logistics.|RAND Corporation', 'authors: each name and biography on the back page, in order');
+eq(/navies<span class="fn">/.test(r.html), true, 'authors: a citation in a biography becomes a footnote');
+eq(r.problems.some((p) => /@typed is not cited/.test(p.msg)), false, 'authors: a source cited only in a biography counts as cited');
+eq(r.problems.some((p) => p.level === 'note' && /No biography for RAND Corporation/.test(p.msg)), true, 'authors: a missing biography is noted');
+eq(WP.citeNames([{ name: 'Jane Doe' }, { name: 'John Roe' }]), 'Doe, Jane, and John Roe', 'authors: two authors for cite as');
+eq(WP.citeNames('ABCDEFG'.split('').map((c) => ({ name: c + ' Smith' }))), 'Smith, A, B Smith, C Smith, et al.', 'authors: more than six give the first three and et al.');
+eq(strip((WP.render(paper({ authors: [{ name: 'Jane Doe', bio: '' }], body: '# A' })).html.match(/<div class="who">([\s\S]*?)<\/div><\/div>/) || ['', ''])[1]), 'AuthorJane Doe', 'authors: one author is labeled Author');
+eq(WP.render(paper({ authors: [], meta: Object.assign(WP.defaults().meta, { title: 'T' }), body: '# A' })).problems.some((p) => /No author is given/.test(p.msg)), true, 'authors: no author is flagged');
+const old = WP.normalize({ meta: { title: 'Old', author: 'Jane Doe' }, back: { bio: 'Old bio.' } });
+eq(JSON.stringify(old.authors), '[{"name":"Jane Doe","bio":"Old bio.","org":false}]', 'project file: a paper from before 1.3 keeps its author and biography');
+eq(WP.parseProject(WP.projectFile(paper({ authors: three }))).doc.authors.map((a) => a.name + (a.org ? '*' : '')).join('|'), 'Jane Doe|John Roe|RAND Corporation*', 'project file: authors save and reopen in order');
+
 // ---- 6. Project files ----
 const d0 = paper({ body: '# A\n\nText.', visuals: [{ id: 'img', kind: 'image', image: 'data:image/png;base64,iVBORw0KGgo=' }, { id: 'bad', kind: 'image', image: 'javascript:alert(1)' }] });
 const back = WP.parseProject(WP.projectFile(d0));

@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.3 — October 2026
+
+- **Several authors.** Under Paper, each author now has a name and a biography of their own, in an order you set with the arrows.
+  - The cover lists them all ("Jane Doe, John Roe, and Ann Lee"), keeping each name on one line.
+  - "Cite as" follows Chicago bibliography form: only the first name is inverted, and more than six authors give the first three and "et al."
+  - Tick "An organization" to keep a name such as RAND Corporation as written.
+  - The "About this paper" page gives each author's biography in turn.
+- The author biography has moved from Back page to Paper, beside the author's name. Projects saved before 1.3 open with their author and biography in the new list.
+- Fixed: a source cited only in a biography was reported as not cited.
+
 ## 1.2 — October 2026
 
 - **Source numbers in the brief's text.** A citation, `[@key]`, now prints the source's number, raised and in gold, where it stands. The number matches the source's entry on the Sources page and links to it in the PDF. A source keeps its number each time it is cited; `[@one; @two]` prints both numbers.

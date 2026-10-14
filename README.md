@@ -27,17 +27,28 @@ The tabs on the left hold the paper. The pages on the right update as you type.
 
 | Tab | What goes there |
 |---|---|
-| **Paper** | Title, subtitle, author, date, paper number, version, short title for the footers, cover image, series and publisher details, the "About the series" box, accent color, and page color |
+| **Paper** | Title, subtitle, authors and their biographies, date, paper number, version, short title for the footers, cover image, series and publisher details, the "About the series" box, accent color, and page color |
 | **Summary** | The problem in brief, key findings (one per line), and recommendations (one per line) |
 | **Body** | The paper itself |
 | **Visuals** | Charts, tables, timelines, key numbers, and images |
 | **Appendix** | Appendices, with the same markup as the body |
 | **Sources** | Sources opened from OSINT Citation Generator list files |
-| **Back page** | Author biography, version history, the series list, and licensing terms |
+| **Back page** | Version history, the series list, and licensing terms |
 
 The panel above the pages lists anything to **fix**, **check**, or **note**. Click a line to go to the tab it concerns.
 
 A new paper starts from the template. Its guidance is in [square brackets]; replace it as you write.
+
+### Authors
+
+Under **Paper**, add each author with **+ Add an author**: a name and a short biography. Use the arrows to set the order. The order carries through to the cover, the "Cite as" line, and the "About this paper" page.
+
+- The cover lists every author: Jane Doe and John Roe; Jane Doe, John Roe, and Ann Lee.
+- "Cite as" follows Chicago bibliography form. Only the first name is inverted (Doe, Jane, John Roe, and Ann Lee). With more than six authors, it gives the first three and "et al."
+- Tick **An organization** for an author such as RAND Corporation, so its name is not inverted.
+- Each biography prints on the "About this paper" page under the author's name. Notes and citations work in biographies too.
+
+A paper saved before version 1.3 opens with its one author and biography already in the list.
 
 ### Writing the body
 

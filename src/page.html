@@ -82,6 +82,13 @@ body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-si
 #app .card .top { display: flex; align-items: center; gap: 8px; }
 #app .card .top .k { font-family: var(--mono); font-size: 12px; color: var(--muted); }
 #app .card .top .grow { flex: 1; }
+#app .authors { display: flex; flex-direction: column; gap: 8px; }
+#app .authors:empty { display: none; }
+#app .author { border: 1px solid var(--line); border-radius: 6px; background: var(--surface); padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+#app .author .top { display: flex; align-items: center; gap: 6px; }
+#app .author .top .nm { flex: 1 1 auto; }
+#app .author .top .num { font-family: var(--mono); font-size: 12px; color: var(--muted); min-width: 16px; }
+#app .author .check { font-size: 12.5px; }
 #app .srcs { display: flex; flex-direction: column; gap: 8px; }
 #app .src { border: 1px solid var(--line); border-radius: 6px; background: var(--surface); padding: 8px 10px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 10px; align-items: start; }
 #app .src .key { font-family: var(--mono); font-size: 12.5px; width: 100%; padding: 3px 6px; }
@@ -133,7 +140,7 @@ body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-si
 <body>
 <div id="app">
   <header class="bar">
-    <h1><span class="mk"></span>White Paper Builder <span class="ver">v1.2</span></h1>
+    <h1><span class="mk"></span>White Paper Builder <span class="ver">v1.3</span></h1>
     <span class="seg kind" role="radiogroup" aria-label="What you are making">
       <label><input type="radio" name="kind" id="kindPaper" value="paper" checked><span>White paper</span></label>
       <label><input type="radio" name="kind" id="kindBrief" value="brief"><span>Intelligence brief</span></label>
@@ -190,11 +197,12 @@ body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-si
           <h2>Cover</h2>
           <div class="field"><label for="m-title">Title</label><input type="text" id="m-title" data-k="meta.title" placeholder="The question or the claim, in ten words or fewer"></div>
           <div class="field"><label for="m-subtitle">Subtitle</label><input type="text" id="m-subtitle" data-k="meta.subtitle" placeholder="The scope, the period, or the method"></div>
+          <div class="field"><span class="label">Authors</span>
+            <div class="authors" id="authorList"></div>
+            <div><button type="button" class="btn small" id="addAuthor">+ Add an author</button></div>
+            <p class="hint">In the order they appear on the cover and in "Cite as". Biographies print on the "About this paper" page.</p></div>
           <div class="row">
-            <div class="field"><label for="m-author">Author</label><input type="text" id="m-author" data-k="meta.author" placeholder="G. Michael Rapp"></div>
             <div class="field"><label for="m-date">Date</label><input type="text" id="m-date" data-k="meta.date" placeholder="October 2026"></div>
-          </div>
-          <div class="row">
             <div class="field"><label for="m-number">Paper number</label><input type="text" id="m-number" data-k="meta.number" placeholder="001"></div>
             <div class="field"><label for="m-version">Version</label><input type="text" id="m-version" data-k="meta.version" placeholder="1.0"></div>
             <div class="field"><label for="m-versionNote">Version note</label><input type="text" id="m-versionNote" data-k="meta.versionNote" placeholder="first edition"></div>
@@ -275,11 +283,11 @@ body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-si
 
         <div class="pane" data-pane="back" hidden>
           <label class="check"><input type="checkbox" id="b-include" data-k="back.include"> <span>Add the "About this paper" page at the end</span></label>
-          <div class="field"><label for="b-bio">Author biography</label><textarea id="b-bio" data-k="back.bio" rows="3" placeholder="Two sentences: background, and what qualifies the author to write this paper."></textarea></div>
+          <p class="hint">Each author's biography is written under Paper, with the author's name.</p>
           <div class="field"><label for="b-history">Version history, one per line: version | date | change</label><textarea id="b-history" data-k="back.history" class="code" rows="3" placeholder="1.0 | October 13, 2026 | First publication"></textarea></div>
           <div class="field"><label for="b-series">In this series, one per line: number | title | status or date</label><textarea id="b-series" data-k="back.series" class="code" rows="4" placeholder="001 | This paper's title | This paper"></textarea></div>
           <div class="field"><label for="b-license">Reuse and licensing terms</label><input type="text" id="b-license" data-k="back.license" placeholder="© 2026 Publisher name. All rights reserved."></div>
-          <p class="hint">The "Cite as" line is built from the title, author, number, version, publisher, date, and link under Paper.</p>
+          <p class="hint">The "Cite as" line is built from the title, authors, number, version, publisher, date, and link under Paper.</p>
         </div>
       </div>
     </section>
