@@ -1,0 +1,178 @@
+/*
+ * The printed eBook. Paged.js reads this stylesheet instead of paper.css when the project
+ * is a book. The page size, margins, running heads, and text size come from the page
+ * script (core.js, renderBook), which knows the trim size chosen under Book:
+ *   --bk-fs, --bk-lh   text size and line height
+ *   --bk-w, --bk-h     the page, in px at 96 per inch
+ *   --bk-ch            the height of the text area
+ *   --wp-accent        the accent color
+ * Two faces: EB Garamond with Cormorant Garamond for titles (face-garamond), or IBM Plex
+ * Serif with Plex Sans Condensed (face-plex).
+ */
+.pagedjs_page { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+@page { background: #FFFFFF; @footnote { margin: 0; padding: 0; } }
+
+.bk { color: #1A1917; font-family: 'Garamond Body', 'EB Garamond', Garamond, Georgia, serif; font-size: var(--bk-fs); line-height: var(--bk-lh); font-kerning: normal; font-variant-ligatures: common-ligatures; hyphens: auto; -webkit-hyphens: auto; }
+.bk * { box-sizing: border-box; }
+.bk a { color: inherit; text-decoration: none; }
+.bk b { font-weight: 600; }
+.bk .missing { color: #A3271B; font-weight: 600; }
+.bk .display, .bk .ch-title, .bk .tp-title, .bk .ht, .bk .fm-h, .bk .pull, .bk .vtitle, .bk .stats-title, .bk .stat .big { font-family: 'Garamond Display', 'Cormorant Garamond', Garamond, serif; font-weight: 600; }
+.bk .ch-num, .bk .tp-series, .bk .tp-by, .bk .tp-pub, .bk .m-label, .bk .ktoc .lab, .bk .vlabel { font-size: 0.7em; line-height: 1.4; letter-spacing: 0.24em; text-transform: uppercase; color: var(--wp-accent); font-variant-numeric: oldstyle-nums; }
+
+/* The cover: the first page, drawn edge to edge. */
+.bk .bk-cover { width: var(--bk-w); height: calc(var(--bk-h) - 1px); overflow: hidden; break-after: page; background: #1F2124; }
+.bk .bk-cover svg { display: block; width: 100%; height: 100%; }
+
+/* Front matter: each on a page of its own, with no running heads or page numbers. */
+.bk .fm { page: front; break-before: page; }
+.bk .bk-half { text-align: center; }
+.bk .bk-half .ht { margin: calc(var(--bk-ch) * 0.26) 0 0; font-size: 1.75em; line-height: 1.15; text-wrap: balance; }
+.bk .bk-titlepage { min-height: var(--bk-ch); display: flex; flex-direction: column; align-items: center; text-align: center; }
+.bk .tp-series { margin: 0 0 calc(var(--bk-ch) * 0.1); }
+.bk .tp-title { margin: calc(var(--bk-ch) * 0.08) 0 0; font-size: 2.55em; line-height: 1.05; text-wrap: balance; }
+.bk .tp-sub { margin: 0.7em 0 0; font-style: italic; font-size: 1.15em; line-height: 1.35; text-wrap: balance; color: #3A3732; }
+.bk .tp-rule { width: 56px; height: 0; margin: 1.6em auto 1.4em; border-top: 2px solid var(--wp-accent); }
+.bk .tp-by { margin: 0; font-size: 0.82em; color: #1A1917; letter-spacing: 0.18em; }
+.bk .tp-foot { margin-top: auto; }
+.bk .tp-pub { margin: 0; color: #1A1917; letter-spacing: 0.2em; }
+.bk .tp-site { margin: 0.2em 0 0; font-size: 0.75em; color: #5A554D; }
+.bk .bk-copy { min-height: var(--bk-ch); display: flex; flex-direction: column; justify-content: flex-end; }
+.bk .cp { font-size: 0.72em; line-height: 1.5; color: #2C2A27; hyphens: manual; }
+.bk .cp p { margin: 0 0 0.85em; text-indent: 0; }
+.bk .cp a { text-decoration: underline; text-decoration-thickness: 0.5px; text-underline-offset: 2px; }
+.bk .cp .cp-title { font-size: 1.1em; }
+.bk .bk-ded { text-align: center; font-style: italic; }
+.bk .bk-ded .ded { margin: calc(var(--bk-ch) * 0.24) auto 0; max-width: 78%; }
+.bk .bk-ded p { margin: 0 0 0.6em; }
+.bk .bk-epi .epi { margin: calc(var(--bk-ch) * 0.2) 8% 0; font-style: italic; }
+.bk .epi p { margin: 0 0 0.6em; text-indent: 0; }
+.bk .epi .epi-by { margin-top: 0.8em; font-style: normal; text-align: right; font-size: 0.9em; }
+.bk .epi .epi-by i { font-style: italic; }
+
+/* Contents, with page numbers. */
+.bk .fm-h { margin: calc(var(--bk-ch) * 0.06) 0 1.2em; font-size: 1.9em; line-height: 1.1; text-align: center; }
+.bk .ktoc { list-style: none; margin: 0; padding: 0; }
+.bk .ktoc li { position: relative; margin: 0; padding: 0.32em 2.4em 0.32em 0; break-inside: avoid; }
+.bk .ktoc li a { display: block; text-wrap: pretty; }
+.bk .ktoc li a::after { content: target-counter(attr(href), page); position: absolute; right: 0; top: 0.32em; font-variant-numeric: oldstyle-nums; }
+.bk .ktoc .lab { display: block; font-size: 0.62em; }
+.bk .ktoc li.t-part { margin-top: 0.9em; padding-top: 0.6em; border-top: 1px solid #E2DED4; }
+.bk .ktoc li.t-part .tt { font-family: 'Garamond Display', 'Cormorant Garamond', Garamond, serif; font-weight: 600; font-size: 1.12em; }
+.bk .ktoc li.in-part { padding-left: 1.2em; }
+.bk .ktoc li.t-back { margin-top: 0.2em; font-style: italic; }
+
+/* Parts and chapters. Each starts a new page (a right-hand page, when chosen under Book). */
+.bk .bk-unit { page: chapter; break-before: page; }
+.bk.recto .bk-unit.k-chapter, .bk.recto .bk-unit.k-part, .bk.recto .bk-unit.k-unnumbered { break-before: right; }
+.bk .bk-unit.k-part { page: part; text-align: center; }
+.bk .ch-head { padding-top: calc(var(--bk-ch) * 0.13); margin: 0 0 2.2em; text-align: center; break-after: avoid; }
+.bk .k-part .ch-head { padding-top: calc(var(--bk-ch) * 0.3); }
+.bk .ch-num { margin: 0 0 0.9em; }
+.bk .ch-title { margin: 0; font-size: 2em; line-height: 1.1; text-wrap: balance; string-set: chapter attr(data-run); }
+.bk .k-part .ch-title { font-size: 2.35em; }
+.bk .ch-head::after { content: ''; display: block; width: 44px; margin: 1.1em auto 0; border-top: 1.5px solid var(--wp-accent); }
+.bk .k-back .ch-head { padding-top: calc(var(--bk-ch) * 0.08); }
+
+/* Text. Indented paragraphs by default; the first after a heading, break, or box is flush. */
+.bk-unit p { margin: 0; orphans: 2; widows: 2; text-wrap: pretty; }
+.bk.para-indent .bk-unit p + p { text-indent: 1.4em; }
+.bk.para-indent .bk-unit p.scene + p, .bk.para-indent .bk-unit p.pull + p, .bk.para-indent .bk-unit p.aside + p, .bk.para-indent .bk-unit p.scene, .bk.para-indent .bk-unit p.pull, .bk.para-indent .bk-unit p.aside, .bk.para-indent .bk-unit p.fnote, .bk.para-indent .bk-unit .matter p, .bk.para-indent .bk-unit .au p { text-indent: 0; }
+.bk.para-block .bk-unit p { margin-bottom: 0.75em; }
+.bk [data-split-from] { text-indent: 0 !important; }
+.bk p.opener::first-line { font-variant: small-caps; letter-spacing: 0.04em; }
+.bk p.opener[data-split-from]::first-line { font-variant: normal; letter-spacing: 0; }
+.bk .bk-sec { margin: 1.5em 0 0.55em; font-family: 'Garamond Display', 'Cormorant Garamond', Garamond, serif; font-weight: 600; font-size: 1.32em; line-height: 1.2; break-after: avoid; text-wrap: balance; }
+.bk h4.minor { margin: 1.2em 0 0.3em; font-style: italic; font-weight: 400; font-size: 1em; break-after: avoid; }
+.bk blockquote { margin: 0.8em 1.4em; font-size: 0.93em; line-height: 1.5; }
+.bk blockquote p { text-indent: 0 !important; }
+.bk .scene { margin: 0.9em 0; text-align: center; color: var(--wp-accent); letter-spacing: 0.2em; break-after: avoid; }
+.bk .pull { margin: 1.1em 0.4em; padding: 0.6em 0; border-top: 1px solid var(--wp-accent); border-bottom: 1px solid var(--wp-accent); font-size: 1.3em; line-height: 1.3; text-align: center; text-wrap: balance; break-inside: avoid; }
+.bk .aside { margin: 0.8em 0; padding-left: 0.9em; border-left: 1px solid var(--wp-accent); font-size: 0.88em; line-height: 1.5; font-style: italic; color: #4A4640; }
+.bk .matter { margin: 1em 0 1.1em; padding: 0.1em 0 0.1em 1em; border-left: 3px solid var(--wp-accent); break-inside: avoid; }
+.bk .matter .m-label { margin: 0 0 0.45em; break-after: avoid; }
+.bk .matter p + p { margin-top: 0.55em; }
+.bk ul, .bk ol { margin: 0.6em 0 0.7em; padding-left: 1.5em; }
+.bk li { margin: 0 0 0.25em; }
+.bk li::marker { color: var(--wp-accent); }
+.bk .labeled { margin: 0.6em 0 0.9em; border-top: 1px solid #E2DED4; }
+.bk .labeled .li { display: grid; grid-template-columns: 4.2em minmax(0, 1fr); column-gap: 0.8em; padding: 0.4em 0; border-bottom: 1px solid #E2DED4; break-inside: avoid; }
+.bk .labeled .ll { color: var(--wp-accent); font-weight: 600; }
+.bk .pagebreak { break-after: page; }
+
+/* Figures, tables, timelines, and key numbers: full width, caption below. */
+.bk figure.vis { margin: 1.1em 0 1.2em; break-inside: avoid; }
+.bk .vtitle { margin: 0; padding-top: 0.5em; border-top: 1px solid var(--wp-accent); font-size: 1.15em; line-height: 1.25; }
+.bk .vsub { margin-top: 0.1em; font-style: italic; font-size: 0.85em; line-height: 1.4; color: #5A554D; }
+.bk .vbody > svg, .bk .vbody > table, .bk .vbody > ol, .bk .vbody > img, .bk .vbody > .vempty { margin-top: 0.6em; }
+.bk svg.chart { display: block; width: 100%; height: auto; overflow: visible; }
+.bk img.vimg { display: block; max-width: 100%; max-height: calc(var(--bk-ch) * 0.7); margin: 0 auto; }
+.bk figure.vis .gut { display: flex; flex-wrap: wrap; gap: 0.1em 0.9em; margin-top: 0.45em; font-size: 0.75em; line-height: 1.45; color: #5A554D; }
+.bk figure.vis .vlabel { font-size: 0.95em; }
+.bk figure.vis .vnote { flex-basis: 100%; font-style: italic; }
+.bk .vempty { padding: 1.2em; border: 1px dashed #A39C8D; color: #5A554D; font-style: italic; text-align: center; }
+.bk table.dtable { width: 100%; border-collapse: collapse; font-size: 0.82em; line-height: 1.4; hyphens: manual; }
+.bk .dtable th { padding: 0.35em 0.7em 0.35em 0; border-bottom: 1px solid #1A1917; text-align: left; font-weight: 600; vertical-align: bottom; }
+.bk .dtable td { padding: 0.35em 0.7em 0.35em 0; border-bottom: 1px solid #E2DED4; vertical-align: top; }
+.bk .dtable .n { text-align: right; font-variant-numeric: lining-nums tabular-nums; }
+.bk .dtable th:last-child, .bk .dtable td:last-child { padding-right: 0; }
+.bk .dtable tr.hot td { color: var(--wp-accent); font-weight: 600; }
+.bk .dtable .code { font-weight: 600; color: var(--wp-accent); }
+.bk figure.rating { break-inside: auto; }
+.bk figure.rating .gut { margin: 0 0 0.4em; }
+.bk .rating .rnote { margin: 0.5em 0 0; font-size: 0.85em; line-height: 1.45; text-indent: 0 !important; }
+.bk .rating .dtable { margin-top: 0.7em; font-size: 0.75em; break-inside: avoid; }
+.bk .rating .dtable .mean { width: 8em; font-weight: 600; }
+.bk .timeline { list-style: none; padding: 0; margin: 0.6em 0 0; }
+.bk .timeline li { display: grid; grid-template-columns: 6.5em minmax(0, 1fr); column-gap: 0.8em; margin: 0; padding: 0.35em 0; border-bottom: 1px solid #E2DED4; font-size: 0.85em; line-height: 1.4; }
+.bk .timeline .when { color: var(--wp-accent); font-weight: 600; }
+.bk .stats-wrap { margin: 1.1em 0 1.2em; break-inside: avoid; }
+.bk .stats-title { margin: 0 0 0.5em; font-size: 1.15em; }
+.bk .stats { display: grid; column-gap: 1em; }
+.bk .stat { padding-top: 0.5em; border-top: 2px solid var(--wp-accent); }
+.bk .stat .big { font-size: 2em; line-height: 1.1; font-variant-numeric: lining-nums; }
+.bk .stat .what { margin-top: 0.2em; font-size: 0.8em; line-height: 1.4; }
+.bk .stats-src { margin-top: 0.4em; font-size: 0.75em; color: #5A554D; }
+
+/* Notes at the foot of the page, numbered afresh in each chapter. */
+.fn { float: footnote; font-family: 'Garamond Body', Garamond, Georgia, serif; font-size: 11.5px; line-height: 16px; font-weight: 400; font-style: normal; letter-spacing: 0; text-transform: none; text-indent: 0; color: #2C2A27; margin: 0 0 3px; overflow-wrap: anywhere; hyphens: manual; }
+.fn::footnote-call { content: none; }
+.fn::footnote-marker { content: none; }
+.pagedjs_footnote_inner_content .fn { position: relative; display: block; padding-left: 18px; list-style: none; }
+.pagedjs_footnote_inner_content .fn::marker { content: none; }
+.pagedjs_footnote_inner_content .fn .fn-n { position: absolute; left: 0; top: 0; }
+a.fn[data-footnote-call] { display: inline; margin: 0; padding: 0; float: none; }
+.fn .fn-n { display: inline-block; min-width: 18px; color: var(--wp-accent); font-weight: 600; }
+.fn a.url { overflow-wrap: anywhere; }
+.bk .fn-call, .bk .en-call { font-size: 0.68em; line-height: 0; color: var(--wp-accent); vertical-align: super; margin-left: 1px; font-weight: 600; font-variant-numeric: lining-nums; }
+.pagedjs_footnote_content { padding-top: 8px; }
+.pagedjs_footnote_content::before { content: ''; display: block; width: 72px; margin-bottom: 6px; border-top: 1px solid var(--wp-accent); }
+.pagedjs_footnote_content.pagedjs_footnote_empty { padding-top: 0; }
+.pagedjs_footnote_content.pagedjs_footnote_empty::before { content: none; }
+
+/* Notes at the back of the book, under each chapter's name. */
+.bk .bk-notes .nt-h { margin: 1.3em 0 0.4em; font-family: 'Garamond Display', 'Cormorant Garamond', Garamond, serif; font-weight: 600; font-size: 1.1em; line-height: 1.25; break-after: avoid; }
+.bk .enotes { list-style: none; margin: 0; padding: 0; font-size: 0.82em; line-height: 1.45; }
+.bk .enotes li { position: relative; margin: 0 0 0.35em; padding-left: 1.9em; overflow-wrap: anywhere; }
+.bk .enotes .en-n, .bk .fnote .en-n { position: absolute; left: 0; color: var(--wp-accent); font-weight: 600; }
+.bk .notes-rule { width: 72px; margin: 1.2em 0 0.6em; border: 0; border-top: 1px solid var(--wp-accent); }
+.bk p.fnote { position: relative; padding-left: 1.9em; font-size: 0.82em; line-height: 1.45; text-indent: 0 !important; }
+
+/* About the authors. */
+.bk .bk-about .au { margin: 0 0 1.4em; }
+.bk .bk-about .au-name { margin: 0 0 0.35em; font-family: 'Garamond Display', 'Cormorant Garamond', Garamond, serif; font-weight: 600; font-size: 1.3em; line-height: 1.2; }
+.bk .bk-about .au p + p { margin-top: 0.6em; }
+
+/* The IBM Plex face, as in the white paper. */
+.bk.face-plex { font-family: 'Plex Serif', Georgia, serif; }
+.bk.face-plex .ch-title, .bk.face-plex .tp-title, .bk.face-plex .ht, .bk.face-plex .fm-h, .bk.face-plex .pull, .bk.face-plex .vtitle, .bk.face-plex .stats-title, .bk.face-plex .stat .big,
+.bk.face-plex .bk-sec, .bk.face-plex .ktoc li.t-part .tt, .bk.face-plex .nt-h, .bk.face-plex .au-name { font-family: 'Plex Sans Cond', 'Arial Narrow', sans-serif; font-weight: 700; letter-spacing: -0.005em; }
+.bk.face-plex .bk-sec { font-weight: 600; font-size: 1.2em; }
+.bk.face-plex .ch-num, .bk.face-plex .tp-series, .bk.face-plex .tp-by, .bk.face-plex .tp-pub, .bk.face-plex .m-label, .bk.face-plex .ktoc .lab, .bk.face-plex .vlabel, .bk.face-plex .ktoc li a::after { font-family: 'Plex Mono', monospace; font-weight: 500; letter-spacing: 0.12em; font-variant-numeric: normal; }
+.bk.face-plex .ch-title { font-size: 1.85em; }
+.bk.face-plex .tp-title { font-size: 2.3em; }
+.bk.face-plex .tp-sub, .bk.face-plex .bk-ded, .bk.face-plex .epi { font-style: italic; }
+.bk.face-plex p.opener::first-line { font-variant: normal; font-weight: 600; letter-spacing: 0; }
+.bk.face-plex .fn-call, .bk.face-plex .en-call { font-family: 'Plex Mono', monospace; }
+.bk.face-plex svg.chart text { font-family: 'Plex Mono', monospace; }
+.bk.face-garamond svg.chart text { font-family: 'Garamond Body', Garamond, serif; }

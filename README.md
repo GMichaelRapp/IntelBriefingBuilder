@@ -1,8 +1,108 @@
-# White Paper Builder
+# eBook Builder
 
-Write a white paper or an intelligence brief and get print-ready pages. You fill in the details and write the text with light markup. The tool lays it all out as US Letter pages. You save the result as a PDF through your browser's print dialog.
+Build an eBook for your readers to download and read offline, and save it two ways: as a **PDF**, laid out as book pages, and as an **ePUB**, the reflowable format reading apps use (Apple Books, Kobo, Google Play Books, Thorium, and Kindle through Send to Kindle). You fill in the details and write the text with light markup; the tool sets the pages.
 
-The switch at the top chooses which you are making: **White paper** or **Intelligence brief**. Both use the same sources, notes, and visuals; the brief is described under [Intelligence briefs](#intelligence-briefs).
+The switch at the top chooses what you are making: **eBook**, **White paper**, or **Intelligence brief**. All three share the same sources, notes, visuals, and markup. This is version 2 of the White Paper Builder; papers and briefs work exactly as before, and are described further down.
+
+It is one web page. There is nothing to install, no account, and nothing is sent anywhere.
+
+## eBooks
+
+A finished eBook has these parts, in this order:
+
+- a cover, designed under **Cover**
+- a half-title page (optional) and a title page
+- a copyright page with the colophon, edition, ISBN or ISSN, and credits, set small at the foot of the page
+- a dedication and an epigraph (both optional)
+- contents, with page numbers in the PDF
+- parts and chapters, each starting a new page
+- back matter: acknowledgments, appendices, a note on sources
+- notes at the back of the book (if you choose that)
+- an "About the author" page from the biographies
+
+In the PDF, left-hand pages carry the book's short title at the top and right-hand pages the chapter's title; page numbers sit at the outer corner. Front matter, part pages, and chapter openings carry no running heads.
+
+### The tabs
+
+| Tab | What goes there |
+|---|---|
+| **Book** | Title, subtitle, authors and biographies, date, series, language, front matter, the copyright page and colophon, the description and subjects reading apps show, and the layout: page size, typeface, chapter numbering, paragraph style, where notes go, accent color |
+| **Cover** | The cover designer, with a live preview |
+| **Chapters** | The book itself |
+| **Visuals** | Charts, tables, timelines, key numbers, and images, as in the white paper |
+| **Back matter** | Acknowledgments, appendices, a glossary: anything after the last chapter |
+| **Sources** | Your OSINT sources: open a list file, add or edit sources, cite them |
+
+### Writing the chapters
+
+| Type this | To get |
+|---|---|
+| `# Title` | A numbered chapter: Chapter One, Two, Three. Each starts a new page and is listed in the contents. |
+| `# Title {-}` | An unnumbered chapter: an introduction, preface, foreword, prologue, or epilogue |
+| `# Title {part}` | A part on a page of its own: Part One. The chapters after it belong to it in the contents. |
+| `## Title` | A section heading inside a chapter |
+| `### Title` | A small heading, in italics |
+| a blank line | A new paragraph. Paragraphs after the first are indented, as in a printed book, unless you choose spaced paragraphs. |
+| `* * *` | A scene break |
+| `^[note text]` | A note |
+| `[@key, p. 45]` | A cited source, in a note |
+| `> text` | A block quotation |
+| `!> text` | A pull quote, set large between rules |
+| `?> text` | A boxed aside, with the heading set under Book |
+| `>> text` | A short aside in italics |
+| `- item`, `1. item`, `{Label} text` | Lists and labeled rows |
+| `[[name]]` | A chart, table, or image from Visuals |
+| `---` | A new page in the PDF (the ePUB ignores it) |
+
+Italic, bold, and links work as everywhere else. Chapter numbers can be words (Chapter One), figures (Chapter 1), or roman (Chapter I), with any word before them, or none.
+
+Notes are numbered afresh in each chapter, and each chapter gives its first citation of a source in full, later ones in short form, so a reader who opens the book in the middle still finds full citations. In the PDF, notes print at the foot of the page or, if you choose, at the back of the book under each chapter's name, linked both ways. In the ePUB they go at the end of each chapter, marked so that reading apps that support it show them as pop-ups.
+
+### The cover
+
+Under **Cover**, choose a layout:
+
+- **Photo to every edge**, with the text on a dark fade. Place it low, in the middle, or high.
+- **Photo above, text on a band of color** below.
+- **Framed photo** between the title and the author.
+- **Type only**, on a background color.
+- **Finished artwork**: an image you designed elsewhere is the whole cover, with no text over it.
+
+Choose the image, then move it with **Across**, **Up and down**, and **Zoom**, and set how dark the fade is. You can change the title's face (Cormorant Garamond, EB Garamond, Plex Sans Condensed, or Plex Mono) and size, set it in capitals, align the text left or centered, set the background, text, and accent colors, add a line above the title (such as "A Global Warning Book"), and show or hide the subtitle, authors, and publisher. The title shrinks and wraps to fit.
+
+The cover is the first page of the PDF and the cover image of the ePUB. **Save the cover as an image** gives you a 1600-pixel-wide JPEG for a Substack post or a store listing.
+
+### Saving the PDF
+
+As for a white paper: **Print or save as PDF**, then **Save as PDF** in the print dialog. The page size comes from the book (6 × 9 in by default; also 5.5 × 8.5 in, A5, or US Letter for easy printing at home), so leave the paper size and margins at their defaults. The file is named after the book's title.
+
+Page numbers count from the cover, so the number printed on a page matches the page number your PDF reader shows.
+
+### Saving the ePUB
+
+Click **Save ePUB**. The file is an EPUB 3 package that passes the W3C's EPUBCheck with no errors or warnings. It holds:
+
+- the cover, drawn as a JPEG
+- the title page, copyright page, dedication, and epigraph
+- the contents, with parts holding their chapters, and the landmarks reading apps use for "Go to cover" and "Start reading"
+- each part, chapter, and back-matter page as its own file, marked as a chapter, part, preface, acknowledgments, appendix, and so on
+- charts, as drawings that stay sharp at any size, and images as files of their own
+- the book's typefaces (EB Garamond and Cormorant Garamond, or IBM Plex), which readers can turn off in their app's settings
+- the title, subtitle, authors, publisher, date, language, description, subjects, series, and an identifier: the ISBN if you give one, otherwise an ID the tool makes once and keeps with the project
+
+The layout reflows: text size, margins, and night mode stay under the reader's control.
+
+## Editing sources
+
+Under **Sources**, every source has an **Edit** button. For a source from an OSINT Citation Generator list, it opens that tool's fields here: the kind of source, authors, title and how it is set, location, description, details, reliability and credibility, publisher, dates, web address, locator, commentary, and, under **More**, editors, translators, contributors, translation, access, qualifiers, the archive link, and the short form. The full note, the short form, and the generator's own checks update as you type, and every note that cites the source follows. **Undo these changes** puts the source back as it was when you opened it.
+
+**New OSINT source** adds a source from scratch, in the same fields. Its key is made from its author and title when you click Done.
+
+**Save these sources as an OSINT list file** writes your sources, edits included, to a file the OSINT Citation Generator opens, so the generator and the builder stay in step.
+
+This works the same way in white papers and briefs.
+
+## White papers
 
 A finished paper has these parts:
 
@@ -111,7 +211,7 @@ Printing needs the page open in its own browser tab. Previews embedded inside ot
 
 ### Saving your work
 
-The paper is kept in this browser as you work. To keep a copy, or to move to another computer, use **Save project**. It saves a `.json` file with everything in it, images included; **Open project** brings it back.
+The project is kept in this browser as you work, separately from the White Paper and Intel Briefing builders, so having all of them on one site does not mix up their work. To keep a copy, or to move to another computer, use **Save project**. It saves a `.json` file with everything in it, images included; **Open project** brings it back.
 
 Clearing your browser's site data clears the paper in progress.
 
@@ -156,16 +256,20 @@ The page runs entirely in your browser and makes no network requests. The fonts 
 ## Known limits
 
 - A table that runs onto a second page does not repeat its header row there.
-- Printing is most faithful in Chrome and Edge.
+- Printing is most faithful in Chrome and Edge. Drawing the cover as an image for the ePUB also works best there; in a browser that refuses, the ePUB carries the cover as a drawing (SVG) instead.
+- Kindle does not open ePUB files directly; send the ePUB with Amazon's Send to Kindle, which converts it.
+- In the PDF, page numbers count from the cover rather than restarting at the first chapter.
 
 ## For maintainers
 
 `index.html` is built from the files in `src/`:
 
-- `src/core.js` turns a paper or a brief into HTML: notes, citations, numbering, charts, and the contents. It has no page and no browser code, so the tests run it directly.
+- `src/core.js` turns a paper, a brief, or a book into HTML: notes, citations, numbering, charts, and the contents. It also draws the book cover as SVG, writes the ePUB package (zip, package document, navigation, XHTML), and previews and saves edited OSINT sources. It has no page and no browser code, so the tests run it directly.
 - `src/paper.css` is the printed design of the white paper: page size and margins, the margin column, headings, footnotes, figures, cover, and back page. Paged.js reads it to lay out the pages.
 - `src/brief.css` is the printed design of the intelligence brief, used instead of `paper.css` for a brief.
-- `src/ui.js` is the editor: tabs, toolbar, visuals, sources, preview, files, and printing.
+- `src/book.css` is the printed design of the eBook. The page size, margins, and running heads come from `core.js`, which knows the trim size.
+- `src/epub.css` is the ePUB's stylesheet. `--ACCENT--` in it is replaced with the book's accent color.
+- `src/ui.js` is the editor: tabs, toolbar, visuals, sources and the source editor, the cover designer, preview, files, printing, and the ePUB (it draws the cover to a canvas and hands the core the font files).
 - `src/page.html` holds the editor's markup and styles.
 - `src/vendor/` holds Paged.js, the OSINT Citation Generator core, and the fonts (IBM Plex, EB Garamond, and Cormorant Garamond), unmodified.
 
@@ -176,7 +280,7 @@ python3 src/build.py
 node Tests/run.js
 ```
 
-Both need nothing beyond Python 3 and Node 18 or later. The tests also run on GitHub whenever a change is pushed.
+Both need nothing beyond Python 3 and Node 18 or later. To check an ePUB against the standard, run the W3C's EPUBCheck on it: `java -jar epubcheck.jar book.epub`. The tests also run on GitHub whenever a change is pushed.
 
 To pick up a newer OSINT Citation Generator, copy the contents of its `<script id="core">` block into `src/vendor/osint-core.js`, rebuild, and run the tests.
 

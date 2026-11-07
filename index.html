@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <!--
-  White Paper Builder
+  eBook Builder (White Paper Builder, version 2)
   Copyright (c) 2026 G. Michael Rapp. MIT License; see LICENSE.
 
   Contains Paged.js (c) Coko Foundation, MIT License; the OSINT Citation Generator core,
@@ -11,8 +11,8 @@
   and Cormorant Garamond (c) The Cormorant Project Authors, SIL Open Font License 1.1. See NOTICE.md.
 -->
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Write a white paper or an intelligence brief and get print-ready pages: cover, contents, numbered sections or stories, footnotes, OSINT citations, charts, tables, appendices, and page numbers. Runs entirely in your browser.">
-<title>White Paper Builder</title>
+<meta name="description" content="Build an eBook, a white paper, or an intelligence brief: cover, front matter, contents, chapters, footnotes, OSINT citations, charts, and tables. Save it as a PDF, and an eBook as an ePUB too. Runs entirely in your browser.">
+<title>eBook Builder</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%2315181B'/%3E%3Crect x='7' y='7' width='8' height='3' fill='%23C42A14'/%3E%3Crect x='7' y='13' width='18' height='2' fill='%23F4F5F2'/%3E%3Crect x='7' y='18' width='18' height='2' fill='%23F4F5F2'/%3E%3Crect x='7' y='23' width='12' height='2' fill='%23F4F5F2'/%3E%3C/svg%3E">
 <style id="fonts">
 @font-face{font-family:'Plex Serif';font-style:normal;font-weight:400;font-display:block;src:url(data:font/woff2;base64,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) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
@@ -141,6 +141,24 @@ body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-si
 #app .src .key { font-family: var(--mono); font-size: 12.5px; width: 100%; padding: 3px 6px; }
 #app .src .txt { grid-column: 1 / -1; font-family: 'Plex Serif', Georgia, serif; font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; }
 #app .src .acts { display: flex; gap: 4px; }
+#app .cover-grid { display: grid; grid-template-columns: minmax(150px, 220px) minmax(0, 1fr); gap: 16px; align-items: start; }
+#app .cover-prev { border: 1px solid var(--line); background: #1F2124; line-height: 0; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 6px 20px rgba(0, 0, 0, 0.12); }
+#app .cover-prev svg { display: block; width: 100%; height: auto; }
+#app .cover-ctl { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+#app .sliders { display: grid; gap: 6px; font-size: 12.5px; }
+#app .sliders label { display: grid; grid-template-columns: 112px minmax(0, 1fr); align-items: center; gap: 8px; }
+#app input[type="range"] { width: 100%; accent-color: var(--accent); }
+#app .sedit { border: 1px solid var(--accent); border-radius: 6px; background: var(--surface); padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+#app .sedit .pv { border-radius: 4px; background: var(--soft); padding: 8px 10px; font-family: 'Plex Serif', Georgia, serif; font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; }
+#app .sedit .pv .k { display: block; font-family: var(--ui); font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
+#app .sedit .pv + .pv { margin-top: -4px; }
+#app .sedit ul.gchecks { margin: 0; padding-left: 18px; font-size: 12px; color: var(--check); }
+#app .sedit details { border-top: 1px solid var(--line); padding-top: 8px; }
+#app .sedit details summary { cursor: pointer; font-size: 12.5px; font-weight: 600; }
+#app .sedit details[open] > .inner { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+#app .sedit .access { display: flex; flex-wrap: wrap; gap: 4px 14px; }
+#app .src.editing { border-color: var(--accent); }
+@media (max-width: 1100px) { #app .cover-grid { grid-template-columns: minmax(0, 1fr); } #app .cover-prev { max-width: 240px; } }
 #app .filemsg { font-size: 12.5px; color: var(--ok); margin: 0; } .filemsg.bad { color: var(--fix); } .filemsg:empty { display: none; }
 #app .view { min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr); }
 #app .viewbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 8px 16px; border-bottom: 1px solid var(--line); background: var(--bg); font-size: 12.5px; color: var(--muted); }
@@ -181,18 +199,20 @@ body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-si
 }
 </style>
 <script>
-(function () { try { var t = JSON.parse(localStorage.getItem('wpb-theme-v1')); if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); } catch (e) {} })();
+(function () { try { var t = JSON.parse(localStorage.getItem('ebb-theme-v1')); if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); } catch (e) {} })();
 </script>
 </head>
 <body>
 <div id="app">
   <header class="bar">
-    <h1><span class="mk"></span>White Paper Builder <span class="ver">v1.3</span></h1>
+    <h1><span class="mk"></span>eBook Builder <span class="ver">v2.0</span></h1>
     <span class="seg kind" role="radiogroup" aria-label="What you are making">
-      <label><input type="radio" name="kind" id="kindPaper" value="paper" checked><span>White paper</span></label>
+      <label><input type="radio" name="kind" id="kindBook" value="book" checked><span>eBook</span></label>
+      <label><input type="radio" name="kind" id="kindPaper" value="paper"><span>White paper</span></label>
       <label><input type="radio" name="kind" id="kindBrief" value="brief"><span>Intelligence brief</span></label>
     </span>
     <button type="button" class="btn primary" id="printBtn">Print or save as PDF</button>
+    <button type="button" class="btn primary" id="epubBtn" data-only="book">Save ePUB</button>
     <button type="button" class="btn" id="saveBtn">Save project</button>
     <button type="button" class="btn" id="openBtn">Open project</button>
     <button type="button" class="btn quiet" id="newBtn">New paper</button>
@@ -210,10 +230,11 @@ body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-si
     <section class="editor" aria-label="Editor">
       <div class="tabs" role="tablist" id="tabs">
         <button type="button" role="tab" data-tab="paper" aria-selected="true">Paper</button>
+        <button type="button" role="tab" data-tab="cover" aria-selected="false" data-only="book">Cover</button>
         <button type="button" role="tab" data-tab="summary" aria-selected="false" data-only="paper">Summary</button>
         <button type="button" role="tab" data-tab="body" aria-selected="false">Body</button>
         <button type="button" role="tab" data-tab="visuals" aria-selected="false">Visuals</button>
-        <button type="button" role="tab" data-tab="appendix" aria-selected="false" data-only="paper">Appendix</button>
+        <button type="button" role="tab" data-tab="appendix" aria-selected="false" data-only="paper book">Appendix</button>
         <button type="button" role="tab" data-tab="sources" aria-selected="false">Sources</button>
         <button type="button" role="tab" data-tab="back" aria-selected="false" data-only="paper">Back page</button>
       </div>
@@ -240,14 +261,76 @@ body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-si
           <div class="field"><label for="m-baccent">Accent color</label><input type="color" id="m-baccent" data-k="meta.accent"></div>
           </div>
 
-          <div class="part" data-only="paper">
-          <h2>Cover</h2>
+          <div class="part" data-only="paper book">
+          <h2 data-only="paper">Cover</h2>
+          <h2 data-only="book">Title and authors</h2>
           <div class="field"><label for="m-title">Title</label><input type="text" id="m-title" data-k="meta.title" placeholder="The question or the claim, in ten words or fewer"></div>
           <div class="field"><label for="m-subtitle">Subtitle</label><input type="text" id="m-subtitle" data-k="meta.subtitle" placeholder="The scope, the period, or the method"></div>
           <div class="field"><span class="label">Authors</span>
             <div class="authors" id="authorList"></div>
             <div><button type="button" class="btn small" id="addAuthor">+ Add an author</button></div>
-            <p class="hint">In the order they appear on the cover and in "Cite as". Biographies print on the "About this paper" page.</p></div>
+            <p class="hint" data-only="paper">In the order they appear on the cover and in "Cite as". Biographies print on the "About this paper" page.</p>
+            <p class="hint" data-only="book">In the order they appear on the cover and title page. Biographies print on the "About the author" page at the back.</p></div>
+          </div>
+
+          <div class="part" data-only="book">
+          <div class="row">
+            <div class="field"><label for="b-date">Date</label><input type="text" id="b-date" data-k="meta.date" placeholder="November 2026"></div>
+            <div class="field"><label for="b-short">Short title, for the running heads</label><input type="text" id="b-short" data-k="meta.shortTitle" placeholder="Leave blank to use the title"></div>
+          </div>
+          <div class="row">
+            <div class="field"><label for="b-series">Series (optional)</label><input type="text" id="b-series" data-k="book.series" placeholder="Global Warning Books"></div>
+            <div class="field"><label for="b-seriesNo">Number in the series</label><input type="text" id="b-seriesNo" data-k="book.seriesNo" placeholder="1"></div>
+            <div class="field"><label for="b-lang">Language</label><input type="text" id="b-lang" data-k="book.lang" list="langList" placeholder="en"><datalist id="langList"><option value="en">English</option><option value="en-US">English (US)</option><option value="en-GB">English (UK)</option><option value="es">Spanish</option><option value="fr">French</option><option value="de">German</option><option value="uk">Ukrainian</option><option value="ru">Russian</option></datalist></div>
+          </div>
+          <h2>Front matter</h2>
+          <label class="check"><input type="checkbox" id="b-halfTitle" data-k="book.halfTitle"> <span>Begin with a half-title page (the title alone) before the title page</span></label>
+          <div class="field"><label for="b-dedication">Dedication (optional)</label><textarea id="b-dedication" data-k="book.dedication" rows="2" placeholder="For the analysts who check the sources."></textarea></div>
+          <div class="field"><label for="b-epigraph">Epigraph (optional)</label><textarea id="b-epigraph" data-k="book.epigraph" rows="3" placeholder="A quotation that sets up the book."></textarea>
+            <input type="text" id="b-epigraphBy" data-k="book.epigraphBy" placeholder="Who said it, and where: Thucydides, *History of the Peloponnesian War*"></div>
+          <h2>Copyright page and colophon</h2>
+          <p class="hint">These print together on the page after the title page, set small at the foot of the page, as in a printed book.</p>
+          <div class="field"><label for="b-copyright">Copyright line</label><textarea id="b-copyright" data-k="book.copyright" rows="2" placeholder="© 2026 Publisher name. All rights reserved."></textarea></div>
+          <div class="field"><label for="b-colophon">Colophon</label><textarea id="b-colophon" data-k="meta.colophon" rows="3" placeholder="Who publishes the book, and anything readers should know: an official product of..., distributed to subscribers of..."></textarea></div>
+          <div class="row">
+            <div class="field"><label for="b-edition">Edition</label><input type="text" id="b-edition" data-k="book.edition" placeholder="First edition, November 2026"></div>
+            <div class="field"><label for="b-isbn">ISBN (optional)</label><input type="text" id="b-isbn" data-k="book.isbn" placeholder="978-..."></div>
+            <div class="field"><label for="b-issn">ISSN (optional)</label><input type="text" id="b-issn" data-k="book.issn" placeholder="3143-5645"></div>
+          </div>
+          <div class="field"><label for="b-credits">Credits, one per line</label><textarea id="b-credits" data-k="book.credits" rows="2" placeholder="Edited by ...&#10;Cover design by ..."></textarea><p class="hint">The cover image credit, set under Cover, is added here.</p></div>
+          <div class="row">
+            <div class="field"><label for="b-publisher">Publisher</label><input type="text" id="b-publisher" data-k="meta.publisher" placeholder="Publisher or imprint"></div>
+            <div class="field"><label for="b-site">Website</label><input type="text" id="b-site" data-k="meta.site" placeholder="example.substack.com"></div>
+          </div>
+          <div class="field"><label for="b-url">Link (optional)</label><input type="url" id="b-url" data-k="meta.url" placeholder="https://example.substack.com"></div>
+          <label class="check"><input type="checkbox" id="b-typeNote" data-k="book.typeNote"> <span>Name the typefaces on the copyright page ("Set in EB Garamond...")</span></label>
+          <h2>For reading apps (ePUB)</h2>
+          <div class="field"><label for="b-description">Description</label><textarea id="b-description" data-k="book.description" rows="3" placeholder="Two or three sentences on what the book covers. Reading apps show it beside the cover."></textarea></div>
+          <div class="field"><label for="b-subjects">Subjects, separated by commas</label><input type="text" id="b-subjects" data-k="book.subjects" placeholder="Geopolitics, Military history, Intelligence"></div>
+          <h2>Layout</h2>
+          <div class="row">
+            <div class="field"><label for="b-trim">Page size of the PDF</label><select id="b-trim" data-k="book.trim"></select></div>
+            <div class="field"><label for="b-face">Typeface</label><select id="b-face" data-k="book.face"><option value="garamond">EB Garamond, with Cormorant titles</option><option value="plex">IBM Plex, as in the white paper</option></select></div>
+          </div>
+          <div class="row">
+            <div class="field"><label for="b-numStyle">Chapter numbers</label><select id="b-numStyle" data-k="book.numStyle"><option value="word">In words: One, Two</option><option value="arabic">In figures: 1, 2</option><option value="roman">Roman: I, II</option><option value="none">Not numbered</option></select></div>
+            <div class="field"><label for="b-chapterWord">Word before the number</label><input type="text" id="b-chapterWord" data-k="book.chapterWord" placeholder="Chapter"></div>
+          </div>
+          <div class="row">
+            <div class="field"><label for="b-para">Paragraphs</label><select id="b-para" data-k="book.para"><option value="indent">Indented, as in a book</option><option value="block">Spaced, as on the web</option></select></div>
+            <div class="field"><label for="b-notes">Notes in the PDF</label><select id="b-notes" data-k="book.notes"><option value="foot">At the foot of the page</option><option value="end">At the back of the book</option></select></div>
+          </div>
+          <div class="row" style="align-items:end">
+            <div class="field"><label for="b-accent">Accent color</label><input type="color" id="b-accent" data-k="meta.accent"></div>
+            <div class="field"><label for="b-matter">Heading of the ?&gt; box</label><input type="text" id="b-matter" data-k="meta.matterLabel" placeholder="So, why does this matter?"></div>
+          </div>
+          <label class="check"><input type="checkbox" id="b-openers" data-k="book.openers"> <span>Set the first line of each chapter in small capitals</span></label>
+          <label class="check"><input type="checkbox" id="b-recto" data-k="book.recto"> <span>Start chapters and parts on a right-hand page (adds blank pages, as in print)</span></label>
+          <label class="check"><input type="checkbox" id="b-about" data-k="book.aboutAuthors"> <span>Add an "About the author" page from the biographies</span></label>
+          <p class="hint">Notes in the ePUB always go at the end of each chapter, where reading apps that support it show them as pop-ups.</p>
+          </div>
+
+          <div class="part" data-only="paper">
           <div class="row">
             <div class="field"><label for="m-date">Date</label><input type="text" id="m-date" data-k="meta.date" placeholder="October 2026"></div>
             <div class="field"><label for="m-number">Paper number</label><input type="text" id="m-number" data-k="meta.number" placeholder="001"></div>
@@ -281,6 +364,51 @@ body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-si
           </div>
         </div>
 
+        <div class="pane" data-pane="cover" hidden>
+          <div class="cover-grid">
+            <div class="cover-prev" id="coverPreview" aria-label="Cover preview"></div>
+            <div class="cover-ctl">
+              <div class="field"><label for="c-layout">Layout</label><select id="c-layout" data-k="book.cover.layout">
+                <option value="photo">Photo to every edge, text on a fade</option>
+                <option value="band">Photo above, text on a band of color</option>
+                <option value="framed">Framed photo between title and author</option>
+                <option value="type">Type only, no photo</option>
+                <option value="art">Finished artwork: the image is the whole cover</option></select></div>
+              <div class="field"><span class="label">Image</span>
+                <div class="row" style="grid-template-columns:auto auto 1fr;align-items:center"><button type="button" class="btn small" id="ccoverPick">Choose an image</button><button type="button" class="btn small quiet" id="ccoverClear">Remove</button><span class="hint" id="ccoverInfo"></span></div>
+                <input type="text" id="c-credit" data-k="meta.coverCaption" placeholder="Image credit (optional), printed on the copyright page"></div>
+              <div class="sliders">
+                <label>Across <input type="range" min="0" max="100" data-k="book.cover.focusX"></label>
+                <label>Up and down <input type="range" min="0" max="100" data-k="book.cover.focusY"></label>
+                <label>Zoom <input type="range" min="100" max="300" data-k="book.cover.zoom"></label>
+                <label>Shade behind text <input type="range" min="0" max="100" data-k="book.cover.shade"></label>
+              </div>
+            </div>
+          </div>
+          <p class="hint" id="coverHint">For a finished cover made elsewhere, choose the last layout. Upright images about 1600 × 2400 pixels fit a 6 × 9 page best.</p>
+          <h2>Text</h2>
+          <div class="field"><label for="c-kicker">Line above the title (optional)</label><input type="text" id="c-kicker" data-k="book.cover.kicker" placeholder="A Global Warning book"></div>
+          <div class="row">
+            <div class="field"><label for="c-font">Title face</label><select id="c-font" data-k="book.cover.font"><option value="display">Cormorant Garamond</option><option value="serif">EB Garamond</option><option value="sans">IBM Plex Sans Condensed, bold</option><option value="mono">IBM Plex Mono, bold</option></select></div>
+            <div class="field"><label for="c-scale">Title size</label><input type="range" id="c-scale" min="50" max="150" data-k="book.cover.scale"></div>
+          </div>
+          <div class="row">
+            <div class="field"><label for="c-valign">Text sits</label><select id="c-valign" data-k="book.cover.valign"><option value="bottom">Low</option><option value="middle">In the middle</option><option value="top">High</option></select></div>
+            <div class="field"><label for="c-align">Aligned</label><select id="c-align" data-k="book.cover.align"><option value="center">Centered</option><option value="left">Left</option></select></div>
+          </div>
+          <div class="row" style="align-items:end">
+            <div class="field"><label for="c-bg">Background</label><input type="color" id="c-bg" data-k="book.cover.bg"></div>
+            <div class="field"><label for="c-ink">Text</label><input type="color" id="c-ink" data-k="book.cover.ink"></div>
+            <div class="field"><label for="c-accent">Accent</label><input type="color" id="c-accent" data-k="meta.accent"></div>
+          </div>
+          <label class="check"><input type="checkbox" data-k="book.cover.upper"> <span>Title in capitals</span></label>
+          <label class="check"><input type="checkbox" data-k="book.cover.showSub"> <span>Show the subtitle</span></label>
+          <label class="check"><input type="checkbox" data-k="book.cover.showAuthor"> <span>Show the authors</span></label>
+          <label class="check"><input type="checkbox" data-k="book.cover.showPub"> <span>Show the publisher at the foot</span></label>
+          <div><button type="button" class="btn small" id="coverSave">Save the cover as an image</button></div>
+          <p class="hint">A JPEG, 1600 pixels wide, for a Substack post or a store listing. The ePUB carries the same picture as its cover.</p>
+        </div>
+
         <div class="pane" data-pane="summary" hidden>
           <p class="hint">One page, about 300 words. Notes and citations work here too.</p>
           <div class="field"><label for="s-lead">The problem in brief</label><textarea id="s-lead" data-k="summary.lead" class="code" rows="6" data-cite></textarea><p class="hint">What is happening, and why it will still matter in five years. A blank line starts a new paragraph.</p></div>
@@ -301,7 +429,8 @@ body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-si
         </div>
 
         <div class="pane" data-pane="appendix" hidden>
-          <p class="hint">Each # heading starts Appendix A, B, C. ## headings are numbered A.1, A.2. [[rating-key]] adds the source rating key table.</p>
+          <p class="hint" data-only="paper">Each # heading starts Appendix A, B, C. ## headings are numbered A.1, A.2. [[rating-key]] adds the source rating key table.</p>
+          <p class="hint" data-only="book">After the last chapter: acknowledgments, appendices, a glossary, a note on sources. Each # heading starts a new page and is listed in the contents, unnumbered. Notes, citations, and visuals work here as in the chapters. [[rating-key]] adds the source rating key table.</p>
           <div class="toolbar" data-for="appendix"></div>
           <textarea id="t-appendix" data-k="appendix" class="code big" spellcheck="true" data-cite aria-label="Appendix text"></textarea>
         </div>
@@ -309,12 +438,14 @@ body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-si
         <div class="pane" data-pane="sources" hidden>
           <p class="hint">Cite sources from your OSINT Citation Generator lists. In the generator, save your list to a file; open that file here. Each source gets a short key.</p>
           <p class="hint" data-only="paper">Write [@key] or [@key, p. 45] in the text: the first citation of a source prints in full in a footnote, later ones in short form.</p>
+          <p class="hint" data-only="book" hidden>Write [@key] or [@key, p. 45] in the text: each chapter gives its first citation of a source in full, in a note, and later ones in short form. Click Edit on a source to correct it here; the notes follow.</p>
           <p class="hint" data-only="brief" hidden>Write [@key] in a story where you use the source. A small source number prints there, linked to the source's entry in the numbered list on the last page; sources are numbered in order of first citation. [ORIGINAL STORY: @key] puts that label in front of its entry. You can turn the numbers off under Brief.</p>
           <div class="row" style="grid-template-columns:auto auto 1fr;align-items:center">
             <button type="button" class="btn" id="srcOpen">Open an OSINT list file</button>
+            <button type="button" class="btn" id="srcNew">New OSINT source</button>
             <button type="button" class="btn quiet" id="srcAddTyped">Add a source by hand</button>
-            <span></span>
           </div>
+          <div class="row" style="grid-template-columns:auto 1fr;align-items:center"><button type="button" class="btn small quiet" id="srcExport">Save these sources as an OSINT list file</button><span class="hint">Opens in the OSINT Citation Generator, edits included.</span></div>
           <input type="file" id="srcPick" accept=".json,application/json" multiple hidden>
           <p class="filemsg" id="srcMsg" role="status"></p>
           <div class="card" id="typedForm" hidden>
@@ -324,6 +455,7 @@ body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-si
             <div class="row" style="grid-template-columns:auto auto 1fr"><button type="button" class="btn small primary" id="tySave">Add source</button><button type="button" class="btn small quiet" id="tyCancel">Cancel</button></div>
             <p class="hint">Use *asterisks* for italics. A page number in [@key, p. 4] goes before the final period.</p>
           </div>
+          <datalist id="descPicks"></datalist>
           <div class="srcs" id="srcList"></div>
           <p class="hint" id="srcEmpty">No sources yet. You can still write notes by hand with ^[note text].</p>
         </div>
@@ -699,6 +831,301 @@ a.fn[data-footnote-call] { display: inline; margin: 0; padding: 0; float: none; 
 .pagedjs_footnote_content::before { content: ''; display: block; width: 140px; margin-bottom: 8px; border-top: 1px solid var(--wp-accent); }
 .pagedjs_footnote_content.pagedjs_footnote_empty { padding-top: 0; }
 .pagedjs_footnote_content.pagedjs_footnote_empty::before { content: none; }
+</script>
+<script type="text/plain" id="book-css">/*
+ * The printed eBook. Paged.js reads this stylesheet instead of paper.css when the project
+ * is a book. The page size, margins, running heads, and text size come from the page
+ * script (core.js, renderBook), which knows the trim size chosen under Book:
+ *   --bk-fs, --bk-lh   text size and line height
+ *   --bk-w, --bk-h     the page, in px at 96 per inch
+ *   --bk-ch            the height of the text area
+ *   --wp-accent        the accent color
+ * Two faces: EB Garamond with Cormorant Garamond for titles (face-garamond), or IBM Plex
+ * Serif with Plex Sans Condensed (face-plex).
+ */
+.pagedjs_page { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+@page { background: #FFFFFF; @footnote { margin: 0; padding: 0; } }
+
+.bk { color: #1A1917; font-family: 'Garamond Body', 'EB Garamond', Garamond, Georgia, serif; font-size: var(--bk-fs); line-height: var(--bk-lh); font-kerning: normal; font-variant-ligatures: common-ligatures; hyphens: auto; -webkit-hyphens: auto; }
+.bk * { box-sizing: border-box; }
+.bk a { color: inherit; text-decoration: none; }
+.bk b { font-weight: 600; }
+.bk .missing { color: #A3271B; font-weight: 600; }
+.bk .display, .bk .ch-title, .bk .tp-title, .bk .ht, .bk .fm-h, .bk .pull, .bk .vtitle, .bk .stats-title, .bk .stat .big { font-family: 'Garamond Display', 'Cormorant Garamond', Garamond, serif; font-weight: 600; }
+.bk .ch-num, .bk .tp-series, .bk .tp-by, .bk .tp-pub, .bk .m-label, .bk .ktoc .lab, .bk .vlabel { font-size: 0.7em; line-height: 1.4; letter-spacing: 0.24em; text-transform: uppercase; color: var(--wp-accent); font-variant-numeric: oldstyle-nums; }
+
+/* The cover: the first page, drawn edge to edge. */
+.bk .bk-cover { width: var(--bk-w); height: calc(var(--bk-h) - 1px); overflow: hidden; break-after: page; background: #1F2124; }
+.bk .bk-cover svg { display: block; width: 100%; height: 100%; }
+
+/* Front matter: each on a page of its own, with no running heads or page numbers. */
+.bk .fm { page: front; break-before: page; }
+.bk .bk-half { text-align: center; }
+.bk .bk-half .ht { margin: calc(var(--bk-ch) * 0.26) 0 0; font-size: 1.75em; line-height: 1.15; text-wrap: balance; }
+.bk .bk-titlepage { min-height: var(--bk-ch); display: flex; flex-direction: column; align-items: center; text-align: center; }
+.bk .tp-series { margin: 0 0 calc(var(--bk-ch) * 0.1); }
+.bk .tp-title { margin: calc(var(--bk-ch) * 0.08) 0 0; font-size: 2.55em; line-height: 1.05; text-wrap: balance; }
+.bk .tp-sub { margin: 0.7em 0 0; font-style: italic; font-size: 1.15em; line-height: 1.35; text-wrap: balance; color: #3A3732; }
+.bk .tp-rule { width: 56px; height: 0; margin: 1.6em auto 1.4em; border-top: 2px solid var(--wp-accent); }
+.bk .tp-by { margin: 0; font-size: 0.82em; color: #1A1917; letter-spacing: 0.18em; }
+.bk .tp-foot { margin-top: auto; }
+.bk .tp-pub { margin: 0; color: #1A1917; letter-spacing: 0.2em; }
+.bk .tp-site { margin: 0.2em 0 0; font-size: 0.75em; color: #5A554D; }
+.bk .bk-copy { min-height: var(--bk-ch); display: flex; flex-direction: column; justify-content: flex-end; }
+.bk .cp { font-size: 0.72em; line-height: 1.5; color: #2C2A27; hyphens: manual; }
+.bk .cp p { margin: 0 0 0.85em; text-indent: 0; }
+.bk .cp a { text-decoration: underline; text-decoration-thickness: 0.5px; text-underline-offset: 2px; }
+.bk .cp .cp-title { font-size: 1.1em; }
+.bk .bk-ded { text-align: center; font-style: italic; }
+.bk .bk-ded .ded { margin: calc(var(--bk-ch) * 0.24) auto 0; max-width: 78%; }
+.bk .bk-ded p { margin: 0 0 0.6em; }
+.bk .bk-epi .epi { margin: calc(var(--bk-ch) * 0.2) 8% 0; font-style: italic; }
+.bk .epi p { margin: 0 0 0.6em; text-indent: 0; }
+.bk .epi .epi-by { margin-top: 0.8em; font-style: normal; text-align: right; font-size: 0.9em; }
+.bk .epi .epi-by i { font-style: italic; }
+
+/* Contents, with page numbers. */
+.bk .fm-h { margin: calc(var(--bk-ch) * 0.06) 0 1.2em; font-size: 1.9em; line-height: 1.1; text-align: center; }
+.bk .ktoc { list-style: none; margin: 0; padding: 0; }
+.bk .ktoc li { position: relative; margin: 0; padding: 0.32em 2.4em 0.32em 0; break-inside: avoid; }
+.bk .ktoc li a { display: block; text-wrap: pretty; }
+.bk .ktoc li a::after { content: target-counter(attr(href), page); position: absolute; right: 0; top: 0.32em; font-variant-numeric: oldstyle-nums; }
+.bk .ktoc .lab { display: block; font-size: 0.62em; }
+.bk .ktoc li.t-part { margin-top: 0.9em; padding-top: 0.6em; border-top: 1px solid #E2DED4; }
+.bk .ktoc li.t-part .tt { font-family: 'Garamond Display', 'Cormorant Garamond', Garamond, serif; font-weight: 600; font-size: 1.12em; }
+.bk .ktoc li.in-part { padding-left: 1.2em; }
+.bk .ktoc li.t-back { margin-top: 0.2em; font-style: italic; }
+
+/* Parts and chapters. Each starts a new page (a right-hand page, when chosen under Book). */
+.bk .bk-unit { page: chapter; break-before: page; }
+.bk.recto .bk-unit.k-chapter, .bk.recto .bk-unit.k-part, .bk.recto .bk-unit.k-unnumbered { break-before: right; }
+.bk .bk-unit.k-part { page: part; text-align: center; }
+.bk .ch-head { padding-top: calc(var(--bk-ch) * 0.13); margin: 0 0 2.2em; text-align: center; break-after: avoid; }
+.bk .k-part .ch-head { padding-top: calc(var(--bk-ch) * 0.3); }
+.bk .ch-num { margin: 0 0 0.9em; }
+.bk .ch-title { margin: 0; font-size: 2em; line-height: 1.1; text-wrap: balance; string-set: chapter attr(data-run); }
+.bk .k-part .ch-title { font-size: 2.35em; }
+.bk .ch-head::after { content: ''; display: block; width: 44px; margin: 1.1em auto 0; border-top: 1.5px solid var(--wp-accent); }
+.bk .k-back .ch-head { padding-top: calc(var(--bk-ch) * 0.08); }
+
+/* Text. Indented paragraphs by default; the first after a heading, break, or box is flush. */
+.bk-unit p { margin: 0; orphans: 2; widows: 2; text-wrap: pretty; }
+.bk.para-indent .bk-unit p + p { text-indent: 1.4em; }
+.bk.para-indent .bk-unit p.scene + p, .bk.para-indent .bk-unit p.pull + p, .bk.para-indent .bk-unit p.aside + p, .bk.para-indent .bk-unit p.scene, .bk.para-indent .bk-unit p.pull, .bk.para-indent .bk-unit p.aside, .bk.para-indent .bk-unit p.fnote, .bk.para-indent .bk-unit .matter p, .bk.para-indent .bk-unit .au p { text-indent: 0; }
+.bk.para-block .bk-unit p { margin-bottom: 0.75em; }
+.bk [data-split-from] { text-indent: 0 !important; }
+.bk p.opener::first-line { font-variant: small-caps; letter-spacing: 0.04em; }
+.bk p.opener[data-split-from]::first-line { font-variant: normal; letter-spacing: 0; }
+.bk .bk-sec { margin: 1.5em 0 0.55em; font-family: 'Garamond Display', 'Cormorant Garamond', Garamond, serif; font-weight: 600; font-size: 1.32em; line-height: 1.2; break-after: avoid; text-wrap: balance; }
+.bk h4.minor { margin: 1.2em 0 0.3em; font-style: italic; font-weight: 400; font-size: 1em; break-after: avoid; }
+.bk blockquote { margin: 0.8em 1.4em; font-size: 0.93em; line-height: 1.5; }
+.bk blockquote p { text-indent: 0 !important; }
+.bk .scene { margin: 0.9em 0; text-align: center; color: var(--wp-accent); letter-spacing: 0.2em; break-after: avoid; }
+.bk .pull { margin: 1.1em 0.4em; padding: 0.6em 0; border-top: 1px solid var(--wp-accent); border-bottom: 1px solid var(--wp-accent); font-size: 1.3em; line-height: 1.3; text-align: center; text-wrap: balance; break-inside: avoid; }
+.bk .aside { margin: 0.8em 0; padding-left: 0.9em; border-left: 1px solid var(--wp-accent); font-size: 0.88em; line-height: 1.5; font-style: italic; color: #4A4640; }
+.bk .matter { margin: 1em 0 1.1em; padding: 0.1em 0 0.1em 1em; border-left: 3px solid var(--wp-accent); break-inside: avoid; }
+.bk .matter .m-label { margin: 0 0 0.45em; break-after: avoid; }
+.bk .matter p + p { margin-top: 0.55em; }
+.bk ul, .bk ol { margin: 0.6em 0 0.7em; padding-left: 1.5em; }
+.bk li { margin: 0 0 0.25em; }
+.bk li::marker { color: var(--wp-accent); }
+.bk .labeled { margin: 0.6em 0 0.9em; border-top: 1px solid #E2DED4; }
+.bk .labeled .li { display: grid; grid-template-columns: 4.2em minmax(0, 1fr); column-gap: 0.8em; padding: 0.4em 0; border-bottom: 1px solid #E2DED4; break-inside: avoid; }
+.bk .labeled .ll { color: var(--wp-accent); font-weight: 600; }
+.bk .pagebreak { break-after: page; }
+
+/* Figures, tables, timelines, and key numbers: full width, caption below. */
+.bk figure.vis { margin: 1.1em 0 1.2em; break-inside: avoid; }
+.bk .vtitle { margin: 0; padding-top: 0.5em; border-top: 1px solid var(--wp-accent); font-size: 1.15em; line-height: 1.25; }
+.bk .vsub { margin-top: 0.1em; font-style: italic; font-size: 0.85em; line-height: 1.4; color: #5A554D; }
+.bk .vbody > svg, .bk .vbody > table, .bk .vbody > ol, .bk .vbody > img, .bk .vbody > .vempty { margin-top: 0.6em; }
+.bk svg.chart { display: block; width: 100%; height: auto; overflow: visible; }
+.bk img.vimg { display: block; max-width: 100%; max-height: calc(var(--bk-ch) * 0.7); margin: 0 auto; }
+.bk figure.vis .gut { display: flex; flex-wrap: wrap; gap: 0.1em 0.9em; margin-top: 0.45em; font-size: 0.75em; line-height: 1.45; color: #5A554D; }
+.bk figure.vis .vlabel { font-size: 0.95em; }
+.bk figure.vis .vnote { flex-basis: 100%; font-style: italic; }
+.bk .vempty { padding: 1.2em; border: 1px dashed #A39C8D; color: #5A554D; font-style: italic; text-align: center; }
+.bk table.dtable { width: 100%; border-collapse: collapse; font-size: 0.82em; line-height: 1.4; hyphens: manual; }
+.bk .dtable th { padding: 0.35em 0.7em 0.35em 0; border-bottom: 1px solid #1A1917; text-align: left; font-weight: 600; vertical-align: bottom; }
+.bk .dtable td { padding: 0.35em 0.7em 0.35em 0; border-bottom: 1px solid #E2DED4; vertical-align: top; }
+.bk .dtable .n { text-align: right; font-variant-numeric: lining-nums tabular-nums; }
+.bk .dtable th:last-child, .bk .dtable td:last-child { padding-right: 0; }
+.bk .dtable tr.hot td { color: var(--wp-accent); font-weight: 600; }
+.bk .dtable .code { font-weight: 600; color: var(--wp-accent); }
+.bk figure.rating { break-inside: auto; }
+.bk figure.rating .gut { margin: 0 0 0.4em; }
+.bk .rating .rnote { margin: 0.5em 0 0; font-size: 0.85em; line-height: 1.45; text-indent: 0 !important; }
+.bk .rating .dtable { margin-top: 0.7em; font-size: 0.75em; break-inside: avoid; }
+.bk .rating .dtable .mean { width: 8em; font-weight: 600; }
+.bk .timeline { list-style: none; padding: 0; margin: 0.6em 0 0; }
+.bk .timeline li { display: grid; grid-template-columns: 6.5em minmax(0, 1fr); column-gap: 0.8em; margin: 0; padding: 0.35em 0; border-bottom: 1px solid #E2DED4; font-size: 0.85em; line-height: 1.4; }
+.bk .timeline .when { color: var(--wp-accent); font-weight: 600; }
+.bk .stats-wrap { margin: 1.1em 0 1.2em; break-inside: avoid; }
+.bk .stats-title { margin: 0 0 0.5em; font-size: 1.15em; }
+.bk .stats { display: grid; column-gap: 1em; }
+.bk .stat { padding-top: 0.5em; border-top: 2px solid var(--wp-accent); }
+.bk .stat .big { font-size: 2em; line-height: 1.1; font-variant-numeric: lining-nums; }
+.bk .stat .what { margin-top: 0.2em; font-size: 0.8em; line-height: 1.4; }
+.bk .stats-src { margin-top: 0.4em; font-size: 0.75em; color: #5A554D; }
+
+/* Notes at the foot of the page, numbered afresh in each chapter. */
+.fn { float: footnote; font-family: 'Garamond Body', Garamond, Georgia, serif; font-size: 11.5px; line-height: 16px; font-weight: 400; font-style: normal; letter-spacing: 0; text-transform: none; text-indent: 0; color: #2C2A27; margin: 0 0 3px; overflow-wrap: anywhere; hyphens: manual; }
+.fn::footnote-call { content: none; }
+.fn::footnote-marker { content: none; }
+.pagedjs_footnote_inner_content .fn { position: relative; display: block; padding-left: 18px; list-style: none; }
+.pagedjs_footnote_inner_content .fn::marker { content: none; }
+.pagedjs_footnote_inner_content .fn .fn-n { position: absolute; left: 0; top: 0; }
+a.fn[data-footnote-call] { display: inline; margin: 0; padding: 0; float: none; }
+.fn .fn-n { display: inline-block; min-width: 18px; color: var(--wp-accent); font-weight: 600; }
+.fn a.url { overflow-wrap: anywhere; }
+.bk .fn-call, .bk .en-call { font-size: 0.68em; line-height: 0; color: var(--wp-accent); vertical-align: super; margin-left: 1px; font-weight: 600; font-variant-numeric: lining-nums; }
+.pagedjs_footnote_content { padding-top: 8px; }
+.pagedjs_footnote_content::before { content: ''; display: block; width: 72px; margin-bottom: 6px; border-top: 1px solid var(--wp-accent); }
+.pagedjs_footnote_content.pagedjs_footnote_empty { padding-top: 0; }
+.pagedjs_footnote_content.pagedjs_footnote_empty::before { content: none; }
+
+/* Notes at the back of the book, under each chapter's name. */
+.bk .bk-notes .nt-h { margin: 1.3em 0 0.4em; font-family: 'Garamond Display', 'Cormorant Garamond', Garamond, serif; font-weight: 600; font-size: 1.1em; line-height: 1.25; break-after: avoid; }
+.bk .enotes { list-style: none; margin: 0; padding: 0; font-size: 0.82em; line-height: 1.45; }
+.bk .enotes li { position: relative; margin: 0 0 0.35em; padding-left: 1.9em; overflow-wrap: anywhere; }
+.bk .enotes .en-n, .bk .fnote .en-n { position: absolute; left: 0; color: var(--wp-accent); font-weight: 600; }
+.bk .notes-rule { width: 72px; margin: 1.2em 0 0.6em; border: 0; border-top: 1px solid var(--wp-accent); }
+.bk p.fnote { position: relative; padding-left: 1.9em; font-size: 0.82em; line-height: 1.45; text-indent: 0 !important; }
+
+/* About the authors. */
+.bk .bk-about .au { margin: 0 0 1.4em; }
+.bk .bk-about .au-name { margin: 0 0 0.35em; font-family: 'Garamond Display', 'Cormorant Garamond', Garamond, serif; font-weight: 600; font-size: 1.3em; line-height: 1.2; }
+.bk .bk-about .au p + p { margin-top: 0.6em; }
+
+/* The IBM Plex face, as in the white paper. */
+.bk.face-plex { font-family: 'Plex Serif', Georgia, serif; }
+.bk.face-plex .ch-title, .bk.face-plex .tp-title, .bk.face-plex .ht, .bk.face-plex .fm-h, .bk.face-plex .pull, .bk.face-plex .vtitle, .bk.face-plex .stats-title, .bk.face-plex .stat .big,
+.bk.face-plex .bk-sec, .bk.face-plex .ktoc li.t-part .tt, .bk.face-plex .nt-h, .bk.face-plex .au-name { font-family: 'Plex Sans Cond', 'Arial Narrow', sans-serif; font-weight: 700; letter-spacing: -0.005em; }
+.bk.face-plex .bk-sec { font-weight: 600; font-size: 1.2em; }
+.bk.face-plex .ch-num, .bk.face-plex .tp-series, .bk.face-plex .tp-by, .bk.face-plex .tp-pub, .bk.face-plex .m-label, .bk.face-plex .ktoc .lab, .bk.face-plex .vlabel, .bk.face-plex .ktoc li a::after { font-family: 'Plex Mono', monospace; font-weight: 500; letter-spacing: 0.12em; font-variant-numeric: normal; }
+.bk.face-plex .ch-title { font-size: 1.85em; }
+.bk.face-plex .tp-title { font-size: 2.3em; }
+.bk.face-plex .tp-sub, .bk.face-plex .bk-ded, .bk.face-plex .epi { font-style: italic; }
+.bk.face-plex p.opener::first-line { font-variant: normal; font-weight: 600; letter-spacing: 0; }
+.bk.face-plex .fn-call, .bk.face-plex .en-call { font-family: 'Plex Mono', monospace; }
+.bk.face-plex svg.chart text { font-family: 'Plex Mono', monospace; }
+.bk.face-garamond svg.chart text { font-family: 'Garamond Body', Garamond, serif; }
+</script>
+<script type="text/plain" id="epub-css">/*
+ * The ePUB's stylesheet. Reflowable: sizes are relative, so the reader's own text size,
+ * margins, and night mode still work. --ACCENT-- is replaced with the book's accent color
+ * when the ePUB is written; the book's typefaces, when embedded, are declared above this.
+ */
+body { margin: 0 3%; font-family: "Garamond Body", "EB Garamond", Garamond, Georgia, serif; line-height: 1.5; font-kerning: normal; widows: 2; orphans: 2; }
+body.face-plex { font-family: "Plex Serif", "IBM Plex Serif", Georgia, serif; }
+.face-garamond h1, .face-garamond h2, .face-garamond h3, .face-garamond .pull, .face-garamond .vtitle, .face-garamond .stat .big, .face-garamond .tp-title { font-family: "Garamond Display", "Cormorant Garamond", "Garamond Body", Garamond, serif; font-weight: 600; }
+.face-plex h1, .face-plex h2, .face-plex h3, .face-plex .pull, .face-plex .vtitle, .face-plex .stat .big, .face-plex .tp-title { font-family: "Plex Sans Cond", "IBM Plex Sans Condensed", "Arial Narrow", sans-serif; font-weight: 700; }
+a { color: inherit; }
+a.url { word-wrap: break-word; overflow-wrap: anywhere; }
+b { font-weight: 600; }
+
+/* Cover. */
+.cover-page { margin: 0; padding: 0; text-align: center; page-break-after: always; }
+.cover-page img { max-width: 100%; max-height: 100vh; height: auto; }
+
+/* Title page, copyright page, dedication, epigraph. */
+.titlepage { text-align: center; margin-top: 18%; }
+.tp-series, .tp-by, .tp-pub, .ch-num, .m-label, .vlabel { font-size: 0.72em; letter-spacing: 0.2em; text-transform: uppercase; color: --ACCENT--; }
+.tp-title { font-size: 2.2em; line-height: 1.1; margin: 0.6em 0 0; }
+.tp-sub { font-size: 1.15em; font-style: italic; margin: 0.5em 0 0; }
+.tp-rule { width: 3em; margin: 1.4em auto; border-top: 2px solid --ACCENT--; height: 0; }
+.tp-by { color: inherit; font-size: 0.85em; }
+.tp-foot { margin-top: 4em; }
+.tp-pub { color: inherit; margin: 0; }
+.tp-site { font-size: 0.8em; margin: 0.2em 0 0; }
+.copyright { margin-top: 30%; font-size: 0.8em; line-height: 1.5; }
+.copyright p { margin: 0 0 0.8em; text-indent: 0; }
+.dedication { margin: 30% 10% 0; text-align: center; font-style: italic; }
+.epigraph { margin: 25% 8% 0; }
+.epi { margin: 0; font-style: italic; }
+.epi p { margin: 0 0 0.6em; text-indent: 0; }
+.epi-by { text-align: right; font-style: normal; font-size: 0.9em; }
+
+/* Contents. */
+.contents h1, .fm-h { text-align: center; font-size: 1.8em; margin: 1em 0 1em; }
+.contents ol { list-style: none; margin: 0; padding: 0; }
+.contents ol ol { padding-left: 1.4em; }
+.contents li { margin: 0.45em 0; }
+.contents a { text-decoration: none; }
+
+/* Parts and chapters. */
+.unit { page-break-before: always; }
+.ch-head { margin: 2.5em 0 2em; text-align: center; page-break-after: avoid; }
+.k-part .ch-head { margin-top: 30%; }
+.ch-num { margin: 0 0 0.8em; }
+.ch-title { font-size: 1.9em; line-height: 1.15; margin: 0; }
+.k-part .ch-title { font-size: 2.2em; }
+.ch-head:after { content: ""; display: block; width: 2.6em; margin: 1em auto 0; border-top: 1.5px solid --ACCENT--; }
+.k-back .ch-head { margin-top: 1.5em; }
+
+/* Text. */
+p { margin: 0; }
+.para-indent .unit p + p { text-indent: 1.4em; }
+.para-indent .unit p.scene + p, .para-indent .unit p.pull + p, .para-indent .unit p.aside + p, .para-indent .unit p.scene, .para-indent .unit p.pull, .para-indent .unit p.aside, .para-indent .unit p.fnote, .para-indent .unit .matter p, .para-indent .unit .au p, .para-indent .unit aside p { text-indent: 0; }
+.para-block .unit p { margin-bottom: 0.8em; }
+p.opener:first-line { font-variant: small-caps; letter-spacing: 0.03em; }
+.face-plex p.opener:first-line { font-variant: normal; font-weight: 600; }
+h3.bk-sec { font-size: 1.3em; line-height: 1.2; margin: 1.5em 0 0.5em; page-break-after: avoid; }
+h4.minor { font-size: 1em; font-style: italic; font-weight: normal; margin: 1.2em 0 0.3em; page-break-after: avoid; }
+blockquote { margin: 0.9em 1.5em; font-size: 0.94em; }
+blockquote p { text-indent: 0; }
+.scene { margin: 1em 0; text-align: center; color: --ACCENT--; letter-spacing: 0.2em; }
+.pull { margin: 1.2em 0.5em; padding: 0.6em 0; border-top: 1px solid --ACCENT--; border-bottom: 1px solid --ACCENT--; font-size: 1.25em; line-height: 1.3; text-align: center; page-break-inside: avoid; }
+.aside { margin: 0.9em 0; padding-left: 0.9em; border-left: 1px solid --ACCENT--; font-size: 0.9em; font-style: italic; }
+.matter { display: block; margin: 1.1em 0; padding: 0.1em 0 0.1em 1em; border-left: 3px solid --ACCENT--; page-break-inside: avoid; }
+.matter .m-label { margin: 0 0 0.4em; }
+.matter p + p { margin-top: 0.5em; }
+ul, ol { margin: 0.6em 0 0.7em; padding-left: 1.5em; }
+li { margin: 0 0 0.25em; }
+.labeled { margin: 0.6em 0 0.9em; border-top: 1px solid #CFCAC0; }
+.labeled .li { padding: 0.4em 0; border-bottom: 1px solid #CFCAC0; }
+.labeled .ll { color: --ACCENT--; font-weight: 600; }
+
+/* Figures, tables, timelines, key numbers. */
+figure.vis { margin: 1.2em 0; page-break-inside: avoid; }
+.vtitle { margin: 0; padding-top: 0.5em; border-top: 1px solid --ACCENT--; font-size: 1.15em; line-height: 1.25; }
+.vsub { font-style: italic; font-size: 0.85em; }
+figure.vis svg.chart { display: block; width: 100%; height: auto; margin-top: 0.6em; }
+figure.vis img.vimg { display: block; max-width: 100%; height: auto; margin: 0.6em auto 0; }
+figure.vis .gut { margin-top: 0.45em; font-size: 0.78em; line-height: 1.45; }
+figure.vis .gut div { display: inline; margin-right: 0.8em; }
+figure.vis .vnote { display: block; font-style: italic; }
+.vempty { padding: 1em; border: 1px dashed #A39C8D; font-style: italic; text-align: center; }
+table.dtable { width: 100%; border-collapse: collapse; font-size: 0.85em; line-height: 1.4; margin-top: 0.6em; }
+.dtable th { padding: 0.35em 0.6em 0.35em 0; border-bottom: 1px solid currentColor; text-align: left; font-weight: 600; vertical-align: bottom; }
+.dtable td { padding: 0.35em 0.6em 0.35em 0; border-bottom: 1px solid #CFCAC0; vertical-align: top; }
+.dtable .n { text-align: right; }
+.dtable tr.hot td, .dtable .code { color: --ACCENT--; font-weight: 600; }
+.rnote { font-size: 0.88em; }
+.timeline { list-style: none; padding: 0; margin: 0.6em 0 0; }
+.timeline li { padding: 0.35em 0; border-bottom: 1px solid #CFCAC0; font-size: 0.88em; }
+.timeline .when { display: block; color: --ACCENT--; font-weight: 600; }
+.stats-wrap { margin: 1.2em 0; }
+.stats-title { font-size: 1.15em; margin: 0 0 0.5em; }
+.stats { display: block; }
+.stat { display: inline-block; width: 46%; margin: 0 2% 0.8em 0; padding-top: 0.4em; border-top: 2px solid --ACCENT--; vertical-align: top; }
+.stat .big { font-size: 1.9em; line-height: 1.1; }
+.stat .what { font-size: 0.82em; }
+.stats-src { font-size: 0.78em; }
+.missing { color: #A3271B; font-weight: 600; }
+
+/* Notes: numbered afresh in each chapter, at its end. Reading apps that support it show them as pop-ups. */
+sup.nref { font-size: 0.7em; line-height: 0; vertical-align: super; }
+sup.nref a { text-decoration: none; color: --ACCENT--; font-weight: 600; }
+.notes-rule { width: 5em; margin: 2em 0 0.8em; border: 0; border-top: 1px solid --ACCENT--; }
+aside.fnote, p.fnote { margin: 0 0 0.5em; font-size: 0.85em; line-height: 1.45; }
+aside.fnote p { margin: 0; text-indent: 0; }
+a.nback { text-decoration: none; color: --ACCENT--; font-weight: 600; }
+
+/* About the authors. */
+.au { margin: 0 0 1.4em; }
+.au-name { font-size: 1.25em; margin: 0 0 0.3em; }
+.au p + p { margin-top: 0.6em; }
 </script>
 <script id="pagedjs">/**
  * @license Paged.js v0.4.3 | MIT | https://gitlab.coko.foundation/pagedjs/pagedjs
@@ -1597,6 +2024,7 @@ var WP = (function () {
       if ((m = line.match(/^(#{1,3})\s+(.+)$/))) { flush(); out.push({ t: 'h', level: m[1].length, text: m[2] }); return; }
       if ((m = line.match(/^\[\[\s*([\w.-]+)\s*\]\]$/))) { flush(); out.push({ t: 'visual', id: m[1] }); return; }
       if (/^-{3,}$/.test(line)) { flush(); out.push({ t: 'break' }); return; }
+      if (/^(\*\s*){3,}$/.test(line) || line === '⁂') { flush(); out.push({ t: 'scene' }); return; }
       var kinds = [[/^\?>\s?(.*)$/, 'matter'], [/^!>\s?(.*)$/, 'key'], [/^>>\s?(.*)$/, 'side'], [/^>\s?(.*)$/, 'quote']];
       for (var k = 0; k < kinds.length; k++) {
         if ((m = line.match(kinds[k][0]))) {
@@ -1808,7 +2236,25 @@ var WP = (function () {
   }
 
   // ------------------------------------------------------------------ the paper
-  var PAPER_ACCENT = '#C42A14', BRIEF_ACCENT = '#D9B063';
+  var PAPER_ACCENT = '#C42A14', BRIEF_ACCENT = '#D9B063', BOOK_ACCENT = '#9E3B22';
+  // eBook page sizes, in inches, with the page margins and text size that suit each (px at 96 per inch).
+  var TRIMS = {
+    '6x9': { w: 6, h: 9, label: '6 × 9 in, trade paperback', m: [62, 52, 70, 64], fs: 15, lh: 22.5 },
+    '5.5x8.5': { w: 5.5, h: 8.5, label: '5.5 × 8.5 in, digest', m: [58, 48, 66, 60], fs: 14.5, lh: 21.5 },
+    'a5': { w: 5.83, h: 8.27, label: 'A5, 148 × 210 mm', m: [58, 48, 66, 60], fs: 14.5, lh: 21.5 },
+    'letter': { w: 8.5, h: 11, label: '8.5 × 11 in, US Letter (easy to print at home)', m: [84, 80, 92, 92], fs: 17, lh: 27 }
+  };
+  var COVER_LAYOUTS = ['photo', 'band', 'framed', 'type', 'art'];
+  // Cover title faces: the family, weight, line height, and a rough width per character
+  // (used to fit the title when the page cannot measure text, as in the tests).
+  var COVER_FONTS = {
+    display: { family: 'Garamond Display', css: "'Garamond Display', 'Cormorant Garamond', Garamond, serif", weight: 600, lh: 1.02, cw: 0.44, small: 'Garamond Body' },
+    serif: { family: 'Garamond Body', css: "'Garamond Body', 'EB Garamond', Garamond, Georgia, serif", weight: 400, lh: 1.08, cw: 0.47, small: 'Garamond Body' },
+    sans: { family: 'Plex Sans Cond', css: "'Plex Sans Cond', 'Arial Narrow', sans-serif", weight: 700, lh: 1.02, cw: 0.47, small: 'Plex Sans Cond' },
+    mono: { family: 'Plex Mono', css: "'Plex Mono', Menlo, monospace", weight: 700, lh: 1.12, cw: 0.6, small: 'Plex Mono' }
+  };
+  var SMALL_CSS = { 'Garamond Body': "'Garamond Body', 'EB Garamond', Garamond, Georgia, serif", 'Plex Sans Cond': "'Plex Sans Cond', 'Arial Narrow', sans-serif", 'Plex Mono': "'Plex Mono', Menlo, monospace" };
+  var SMALL_CW = { 'Garamond Body': 0.47, 'Plex Sans Cond': 0.47, 'Plex Mono': 0.6 };
   var SOURCES_NOTE = 'In order of appearance. Formatted to the OSINT Style Guide v1.5 pattern: Author, “Title,” Location [Description] (Publisher: Date) URL/DOI: Locator.';
   function defaults() {
     return {
@@ -1824,6 +2270,17 @@ var WP = (function () {
       aboutSeries: '',
       body: '', appendix: '',
       back: { include: true, history: '', series: '', license: '' },
+      // The eBook: its own front matter, layout choices, ePUB details, and cover design.
+      // Title, subtitle, authors, date, publisher, colophon, accent, and cover image are
+      // shared with the paper and the brief, under meta and authors.
+      book: {
+        trim: '6x9', face: 'garamond', para: 'indent', chapterWord: 'Chapter', numStyle: 'word', recto: false, notes: 'foot', halfTitle: true, openers: true,
+        dedication: '', epigraph: '', epigraphBy: '',
+        copyright: '', edition: '', isbn: '', issn: '', credits: '', typeNote: true, aboutAuthors: true,
+        lang: 'en', description: '', subjects: '', series: '', seriesNo: '', bookId: '',
+        cover: { layout: 'photo', bg: '#1F2124', ink: '#FFFFFF', valign: 'bottom', align: 'center', shade: 70, font: 'display', scale: 100, upper: false,
+          kicker: '', showSub: true, showAuthor: true, showPub: true, focusX: 50, focusY: 50, zoom: 100, imgW: 0, imgH: 0 }
+      },
       visuals: [], sources: []
     };
   }
@@ -1834,7 +2291,28 @@ var WP = (function () {
       var src = doc[k] && typeof doc[k] === 'object' ? doc[k] : {};
       Object.keys(d[k]).forEach(function (f) { if (typeof src[f] === typeof d[k][f]) d[k][f] = src[f]; });
     });
-    if (d.meta.kind !== 'brief') d.meta.kind = 'paper';
+    if (d.meta.kind !== 'brief' && d.meta.kind !== 'book') d.meta.kind = 'paper';
+    var bk = doc.book && typeof doc.book === 'object' ? doc.book : {};
+    Object.keys(d.book).forEach(function (f) { if (f !== 'cover' && typeof bk[f] === typeof d.book[f]) d.book[f] = bk[f]; });
+    var bc = bk.cover && typeof bk.cover === 'object' ? bk.cover : {};
+    Object.keys(d.book.cover).forEach(function (f) {
+      var want = typeof d.book.cover[f], v = bc[f];
+      if (want === 'number' && v !== '' && v !== null && isFinite(+v)) d.book.cover[f] = +v;
+      else if (typeof v === want) d.book.cover[f] = v;
+    });
+    if (!TRIMS[d.book.trim]) d.book.trim = '6x9';
+    if (d.book.face !== 'plex') d.book.face = 'garamond';
+    if (d.book.para !== 'block') d.book.para = 'indent';
+    if (d.book.notes !== 'end') d.book.notes = 'foot';
+    if (['word', 'arabic', 'roman', 'none'].indexOf(d.book.numStyle) === -1) d.book.numStyle = 'word';
+    var C0 = d.book.cover;
+    if (COVER_LAYOUTS.indexOf(C0.layout) === -1) C0.layout = 'photo';
+    if (['top', 'middle', 'bottom'].indexOf(C0.valign) === -1) C0.valign = 'bottom';
+    if (C0.align !== 'left') C0.align = 'center';
+    if (!COVER_FONTS[C0.font]) C0.font = 'display';
+    ['bg', 'ink'].forEach(function (k) { if (!/^#[0-9a-f]{6}$/i.test(C0[k])) C0[k] = k === 'bg' ? '#1F2124' : '#FFFFFF'; });
+    C0.shade = Math.max(0, Math.min(100, C0.shade)); C0.scale = Math.max(50, Math.min(150, C0.scale)); C0.zoom = Math.max(100, Math.min(300, C0.zoom));
+    C0.focusX = Math.max(0, Math.min(100, C0.focusX)); C0.focusY = Math.max(0, Math.min(100, C0.focusY));
     if (Array.isArray(doc.authors)) d.authors = doc.authors.filter(function (a) { return a && typeof a === 'object'; }).map(function (a) {
       return { name: String(a.name == null ? '' : a.name), bio: String(a.bio == null ? '' : a.bio), org: !!a.org };
     }).filter(function (a) { return clean(a.name) || clean(a.bio); }).slice(0, 40);
@@ -1862,9 +2340,10 @@ var WP = (function () {
     return d;
   }
 
-  function render(input) {
+  function render(input, opts) {
+    opts = opts || {};
     var doc = normalize(input), m = doc.meta, brief = m.kind === 'brief';
-    var accent = /^#[0-9a-f]{6}$/i.test(m.accent) ? m.accent : brief ? BRIEF_ACCENT : PAPER_ACCENT;
+    var accent = /^#[0-9a-f]{6}$/i.test(m.accent) ? m.accent : brief ? BRIEF_ACCENT : m.kind === 'book' ? BOOK_ACCENT : PAPER_ACCENT;
     var problems = [], notes = 0, srcByKey = {}, seen = {}, usedKeys = {}, order = [], firstLoc = {}, labelOf = {};
     doc.sources.forEach(function (s) { srcByKey[s.key] = s; });
     var visById = {}; doc.visuals.forEach(function (v) { visById[v.id] = v; });
@@ -1960,6 +2439,7 @@ var WP = (function () {
 
     function paras(text) { return String(text).split(/\n\n/).map(clean).filter(Boolean).map(function (p) { return '<p>' + inline(p, ctx) + '</p>'; }).join(''); }
     if (brief) return renderBrief();
+    if (m.kind === 'book') return renderBook(opts.target === 'epub');
 
     var title = clean(m.title) || 'Untitled paper', shortTitle = clean(m.shortTitle) || title;
     if (!clean(m.title)) problem('fix', 'The paper has no title yet. Fill it in under Paper.', 'paper');
@@ -2121,6 +2601,213 @@ var WP = (function () {
         runningLeft: foot, shortTitle: name || 'Brief'
       };
     }
+    // ---------------------------------------------------------------- the eBook
+    // Cover, half title, title page, copyright page, dedication, epigraph, contents, then
+    // parts and chapters, back matter, notes, and the authors. For print, Paged.js lays it
+    // out on the chosen page size; for an ePUB (epub true) each part, chapter, and front
+    // page is kept apart, with its notes, for epubFiles to write as its own file.
+    function renderBook(epub) {
+      var B = doc.book, T = TRIMS[B.trim];
+      var title = clean(m.title) ? plainText(m.title) : 'Untitled book', sub = clean(m.subtitle) ? plainText(m.subtitle) : '';
+      var authors = doc.authors.filter(function (a) { return clean(a.name); }), names = authors.map(function (a) { return clean(a.name); });
+      if (!clean(m.title)) problem('fix', 'The book has no title yet. Fill it in under Book.', 'paper');
+      if (!authors.length) problem('check', 'No author is given. Add one under Book.', 'paper');
+      if (!clean(B.copyright)) problem('check', 'The copyright page has no copyright line. Fill it in under Book.', 'paper');
+      if (!clean(B.description)) problem('note', 'No description yet. Reading apps show it with the ePUB; write two or three sentences under Book.', 'paper');
+      if (!safeImage(m.coverImage) && B.cover.layout !== 'type') problem('note', 'The cover has no image yet. Choose one under Cover, or pick the type-only layout.', 'cover');
+      var units = [], cur = null, part = 0, chap = 0, totalNotes = 0, unitN = 0, partOpen = null;
+      var dataRun = function (s) { return esc(s); };
+
+      ctx.note = function (html) {
+        totalNotes++; notes++;
+        var u = cur || newUnit('plain', '', false), n = u.notes.length + 1, id = u.idx + '-' + n;
+        if (epub) { u.notes.push({ n: n, html: html }); return '<sup class="nref"><a epub:type="noteref" role="doc-noteref" id="fnr-' + id + '" href="#fn-' + id + '">' + n + '</a></sup>'; }
+        if (B.notes === 'end') { u.notes.push({ n: n, html: html }); return '<sup class="en-call"><a id="enr-' + id + '" href="#en-' + id + '">' + n + '</a></sup>'; }
+        u.notes.push({ n: n, html: html });
+        return '<span class="fn"><span class="fn-n">' + n + '</span> ' + html + '</span><sup class="fn-call">' + n + '</sup>';
+      };
+      // A heading's role, from a trailing {-} (unnumbered) or {part}.
+      function headKind(text, back) {
+        var mm = String(text).match(/\s*\{\s*(-|part|unnumbered)\s*\}\s*$/i);
+        var t = mm ? String(text).slice(0, mm.index) : String(text);
+        if (back) return { kind: 'back', text: t };
+        if (mm && /part/i.test(mm[1])) return { kind: 'part', text: t };
+        return { kind: mm ? 'unnumbered' : 'chapter', text: t };
+      }
+      function newUnit(kind, text, back) {
+        unitN++;
+        var u = { idx: unitN, kind: kind, back: !!back, id: 'u' + unitN, file: 'u' + pad2(unitN) + '.xhtml', label: '', title: '', plain: '', out: [], notes: [], opened: false, role: '' };
+        if (kind === 'chapter') { chap++; u.label = chapterLabel(chap); u.num = chap; }
+        if (kind === 'part') { part++; u.label = 'Part ' + (B.numStyle === 'arabic' ? String(part) : B.numStyle === 'roman' ? roman(part) : numberWord(part)); }
+        if (text) { u.title = inline(text, ctx, false); u.plain = plainText(text); }
+        u.role = semantic(kind, u.plain);
+        // Each part and chapter gives its first citation of a source in full again.
+        seen = {};
+        units.push(u); cur = u;
+        if (kind === 'part') partOpen = u; else if (u.back) partOpen = null;
+        u.part = kind === 'part' ? null : partOpen;
+        return u;
+      }
+      function chapterLabel(n) {
+        if (B.numStyle === 'none') return '';
+        var num = B.numStyle === 'arabic' ? String(n) : B.numStyle === 'roman' ? roman(n) : numberWord(n);
+        return clean(B.chapterWord) ? clean(B.chapterWord) + ' ' + num : num;
+      }
+      function unitBlocks(md, back) {
+        blocks(md).forEach(function (b) {
+          if (b.t === 'h' && b.level === 1) {
+            var hk = headKind(b.text, back);
+            newUnit(hk.kind, hk.text, back);
+            return;
+          }
+          if (!cur || (back && !cur.back)) newUnit(back ? 'back' : 'plain', '', back);
+          var u = cur, o = u.out;
+          if (b.t === 'h') { o.push(b.level === 2 ? '<h3 class="bk-sec">' + inline(b.text, ctx, false) + '</h3>' : '<h4 class="minor">' + inline(b.text, ctx, false) + '</h4>'); return; }
+          if (b.t === 'p') { o.push('<p' + (!u.opened && B.openers && (u.kind === 'chapter' || u.kind === 'unnumbered' || u.kind === 'back') ? ' class="opener"' : '') + '>' + inline(b.text, ctx) + '</p>'); u.opened = true; return; }
+          u.opened = true;
+          if (b.t === 'quote') { o.push('<blockquote>' + inline(b.text, ctx) + '</blockquote>'); return; }
+          if (b.t === 'scene') { o.push('<p class="scene" role="separator">* * *</p>'); return; }
+          if (b.t === 'break') { o.push(epub ? '' : '<div class="pagebreak"></div>'); return; }
+          if (b.t === 'matter') { o.push('<aside class="matter"><p class="m-label">' + fmtText(clean(m.matterLabel) || 'Why it matters') + '</p>' + paras(b.text) + '</aside>'); return; }
+          if (b.t === 'key') { o.push('<p class="pull">' + inline(b.text, ctx) + '</p>'); return; }
+          if (b.t === 'side') { o.push('<p class="aside">' + inline(b.text, ctx) + '</p>'); return; }
+          if (b.t === 'visual') {
+            // In a book the caption follows the figure, in reading order.
+            // The rating key may run over a page, so its caption stays on top, where it cannot be left behind.
+            var vh = visualHtml(b.id, false, '');
+            o.push(/^<figure[^>]*\brating\b/.test(vh) ? vh : vh.replace(/^(<figure[^>]*>)(<figcaption[\s\S]*?<\/figcaption>)([\s\S]*)(<\/figure>)$/, '$1$3$2$4'));
+            return;
+          }
+          if (b.t === 'ul' || b.t === 'ol') { o.push('<' + b.t + (b.t === 'ol' && b.start !== 1 ? ' start="' + b.start + '"' : '') + '>' + b.items.map(function (x) { return '<li>' + inline(x, ctx) + '</li>'; }).join('') + '</' + b.t + '>'); return; }
+          if (b.t === 'labeled') { o.push('<div class="labeled">' + b.items.map(function (x) { return '<div class="li"><div class="ll">' + fmtText(x.label) + '</div><div class="lt">' + inline(x.text, ctx) + '</div></div>'; }).join('') + '</div>'); return; }
+        });
+      }
+      unitBlocks(doc.body, false);
+      var bodyCount = units.length;
+      if (clean(doc.appendix)) { cur = null; unitBlocks(doc.appendix, true); }
+      if (!clean(doc.body)) problem('fix', 'The book has no chapters yet. Start one under Chapters with a # heading.', 'body');
+      else if (!chap && !units.some(function (u) { return u.kind === 'unnumbered'; })) problem('check', 'No chapter headings yet. Start each chapter with a # heading so it is numbered and listed in the contents.', 'body');
+      doc.visuals.forEach(function (v) { if (!usedVis[v.id]) problem('note', 'The visual [[' + v.id + ']] is not placed in the text yet.', 'visuals'); });
+      // Sources cited only in a biography count as cited.
+      var aboutHtml = '';
+      var bios = authors.filter(function (a) { return clean(a.bio); });
+      if (B.aboutAuthors && bios.length) {
+        cur = { idx: 'ab', notes: [] }; seen = {};
+        aboutHtml = bios.map(function (a) { return '<div class="au"><h3 class="au-name">' + fmtText(clean(a.name)) + '</h3>' + paras(a.bio) + '</div>'; }).join('');
+        // Notes in a biography: at the foot of the page in print, otherwise right after the biographies.
+        if (cur.notes.length && (epub || B.notes === 'end')) aboutHtml += '<hr class="notes-rule"/>' + cur.notes.map(function (x) {
+          var id = 'ab-' + x.n;
+          return epub ? '<aside epub:type="footnote" role="doc-footnote" class="fnote" id="fn-' + id + '"><p><a class="nback" href="#fnr-' + id + '">' + x.n + '.</a> ' + x.html + '</p></aside>'
+            : '<p class="fnote" id="en-' + id + '"><a class="en-n" href="#enr-' + id + '">' + x.n + '.</a> ' + x.html + '</p>';
+        }).join('');
+      }
+      doc.sources.forEach(function (s) { if (!usedKeys[s.key]) problem('note', 'Source @' + s.key + ' is not cited.', 'sources'); });
+
+      // Front matter, shared by the PDF and the ePUB.
+      var series = clean(B.series) ? plainText(B.series) + (clean(B.seriesNo) ? ' · No. ' + clean(B.seriesNo) : '') : '';
+      var pub = clean(m.publisher), site = clean(m.site), url = safeUrl(m.url), year = (String(m.date).match(/\b(1[89]|20|21)\d\d\b/) || [String(new Date().getFullYear())])[0];
+      var faceNote = B.face === 'plex' ? 'Set in IBM Plex Serif and IBM Plex Sans Condensed.' : 'Set in EB Garamond and Cormorant Garamond.';
+      var titlePage = (series ? '<p class="tp-series">' + esc(series) + '</p>' : '')
+        + '<h1 class="tp-title">' + fmtText(clean(m.title) ? m.title : 'Untitled book') + '</h1>'
+        + (sub ? '<p class="tp-sub">' + fmtText(m.subtitle) + '</p>' : '')
+        + '<p class="tp-rule" aria-hidden="true"></p>'
+        + (names.length ? '<p class="tp-by">' + andList(names.map(function (x) { return fmtText(x); })) + '</p>' : '')
+        + '<div class="tp-foot">' + (pub ? '<p class="tp-pub">' + esc(pub) + '</p>' : '') + (site ? '<p class="tp-site">' + esc(site) + '</p>' : '') + '</div>';
+      var credits = lines(B.credits);
+      if (clean(m.coverCaption)) credits.push('Cover image: ' + clean(m.coverCaption).replace(/^cover( image)?:\s*/i, ''));
+      var copyPage = '<p class="cp-title"><i>' + fmtText(title) + '</i>' + (sub ? ': ' + fmtText(sub) : '') + '</p>'
+        + (clean(B.copyright) ? String(B.copyright).split(/\n\s*\n|\n/).map(clean).filter(Boolean).map(function (p) { return '<p>' + fmtText(p) + '</p>'; }).join('') : '')
+        + (clean(m.colophon) ? String(m.colophon).split(/\n\s*\n/).map(function (p) { return '<p>' + fmtText(p.replace(/\n/g, ' ')) + '</p>'; }).join('') : '')
+        + (clean(B.edition) ? '<p>' + fmtText(B.edition) + '</p>' : '')
+        + (clean(B.isbn) ? '<p>ISBN ' + esc(clean(B.isbn).replace(/^ISBN:?\s*/i, '')) + '</p>' : '')
+        + (clean(B.issn) ? '<p>ISSN ' + esc(clean(B.issn).replace(/^ISSN:?\s*/i, '')) + '</p>' : '')
+        + (credits.length ? '<p class="cp-credits">' + credits.map(fmtText).join('<br>') + '</p>' : '')
+        + (B.typeNote ? '<p>' + faceNote + '</p>' : '')
+        + (pub || site || url ? '<p class="cp-pub">' + [pub ? esc(pub) : '', url ? '<a href="' + esc(url) + '">' + esc(site || url) + '</a>' : site ? esc(site) : ''].filter(Boolean).join('<br>') + '</p>' : '');
+      var dedication = clean(B.dedication) ? String(B.dedication).split(/\n\s*\n/).map(function (p) { return '<p>' + fmtText(p.replace(/\n/g, ' ')) + '</p>'; }).join('') : '';
+      var epigraph = clean(B.epigraph) ? '<blockquote class="epi">' + String(B.epigraph).split(/\n\s*\n/).map(function (p) { return '<p>' + fmtText(p.replace(/\n/g, ' ')) + '</p>'; }).join('') + (clean(B.epigraphBy) ? '<p class="epi-by">— ' + fmtText(B.epigraphBy) + '</p>' : '') + '</blockquote>' : '';
+      var stats = { notes: totalNotes, words: words(doc.body) + words(doc.appendix), figures: figs.length, cited: Object.keys(usedKeys).length, chapters: chap, parts: part };
+
+      function unitHead(u, tag) {
+        if (u.kind === 'plain' || (u.back && !u.title)) return '';
+        var t = u.title || '';
+        return '<header class="ch-head">' + (u.label ? '<p class="ch-num">' + esc(u.label) + '</p>' : '')
+          + (t ? '<' + tag + ' class="ch-title" id="h-' + u.id + '"' + (epub ? '' : ' data-run="' + dataRun(u.plain) + '"') + '>' + t + '</' + tag + '>' : '') + '</header>';
+      }
+
+      if (epub) {
+        return {
+          problems: problems, stats: stats,
+          epub: {
+            title: title, sub: sub, names: names, authors: authors, series: clean(B.series) ? plainText(B.series) : '', seriesNo: clean(B.seriesNo), pub: pub, site: site, url: url, year: year,
+            accent: accent, titlePage: titlePage, copyPage: copyPage, dedication: dedication, epigraph: epigraph, about: aboutHtml, aboutCount: bios.length,
+            units: units.map(function (u) {
+              var notesHtml = u.notes.length ? '<hr class="notes-rule"/>' + u.notes.map(function (x) {
+                var id = u.idx + '-' + x.n;
+                return '<aside epub:type="footnote" role="doc-footnote" class="fnote" id="fn-' + id + '"><p><a class="nback" href="#fnr-' + id + '">' + x.n + '.</a> ' + x.html + '</p></aside>';
+              }).join('') : '';
+              return { id: u.id, file: u.file, kind: u.kind, back: u.back, label: u.label, plain: u.plain, role: u.role, part: u.part ? u.part.id : null, hasTitle: !!u.title,
+                html: unitHead(u, 'h1') + u.out.join('\n') + notesHtml };
+            })
+          }
+        };
+      }
+
+      // ---- print
+      var tocRows = [];
+      units.forEach(function (u) {
+        if (!u.title && !u.label) return;
+        tocRows.push('<li class="t-' + u.kind + (u.part && u.kind !== 'part' ? ' in-part' : '') + '">' + (u.label && u.kind === 'part' ? '<span class="lab">' + esc(u.label) + '</span>' : '')
+          + '<a href="#' + u.id + '">' + (u.kind === 'chapter' && u.label ? '<span class="lab">' + esc(u.label) + '</span>' : '') + '<span class="tt">' + esc(u.plain || u.label) + '</span></a></li>');
+      });
+      var hasEnd = B.notes === 'end' && units.some(function (u) { return u.notes.length; });
+      if (hasEnd) tocRows.push('<li class="t-back"><a href="#notes"><span class="tt">Notes</span></a></li>');
+      if (aboutHtml) tocRows.push('<li class="t-back"><a href="#about"><span class="tt">About the ' + (bios.length > 1 ? 'authors' : 'author') + '</span></a></li>');
+
+      var svg = coverSvg(doc, { measure: opts.measure || MEASURE, title: 'Cover' });
+      var front = '<section class="bk-cover">' + svg + '</section>'
+        + (B.halfTitle ? '<section class="fm bk-half"><p class="ht">' + fmtText(clean(m.title) ? m.title : 'Untitled book') + '</p></section>' : '')
+        + '<section class="fm bk-titlepage">' + titlePage + '</section>'
+        + '<section class="fm bk-copy"><div class="cp">' + copyPage + '</div></section>'
+        + (dedication ? '<section class="fm bk-ded"><div class="ded">' + dedication + '</div></section>' : '')
+        + (epigraph ? '<section class="fm bk-epi">' + epigraph + '</section>' : '')
+        + (tocRows.length ? '<section class="fm bk-toc" id="contents"><h2 class="fm-h">Contents</h2><ol class="ktoc">' + tocRows.join('') + '</ol></section>' : '');
+      var body = units.map(function (u) {
+        var head = unitHead(u, 'h2');
+        var cls = 'bk-unit k-' + u.kind + (u.back ? ' back' : '') + (u.kind === 'plain' && u === units[0] ? '' : '');
+        return '<section class="' + cls + '" id="' + u.id + '">' + head + u.out.join('\n') + '</section>';
+      }).join('\n');
+      var endHtml = hasEnd ? '<section class="bk-unit k-back bk-notes" id="notes"><header class="ch-head"><h2 class="ch-title" data-run="Notes">Notes</h2></header>' + units.filter(function (u) { return u.notes.length; }).map(function (u) {
+        return '<h3 class="nt-h">' + esc(u.label && u.plain ? u.label + ': ' + u.plain : u.label || u.plain || 'Opening') + '</h3><ol class="enotes">' + u.notes.map(function (x) {
+          var id = u.idx + '-' + x.n;
+          return '<li id="en-' + id + '"><a class="en-n" href="#enr-' + id + '">' + x.n + '.</a> ' + x.html + '</li>';
+        }).join('') + '</ol>';
+      }).join('') + '</section>' : '';
+      var about = aboutHtml ? '<section class="bk-unit k-back bk-about" id="about"><header class="ch-head"><h2 class="ch-title" data-run="About the ' + (bios.length > 1 ? 'authors' : 'author') + '">About the ' + (bios.length > 1 ? 'authors' : 'author') + '</h2></header>' + aboutHtml + '</section>' : '';
+
+      var px = function (n) { return Math.round(n) + 'px'; };
+      var Wp = Math.round(T.w * 96), Hp = Math.round(T.h * 96), M = T.m;
+      var plex = B.face === 'plex';
+      var fs = plex ? T.fs - 1 : T.fs, lh = T.lh;
+      var vars = ':root{--wp-accent:' + accent + ';--bk-fs:' + fs + 'px;--bk-lh:' + lh + 'px;--bk-w:' + Wp + 'px;--bk-h:' + Hp + 'px;--bk-ch:' + (Hp - M[0] - M[2] - 4) + 'px;}';
+      var runBox = 'font-family:' + (plex ? '"Plex Sans Cond",sans-serif;font-weight:600;font-size:10px;letter-spacing:0.12em;' : '"Garamond Body",Garamond,serif;font-size:10.5px;letter-spacing:0.16em;') + 'text-transform:uppercase;color:#5A554D;line-height:14px;';
+      var folio = 'font-family:' + (plex ? '"Plex Mono",monospace;font-size:10.5px;' : '"Garamond Body",Garamond,serif;font-size:12px;') + 'color:#2C2A27;line-height:14px;';
+      var none = '@top-left{content:none}@top-center{content:none}@top-right{content:none}@bottom-left{content:none}@bottom-center{content:none}@bottom-right{content:none}';
+      var shortT = clean(m.shortTitle) ? plainText(m.shortTitle) : title;
+      var running = '@page{size:' + T.w + 'in ' + T.h + 'in;margin:' + px(M[0]) + ' ' + px(M[1]) + ' ' + px(M[2]) + ' ' + px(M[3]) + ';}'
+        + '@page :left{margin-left:' + px(M[1]) + ';margin-right:' + px(M[3]) + ';@top-center{content:"' + cssStr(shortT) + '";' + runBox + 'vertical-align:bottom;padding-bottom:' + Math.round(M[0] * 0.35) + 'px;}@bottom-left{content:counter(page);' + folio + 'vertical-align:top;padding-top:' + Math.round(M[2] * 0.3) + 'px;}}'
+        + '@page :right{margin-left:' + px(M[3]) + ';margin-right:' + px(M[1]) + ';@top-center{content:string(chapter);' + runBox + 'vertical-align:bottom;padding-bottom:' + Math.round(M[0] * 0.35) + 'px;}@bottom-right{content:counter(page);' + folio + 'vertical-align:top;padding-top:' + Math.round(M[2] * 0.3) + 'px;}}'
+        + '@page :first{margin:0;' + none + '}'
+        + '@page front{' + none + '}@page part{' + none + '}@page :blank{' + none + '}'
+        + '@page chapter:first{@top-left{content:none}@top-center{content:none}@top-right{content:none}}'
+        // Notes move to the foot of the page, out of the book's own styles, so their face is set here.
+        + (plex ? '.fn{font-family:"Plex Serif",Georgia,serif;font-size:10.5px;line-height:15px;}.fn .fn-n{font-family:"Plex Mono",monospace;font-weight:500;}' : '');
+      return {
+        html: '<div class="bk face-' + B.face + ' para-' + B.para + (B.recto ? ' recto' : '') + '">' + front + '<div class="bk-main">' + body + endHtml + about + '</div></div>',
+        vars: vars + running, problems: problems, stats: stats,
+        runningLeft: shortT, shortTitle: shortT, size: { w: Wp, h: Hp }
+      };
+    }
     var html = '<div class="wp">' + cover + contents + sumHtml + '<section class="wp-body">' + bodyHtml + '</section>' + (appHtml ? '<section class="wp-appendix">' + appHtml + '</section>' : '') + backHtml + '</div>';
     return {
       html: html, vars: vars + running, problems: problems,
@@ -2159,6 +2846,368 @@ var WP = (function () {
     return w.length > 1 ? w[w.length - 1] + ', ' + w.slice(0, -1).join(' ') : n;
   }
 
+  // ------------------------------------------------------------------ eBook helpers
+  var ONES = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+  var TENS = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+  function numberWord(n) { if (n < 20) return ONES[n]; if (n < 100) return TENS[Math.floor(n / 10)] + (n % 10 ? '-' + ONES[n % 10] : ''); return String(n); }
+  function roman(n) {
+    var v = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1], s = ['M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I'], out = '';
+    for (var i = 0; i < v.length; i++) while (n >= v[i]) { out += s[i]; n -= v[i]; }
+    return out;
+  }
+  // The ePUB structural role of a part, chapter, or back-matter page, from its kind and title.
+  var ROLE_WORDS = [[/^preface\b/, 'preface'], [/^foreword\b/, 'foreword'], [/^introduction\b/, 'introduction'], [/^prologue\b/, 'prologue'], [/^epilogue\b/, 'epilogue'],
+    [/^afterword\b/, 'afterword'], [/^acknowledge?ments?\b/, 'acknowledgments'], [/^appendix\b/, 'appendix'], [/^glossary\b/, 'glossary'], [/^(bibliography|works cited|further reading)\b/, 'bibliography'], [/^conclusion\b/, 'conclusion']];
+  function semantic(kind, plain) {
+    if (kind === 'part') return 'part';
+    if (kind === 'chapter') return 'chapter';
+    var t = clean(plain).toLowerCase();
+    for (var i = 0; i < ROLE_WORDS.length; i++) if (ROLE_WORDS[i][0].test(t)) return ROLE_WORDS[i][1];
+    return kind === 'back' ? '' : 'chapter';
+  }
+  // Text measurement for fitting the cover title. The page sets this to a canvas measure
+  // once the fonts load; without it, widths are estimated from the face's average letter.
+  var MEASURE = null;
+  function setMeasure(fn) { MEASURE = typeof fn === 'function' ? fn : null; }
+
+  // ------------------------------------------------------------------ the cover, as one SVG
+  // 1600 px wide, as tall as the trim size asks. The same picture is the PDF's first page,
+  // the preview under Cover, and (drawn to a canvas by the page) the ePUB's cover image.
+  function coverSvg(input, o) {
+    o = o || {};
+    var doc = normalize(input), m = doc.meta, B = doc.book, C = B.cover, T = TRIMS[B.trim];
+    var W = 1600, H = Math.round(W * T.h / T.w), accent = /^#[0-9a-f]{6}$/i.test(m.accent) ? m.accent : BOOK_ACCENT;
+    var measure = o.measure || MEASURE, F = COVER_FONTS[C.font], small = F.small, id = o.idPrefix || 'cv';
+    var img = safeImage(m.coverImage), layout = C.layout;
+    if (layout === 'art' && !img) layout = 'type';
+    var mx = Math.round(W * 0.1), maxW = W - 2 * mx, ink = C.ink, defs = [], out = [];
+    function width(text, size, fam, weight, italic, ls) {
+      var w = null;
+      if (measure) { try { w = measure(text, (italic ? 'italic ' : '') + weight + ' ' + size + 'px "' + fam + '"'); } catch (e) { w = null; } }
+      if (w === null || !isFinite(w)) w = text.length * size * (fam === F.family ? F.cw : SMALL_CW[fam] || 0.5) * (fam !== 'Plex Mono' && text === text.toUpperCase() && /[A-Z]/.test(text) ? 1.25 : 1);
+      return w + Math.max(0, text.length - 1) * (ls || 0) * size;
+    }
+    function wrap(text, size, fam, weight, italic, ls, max) {
+      var ws = clean(text).split(' '), ls2 = [], line = '';
+      ws.forEach(function (w) { var t = line ? line + ' ' + w : w; if (line && width(t, size, fam, weight, italic, ls) > max) { ls2.push(line); line = w; } else line = t; });
+      if (line) ls2.push(line);
+      return ls2;
+    }
+    // The fewest lines at this size, then the narrowest measure that keeps that many, so lines balance.
+    function balanced(text, size, fam, weight, italic, ls, max) {
+      var first = wrap(text, size, fam, weight, italic, ls, max), lo = max * 0.45, hi = max;
+      if (first.length < 2) return first;
+      for (var k = 0; k < 12; k++) { var mid = (lo + hi) / 2; if (wrap(text, size, fam, weight, italic, ls, mid).length <= first.length) hi = mid; else lo = mid; }
+      return wrap(text, size, fam, weight, italic, ls, hi);
+    }
+    var title = clean(m.title) ? plainText(m.title) : 'Untitled book';
+    if (C.upper) title = title.toUpperCase();
+    var sub = C.showSub && clean(m.subtitle) ? plainText(m.subtitle) : '';
+    var names = doc.authors.filter(function (a) { return clean(a.name); }).map(function (a) { return clean(a.name); });
+    var who = C.showAuthor && names.length ? andList(names).toUpperCase() : '';
+    var pub = C.showPub && clean(m.publisher) ? plainText(m.publisher).toUpperCase() : '';
+    var kicker = clean(C.kicker) ? plainText(C.kicker).toUpperCase() : '';
+    var smallW = small === 'Plex Mono' ? 500 : 600, italicSub = small === 'Garamond Body';
+    // Fit the title: the largest size at which it takes no more lines than the layout allows.
+    var maxLines = layout === 'band' ? 3 : 4, tSize = Math.round(W * 0.118 * C.scale / 100), tLines;
+    for (; tSize > 44; tSize = Math.round(tSize * 0.95)) {
+      tLines = wrap(title, tSize, F.family, F.weight, false, C.upper ? 0.04 : 0, maxW);
+      if (tLines.length <= maxLines && tLines.every(function (l) { return width(l, tSize, F.family, F.weight, false, C.upper ? 0.04 : 0) <= maxW; })) break;
+    }
+    tLines = balanced(title, tSize, F.family, F.weight, false, C.upper ? 0.04 : 0, maxW);
+    // Each piece of text as a block: its lines, size, line height, face, and the space above it.
+    function blk(lines2, size, lh, fam, css, weight, italic, ls, fill, opacity, gap) { return { lines: lines2, size: size, lh: lh, fam: fam, css: css, weight: weight, italic: italic, ls: ls, fill: fill, opacity: opacity, gap: gap }; }
+    var smallCss = SMALL_CSS[small];
+    var kick = kicker ? blk(wrap(kicker, 34, small, smallW, false, 0.28, maxW), 34, 48, small, smallCss, smallW, false, 0.28, ink, 0.85, 0) : null;
+    var tb = blk(tLines, tSize, Math.round(tSize * F.lh), F.family, F.css, F.weight, false, C.upper ? 0.04 : 0, ink, 1, kick ? 40 : 0);
+    var rule = { rule: true, gap: 54, h: 6 };
+    var sb = sub ? blk(balanced(sub, 52, small, italicSub ? 400 : 500, italicSub, 0, maxW * 0.92), 52, 68, small, smallCss, italicSub ? 400 : 500, italicSub, 0, ink, 0.92, 48) : null;
+    var wb = who ? blk(wrap(who, 42, small, smallW, false, 0.16, maxW), 42, 58, small, smallCss, smallW, false, 0.16, ink, 1, sub ? 56 : 56) : null;
+    var pb = pub ? blk([pub], 28, 36, small, smallCss, smallW, false, 0.26, ink, 0.82, 0) : null;
+    function height(list) { return list.reduce(function (h, b, i) { return h + (i ? b.gap : 0) + (b.rule ? b.h : b.lines.length * b.lh); }, 0); }
+    var tx = C.align === 'left' ? mx : W / 2, anchor = C.align === 'left' ? 'start' : 'middle';
+    function draw(list, top) {
+      var y = top;
+      list.forEach(function (b, i) {
+        if (i) y += b.gap;
+        if (b.rule) { var rw = 150; out.push('<rect x="' + (C.align === 'left' ? mx : W / 2 - rw / 2) + '" y="' + y + '" width="' + rw + '" height="' + b.h + '" fill="' + accent + '"/>'); y += b.h; return; }
+        b.lines.forEach(function (l) {
+          var base = y + (b.lh - b.size) / 2 + b.size * 0.8;
+          out.push('<text x="' + tx + '" y="' + base.toFixed(1) + '" text-anchor="' + anchor + '" font-family="' + esc(b.css) + '" font-size="' + b.size + '" font-weight="' + b.weight + '"'
+            + (b.italic ? ' font-style="italic"' : '') + (b.ls ? ' letter-spacing="' + (b.ls * b.size).toFixed(1) + '"' : '') + ' fill="' + b.fill + '"' + (b.opacity < 1 ? ' fill-opacity="' + b.opacity + '"' : '') + '>' + esc(l) + '</text>');
+          y += b.lh;
+        });
+      });
+      return y;
+    }
+    function picture(x, y, w, h, n) {
+      var cid = id + '-clip' + n, href = ' href="' + img + '" xlink:href="' + img + '"';
+      defs.push('<clipPath id="' + cid + '"><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '"/></clipPath>');
+      if (C.imgW > 0 && C.imgH > 0) {
+        var s = Math.max(w / C.imgW, h / C.imgH) * C.zoom / 100, dw = C.imgW * s, dh = C.imgH * s;
+        var ix = x + (w - dw) * C.focusX / 100, iy = y + (h - dh) * C.focusY / 100;
+        return '<image clip-path="url(#' + cid + ')" x="' + ix.toFixed(1) + '" y="' + iy.toFixed(1) + '" width="' + dw.toFixed(1) + '" height="' + dh.toFixed(1) + '" preserveAspectRatio="none"' + href + '/>';
+      }
+      return '<image clip-path="url(#' + cid + ')" x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" preserveAspectRatio="xMidYMid slice"' + href + '/>';
+    }
+    var shade = C.shade / 100, main = [kick, tb, rule, sb, wb].filter(Boolean), top, bottomPad = Math.round(H * 0.075);
+    out.push('<rect width="' + W + '" height="' + H + '" fill="' + C.bg + '"/>');
+    if (layout === 'art') {
+      out.push(picture(0, 0, W, H, 1));
+    } else if (layout === 'band') {
+      var bandY = Math.round(H * 0.56);
+      if (img) out.push(picture(0, 0, W, bandY, 1));
+      else { defs.push('<linearGradient id="' + id + '-ph" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.10"/><stop offset="1" stop-color="#000000" stop-opacity="0.25"/></linearGradient>'); out.push('<rect width="' + W + '" height="' + bandY + '" fill="url(#' + id + '-ph)"/>'); }
+      out.push('<rect y="' + (bandY - 7) + '" width="' + W + '" height="14" fill="' + accent + '"/>');
+      var room = H - bandY - (pb ? pb.lh + bottomPad : bottomPad) - 30, hb = height(main);
+      top = bandY + 30 + Math.max(40, (room - hb) / 2);
+      draw(main, Math.round(top));
+      if (pb) draw([pb], H - bottomPad - pb.lh);
+    } else if (layout === 'framed') {
+      var upper = [kick, tb, rule, sb].filter(Boolean), lower = [wb, pb].filter(Boolean);
+      if (pb && wb) pb.gap = 30;
+      var y1 = draw(upper, Math.round(H * 0.075));
+      var lh2 = height(lower), y2 = H - bottomPad - lh2;
+      var fy = y1 + 70, fh = Math.max(Math.round(H * 0.18), y2 - 70 - fy), fx = mx, fw = W - 2 * mx;
+      if (img) out.push(picture(fx, fy, fw, fh, 1));
+      else out.push('<rect x="' + fx + '" y="' + fy + '" width="' + fw + '" height="' + fh + '" fill="' + ink + '" fill-opacity="0.08"/>');
+      out.push('<rect x="' + fx + '" y="' + fy + '" width="' + fw + '" height="' + fh + '" fill="none" stroke="' + accent + '" stroke-width="5"/>');
+      if (lower.length) draw(lower, y2);
+    } else {
+      if (layout === 'photo') {
+        if (img) out.push(picture(0, 0, W, H, 1));
+        else { defs.push('<linearGradient id="' + id + '-ph" x1="0" y1="0" x2="0.6" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.12"/><stop offset="1" stop-color="#000000" stop-opacity="0.35"/></linearGradient>'); out.push('<rect width="' + W + '" height="' + H + '" fill="url(#' + id + '-ph)"/>'); }
+      } else {
+        out.push('<rect x="' + mx + '" y="' + Math.round(H * 0.045) + '" width="' + (W - 2 * mx) + '" height="4" fill="' + accent + '"/>');
+        out.push('<rect x="' + mx + '" y="' + (H - Math.round(H * 0.045) - 4) + '" width="' + (W - 2 * mx) + '" height="4" fill="' + accent + '"/>');
+      }
+      var hMain = height(main), reserve = pb ? pb.lh + 50 : 0;
+      top = C.valign === 'top' ? Math.round(H * 0.09) : C.valign === 'middle' ? Math.round((H - hMain) / 2) : H - bottomPad - reserve - hMain;
+      if (layout === 'photo' && img && shade > 0) {
+        var gid = id + '-shade';
+        if (C.valign === 'middle') out.push('<rect width="' + W + '" height="' + H + '" fill="#0C0C0B" fill-opacity="' + (shade * 0.55).toFixed(2) + '"/>');
+        else {
+          var bottomSide = C.valign === 'bottom', s0 = bottomSide ? Math.max(0, top - Math.round(H * 0.2)) : 0, s1 = bottomSide ? H : Math.min(H, top + hMain + Math.round(H * 0.2));
+          defs.push('<linearGradient id="' + gid + '" x1="0" y1="0" x2="0" y2="1">' + (bottomSide
+            ? '<stop offset="0" stop-color="#0C0C0B" stop-opacity="0"/><stop offset="0.45" stop-color="#0C0C0B" stop-opacity="' + (shade * 0.75).toFixed(2) + '"/><stop offset="1" stop-color="#0C0C0B" stop-opacity="' + shade.toFixed(2) + '"/>'
+            : '<stop offset="0" stop-color="#0C0C0B" stop-opacity="' + shade.toFixed(2) + '"/><stop offset="0.55" stop-color="#0C0C0B" stop-opacity="' + (shade * 0.75).toFixed(2) + '"/><stop offset="1" stop-color="#0C0C0B" stop-opacity="0"/>') + '</linearGradient>');
+          out.push('<rect y="' + s0 + '" width="' + W + '" height="' + (s1 - s0) + '" fill="url(#' + gid + ')"/>');
+        }
+      }
+      draw(main, top);
+      if (pb) draw([pb], H - bottomPad - pb.lh);
+    }
+    var size = o.standalone ? ' width="' + W + '" height="' + H + '"' : '';
+    return '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="cover-svg" viewBox="0 0 ' + W + ' ' + H + '"' + size + ' preserveAspectRatio="xMidYMid slice" role="img" aria-label="' + esc('Cover: ' + clean(m.title ? plainText(m.title) : 'Untitled book')) + '">'
+      + (o.fontCss || defs.length ? '<defs>' + (o.fontCss ? '<style>' + o.fontCss + '<\/style>' : '') + defs.join('') + '</defs>' : '') + out.join('') + '</svg>';
+  }
+  function coverSize(input) { var T = TRIMS[normalize(input).book.trim]; return { w: 1600, h: Math.round(1600 * T.h / T.w) }; }
+  // The faces a cover uses, so the page can embed just those when it draws the cover as an image.
+  function coverFamilies(input) { var F = COVER_FONTS[normalize(input).book.cover.font]; return F.family === F.small ? [F.family] : [F.family, F.small]; }
+
+  // ------------------------------------------------------------------ the ePUB
+  // An EPUB 3 package, built from the same text as the PDF: one file per part and chapter,
+  // notes at the end of each chapter as pop-up footnotes, figures and charts kept with the
+  // text, the cover as an image, and the contents for the reading app.
+  var CRC_T = null;
+  function crc32(b) {
+    var n, k, c, i, crc = 0xFFFFFFFF;
+    if (!CRC_T) { CRC_T = []; for (n = 0; n < 256; n++) { c = n; for (k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1); CRC_T[n] = c >>> 0; } }
+    for (i = 0; i < b.length; i++) crc = CRC_T[(crc ^ b[i]) & 0xFF] ^ (crc >>> 8);
+    return (crc ^ 0xFFFFFFFF) >>> 0;
+  }
+  function utf8(s) { return new TextEncoder().encode(s); }
+  // A zip with every file stored, not compressed: the EPUB format requires that of the
+  // first file (mimetype) and allows it of the rest.
+  function zipStore(files) {
+    var parts = [], central = [], offset = 0, cdSize = 0, total = 0, pos = 0, out;
+    function u16(n) { return [n & 255, (n >>> 8) & 255]; }
+    function u32(n) { return [n & 255, (n >>> 8) & 255, (n >>> 16) & 255, (n >>> 24) & 255]; }
+    files.forEach(function (f) {
+      var name = utf8(f.name), data = typeof f.data === 'string' ? utf8(f.data) : f.data, crc = crc32(data), size = data.length;
+      var local = [].concat(u32(0x04034b50), u16(20), u16(0x0800), u16(0), u16(0), u16(0x21), u32(crc), u32(size), u32(size), u16(name.length), u16(0));
+      parts.push(new Uint8Array(local), name, data);
+      central.push([new Uint8Array([].concat(u32(0x02014b50), u16(20), u16(20), u16(0x0800), u16(0), u16(0), u16(0x21), u32(crc), u32(size), u32(size), u16(name.length), u16(0), u16(0), u16(0), u16(0), u32(0), u32(offset))), name]);
+      offset += local.length + name.length + size;
+    });
+    central.forEach(function (c) { parts.push(c[0], c[1]); cdSize += c[0].length + c[1].length; });
+    parts.push(new Uint8Array([].concat(u32(0x06054b50), u16(0), u16(0), u16(files.length), u16(files.length), u32(cdSize), u32(offset), u16(0))));
+    parts.forEach(function (p) { total += p.length; });
+    out = new Uint8Array(total);
+    parts.forEach(function (p) { out.set(p, pos); pos += p.length; });
+    return out;
+  }
+  function b64bytes(s) {
+    if (typeof atob === 'function') { var bin = atob(s), out = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i); return out; }
+    return new Uint8Array(Buffer.from(s, 'base64'));
+  }
+  // HTML as written for the PDF, made well-formed XHTML: empty elements closed, SVG given its namespace.
+  function xhtml(h) {
+    return String(h).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '')
+      .replace(/<(img|br|hr|col|wbr|input|source)\b([^>]*?)\s*\/?>/g, '<$1$2/>')
+      .replace(/<svg\b(?![^>]*\bxmlns=)/g, '<svg xmlns="http://www.w3.org/2000/svg"');
+  }
+  function w3cDate(s) {
+    var t = clean(s), mm;
+    if ((mm = t.match(/^(\d{4})(-\d\d(-\d\d)?)?$/))) return t;
+    if ((mm = t.match(/^(?:(\d{1,2})\s+)?([A-Za-z]{3,9})\.?\s+(?:(\d{1,2}),?\s+)?(\d{4})$/))) {
+      var mi = MONTHS.map(function (x) { return x.slice(0, 3).toLowerCase(); }).indexOf(mm[2].slice(0, 3).toLowerCase());
+      if (mi !== -1) { var day = mm[1] || mm[3]; return mm[4] + '-' + pad2(mi + 1) + (day ? '-' + pad2(+day) : ''); }
+    }
+    if ((mm = t.match(/\b(1[5-9]\d\d|20\d\d|21\d\d)\b/))) return mm[1];
+    return '';
+  }
+  function isoNow(d) { return (d || new Date()).toISOString().replace(/\.\d+Z$/, 'Z'); }
+  // A stable identifier for a book with no ISBN and no saved id: a UUID shape from the title and authors.
+  function pseudoUuid(s) {
+    var h = [crc32(utf8('a' + s)), crc32(utf8('b' + s)), crc32(utf8('c' + s)), crc32(utf8('d' + s))].map(function (n) { return ('00000000' + n.toString(16)).slice(-8); }).join('');
+    return h.slice(0, 8) + '-' + h.slice(8, 12) + '-4' + h.slice(13, 16) + '-a' + h.slice(17, 20) + '-' + h.slice(20, 32);
+  }
+  function fileAs(name) { return invertName(name); }
+  var DPUB_ROLES = { chapter: 1, part: 1, preface: 1, foreword: 1, introduction: 1, prologue: 1, epilogue: 1, afterword: 1, acknowledgments: 1, appendix: 1, glossary: 1, bibliography: 1, conclusion: 1 };
+
+  function epubFiles(input, o) {
+    o = o || {};
+    var doc = normalize(input);
+    doc.meta.kind = 'book';
+    var B = doc.book, r = render(doc, { target: 'epub', measure: o.measure }), E = r.epub;
+    var lang = clean(B.lang) || 'en', files = [], items = [], spine = [], imgN = 0, seenImg = {};
+    var langAttr = ' xml:lang="' + esc(lang) + '" lang="' + esc(lang) + '"';
+    function add(name, data, type, id, props, linear) {
+      files.push({ name: 'EPUB/' + name, data: data });
+      items.push('<item id="' + id + '" href="' + name + '" media-type="' + type + '"' + (props ? ' properties="' + props + '"' : '') + '/>');
+      if (linear !== undefined) spine.push('<itemref idref="' + id + '"' + (linear ? '' : ' linear="no"') + '/>');
+    }
+    function images(html) {
+      return html.replace(/(<img\b[^>]*?\ssrc=")data:image\/(png|jpe?g|gif|webp|svg\+xml);base64,([A-Za-z0-9+\/=]+)(")/g, function (all, pre, kind, data, post) {
+        var key = data.length + ':' + data.slice(0, 64) + data.slice(-64);
+        if (!seenImg[key]) {
+          var ext = kind === 'jpeg' ? 'jpg' : kind === 'svg+xml' ? 'svg' : kind, name = 'images/fig-' + (++imgN) + '.' + ext;
+          add(name, b64bytes(data), 'image/' + (kind === 'jpg' ? 'jpeg' : kind), 'img' + imgN);
+          seenImg[key] = name;
+        }
+        return pre + '../' + seenImg[key] + post;
+      });
+    }
+    function page(titleText, body, bodyType) {
+      return '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops"' + langAttr + '>\n<head>\n<meta charset="UTF-8"/>\n<title>' + esc(titleText) + '</title>\n<link rel="stylesheet" type="text/css" href="../css/book.css"/>\n</head>\n'
+        + '<body' + (bodyType ? ' epub:type="' + bodyType + '"' : '') + ' class="' + 'face-' + B.face + ' para-' + B.para + '">\n' + xhtml(body) + '\n</body>\n</html>\n';
+    }
+    function textFile(name, id, titleText, body, bodyType) {
+      var x = page(titleText, images(body), bodyType);
+      add('text/' + name, x, 'application/xhtml+xml', id, /<svg\b/.test(x) ? 'svg' : '', true);
+    }
+
+    files.push({ name: 'mimetype', data: 'application/epub+zip' });
+    files.push({ name: 'META-INF/container.xml', data: '<?xml version="1.0" encoding="UTF-8"?>\n<container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">\n<rootfiles>\n<rootfile full-path="EPUB/package.opf" media-type="application/oebps-package+xml"/>\n</rootfiles>\n</container>\n' });
+
+    // Styles, with the book's accent and, when the page supplies them, its typefaces.
+    var fontCss = '';
+    (o.fonts || []).forEach(function (f, i) {
+      var name = 'fonts/' + slug(f.family) + '-' + f.weight + (f.style === 'italic' ? 'i' : '') + '-' + (i + 1) + '.woff2';
+      add(name, f.data, 'font/woff2', 'font' + (i + 1));
+      fontCss += '@font-face{font-family:"' + f.family + '";font-style:' + f.style + ';font-weight:' + f.weight + ';src:url(../' + name + ') format("woff2");' + (f.range ? 'unicode-range:' + f.range + ';' : '') + '}\n';
+    });
+    add('css/book.css', fontCss + String(o.css || 'body{font-family:serif;}').replace(/--ACCENT--/g, E.accent), 'text/css', 'css');
+
+    // The cover: the page's drawing of it when given, otherwise the SVG itself.
+    var coverName;
+    if (o.cover && o.cover.data) { coverName = 'images/cover.' + (o.cover.type === 'image/png' ? 'png' : 'jpg'); add(coverName, o.cover.data, o.cover.type === 'image/png' ? 'image/png' : 'image/jpeg', 'cover-image', 'cover-image'); }
+    else { coverName = 'images/cover.svg'; add(coverName, '<?xml version="1.0" encoding="UTF-8"?>\n' + coverSvg(doc, { standalone: true, measure: o.measure }), 'image/svg+xml', 'cover-image', 'cover-image'); }
+    var cs = coverSize(doc);
+    textFile('cover.xhtml', 'cover', 'Cover', '<section epub:type="cover" class="cover-page"><img role="doc-cover" src="../' + coverName + '" alt="' + esc('Cover of ' + E.title) + '" width="' + cs.w + '" height="' + cs.h + '"/></section>', 'cover');
+    textFile('title.xhtml', 'titlepage', E.title, '<section epub:type="titlepage" class="titlepage">' + E.titlePage + '</section>', 'frontmatter');
+    textFile('copyright.xhtml', 'copyright', 'Copyright', '<section epub:type="copyright-page" class="copyright">' + E.copyPage + '</section>', 'frontmatter');
+    if (E.dedication) textFile('dedication.xhtml', 'dedication', 'Dedication', '<section epub:type="dedication" role="doc-dedication" class="dedication">' + E.dedication + '</section>', 'frontmatter');
+    if (E.epigraph) textFile('epigraph.xhtml', 'epigraph', 'Epigraph', '<section epub:type="epigraph" role="doc-epigraph" class="epigraph">' + E.epigraph + '</section>', 'frontmatter');
+
+    // Contents: parts hold their chapters.
+    var listed = E.units.filter(function (u) { return u.hasTitle || u.label; });
+    function navText(u) { return u.label && u.plain ? u.label + ': ' + u.plain : u.label || u.plain; }
+    var tree = [], partNode = {};
+    listed.forEach(function (u) {
+      var node = { u: u, kids: [] };
+      if (u.kind === 'part') { partNode[u.id] = node; tree.push(node); }
+      else if (u.part && partNode[u.part]) partNode[u.part].kids.push(node);
+      else tree.push(node);
+    });
+    function navLi(n) { return '<li><a href="text/' + n.u.file + '">' + esc(navText(n.u)) + '</a>' + (n.kids.length ? '<ol>' + n.kids.map(navLi).join('') + '</ol>' : '') + '</li>'; }
+    var navRows = tree.map(navLi).join('') +(E.about ? '<li><a href="text/about.xhtml">About the ' + (E.aboutCount > 1 ? 'Authors' : 'Author') + '</a></li>' : '');
+    var firstBody = E.units.filter(function (u) { return !u.back; })[0];
+    var nav = '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops"' + langAttr + '>\n<head>\n<meta charset="UTF-8"/>\n<title>Contents</title>\n<link rel="stylesheet" type="text/css" href="css/book.css"/>\n</head>\n<body epub:type="frontmatter" class="face-' + B.face + '">\n'
+      + '<nav epub:type="toc" role="doc-toc" id="toc" class="contents"><h1 class="fm-h">Contents</h1>\n<ol>' + navRows + '</ol></nav>\n'
+      + '<nav epub:type="landmarks" id="landmarks" hidden=""><h2>Landmarks</h2><ol><li><a epub:type="cover" href="text/cover.xhtml">Cover</a></li><li><a epub:type="titlepage" href="text/title.xhtml">Title page</a></li><li><a epub:type="toc" href="nav.xhtml#toc">Contents</a></li>'
+      + (firstBody ? '<li><a epub:type="bodymatter" href="text/' + firstBody.file + '">Start reading</a></li>' : '') + '</ol></nav>\n</body>\n</html>\n';
+    add('nav.xhtml', nav, 'application/xhtml+xml', 'nav', 'nav', true);
+
+    E.units.forEach(function (u) {
+      var role = u.role, sem = role ? ' epub:type="' + role + '"' + (DPUB_ROLES[role] ? ' role="doc-' + role + '"' : '') : '';
+      var label = u.hasTitle ? ' aria-labelledby="h-' + u.id + '"' : '';
+      textFile(u.file, u.id, navText(u) || E.title, '<section' + sem + label + ' class="unit k-' + u.kind + '" id="' + u.id + '">' + u.html + '</section>', u.back ? 'backmatter' : 'bodymatter');
+    });
+    if (E.about) textFile('about.xhtml', 'about', 'About the ' + (E.aboutCount > 1 ? 'Authors' : 'Author'), '<section class="unit k-back about" aria-labelledby="h-about"><header class="ch-head"><h1 class="ch-title" id="h-about">About the ' + (E.aboutCount > 1 ? 'Authors' : 'Author') + '</h1></header>' + E.about + '</section>', 'backmatter');
+
+    // The older table of contents, for reading apps that still look for one.
+    var isbn = clean(B.isbn).replace(/[^0-9Xx]/g, ''), ident = isbn.length === 13 || isbn.length === 10 ? 'urn:isbn:' + isbn : 'urn:uuid:' + (/^[0-9a-f-]{36}$/i.test(clean(B.bookId)) ? clean(B.bookId).toLowerCase() : pseudoUuid(E.title + '|' + E.names.join('|')));
+    var playN = 0, ncxRows = listed.map(function (u) { playN++; return '<navPoint id="np' + playN + '" playOrder="' + playN + '"><navLabel><text>' + esc(navText(u)) + '</text></navLabel><content src="text/' + u.file + '"/></navPoint>'; }).join('\n');
+    add('toc.ncx', '<?xml version="1.0" encoding="UTF-8"?>\n<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1"' + ' xml:lang="' + esc(lang) + '">\n<head><meta name="dtb:uid" content="' + esc(ident) + '"/><meta name="dtb:depth" content="1"/><meta name="dtb:totalPageCount" content="0"/><meta name="dtb:maxPageNumber" content="0"/></head>\n<docTitle><text>' + esc(E.title) + '</text></docTitle>\n<navMap>\n' + ncxRows + '\n</navMap>\n</ncx>\n', 'application/x-dtbncx+xml', 'ncx');
+
+    // The package: what the book is, what it holds, and the reading order.
+    var meta = ['<dc:identifier id="bookid">' + esc(ident) + '</dc:identifier>', '<dc:title id="title">' + esc(E.title) + '</dc:title>', '<meta refines="#title" property="title-type">main</meta>'];
+    if (E.sub) meta.push('<dc:title id="subtitle">' + esc(E.sub) + '</dc:title>', '<meta refines="#subtitle" property="title-type">subtitle</meta>');
+    E.authors.forEach(function (a, i) {
+      meta.push('<dc:creator id="creator' + (i + 1) + '">' + esc(clean(a.name)) + '</dc:creator>', '<meta refines="#creator' + (i + 1) + '" property="role" scheme="marc:relators">aut</meta>',
+        '<meta refines="#creator' + (i + 1) + '" property="file-as">' + esc(a.org ? clean(a.name) : fileAs(a.name)) + '</meta>', '<meta refines="#creator' + (i + 1) + '" property="display-seq">' + (i + 1) + '</meta>');
+    });
+    meta.push('<dc:language>' + esc(lang) + '</dc:language>');
+    if (E.pub) meta.push('<dc:publisher>' + esc(E.pub) + '</dc:publisher>');
+    var dd = w3cDate(doc.meta.date); if (dd) meta.push('<dc:date>' + dd + '</dc:date>');
+    if (clean(B.copyright)) meta.push('<dc:rights>' + esc(lines(B.copyright).join(' ')) + '</dc:rights>');
+    if (clean(B.description)) meta.push('<dc:description>' + esc(plainText(String(B.description).replace(/\n+/g, ' '))) + '</dc:description>');
+    String(B.subjects || '').split(/[,;\n]/).map(clean).filter(Boolean).forEach(function (s) { meta.push('<dc:subject>' + esc(s) + '</dc:subject>'); });
+    if (isbn && ident.indexOf('urn:isbn') === 0 && clean(B.bookId)) meta.push('<dc:identifier id="uuid">urn:uuid:' + esc(clean(B.bookId).toLowerCase()) + '</dc:identifier>');
+    if (E.series) {
+      meta.push('<meta property="belongs-to-collection" id="series">' + esc(E.series) + '</meta>', '<meta refines="#series" property="collection-type">series</meta>');
+      if (/^\d+(\.\d+)?$/.test(E.seriesNo)) meta.push('<meta refines="#series" property="group-position">' + (+E.seriesNo) + '</meta>');
+    }
+    meta.push('<meta property="dcterms:modified">' + isoNow(o.now) + '</meta>', '<meta name="cover" content="cover-image"/>',
+      '<meta property="schema:accessMode">textual</meta>', '<meta property="schema:accessMode">visual</meta>', '<meta property="schema:accessModeSufficient">textual</meta>',
+      '<meta property="schema:accessibilityFeature">structuralNavigation</meta>', '<meta property="schema:accessibilityFeature">tableOfContents</meta>', '<meta property="schema:accessibilityFeature">readingOrder</meta>',
+      '<meta property="schema:accessibilityHazard">none</meta>', '<meta property="schema:accessibilitySummary">Headings, a table of contents, and linked notes. Charts carry their titles and sources in text.</meta>');
+    var opf = '<?xml version="1.0" encoding="UTF-8"?>\n<package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="bookid" xml:lang="' + esc(lang) + '" prefix="schema: http://schema.org/">\n<metadata xmlns:dc="http://purl.org/dc/elements/1.1/">\n' + meta.join('\n') + '\n</metadata>\n<manifest>\n' + items.join('\n') + '\n</manifest>\n<spine toc="ncx">\n' + spine.join('\n') + '\n</spine>\n</package>\n';
+    files.push({ name: 'EPUB/package.opf', data: opf });
+    return { files: files.map(function (f) { return { name: f.name, data: typeof f.data === 'string' ? utf8(f.data) : f.data }; }), problems: r.problems, stats: r.stats };
+  }
+  function epub(input, o) { return zipStore(epubFiles(input, o).files); }
+
+  // ------------------------------------------------------------------ editing OSINT sources inside the builder
+  // The OSINT Citation Generator's source types: their labels, how a title is set, what the
+  // location field holds, and its suggested descriptions (version 3.2.1).
+  var OSINT_TYPE_INFO = {"book":{"label":"Book","style":"italics","loc":"Series, if the book belongs to one","picks":["Monograph","Trade Book","Edited Volume","Textbook","Memoir","Official History"]},"journal":{"label":"Journal article","style":"quotes","loc":"Journal","picks":["Peer-Reviewed Article","Journal Article","Review Article","Law Review Article","Preprint Paper","Working Paper","Conference Paper"]},"news":{"label":"News or magazine","style":"quotes","loc":"Outlet","picks":["News Article","News Analysis","Feature Article","Wire Service Report","Investigative Report","Magazine Article","Editorial / Op-Ed","Explainer","State Media Report"]},"chapter":{"label":"Chapter or section","style":"quotes","loc":"Containing volume","picks":["Book Section","Handbook Chapter","Long-Form Publication by Think Tank","Reference Work Entry","Encyclopedia Article"]},"web":{"label":"Website or think tank","style":"quotes","loc":"Site","picks":["Defense Analysis Article","Policy Analysis","Policy Brief","Think Tank Report","Expert Commentary","Blog Post","Web Page","Corporate Press Release"]},"report":{"label":"Report or government document","style":"italics","loc":"Site or series","picks":["Government Report","CRS Report","Think Tank Report","Defense White Paper","National Strategy Document","GAO Report","Whitepaper","Research Report"]},"social":{"label":"Social media post","style":"quotes","loc":"Platform","picks":["Social Media Post","Thread","Channel Post","Video Post","Short-Form Video","Forum Post","Deleted Post (Archived)","Screenshot (Provenance Unverified)"]},"video":{"label":"Video or podcast","style":"quotes","loc":"Platform","picks":["Video","Podcast","Recorded Interview","Lecture (Recorded)","Combat Footage","Livestream Archive"]},"archival":{"label":"Primary or archival","style":"quotes","loc":"Archive","picks":["Archival Material","Primary Source","Declassified Document","Historical Document","FOIA-Released Document","Oral History","Personal Papers"]},"live":{"label":"Live list or tracker","style":"quotes","loc":"Site","picks":["Sanctions List","Flight Tracking Data","Ship Tracking (AIS)","Business Registry Record","Government Dataset","Data Dashboard","Patent Filing"]},"imagery":{"label":"Satellite imagery","style":"quotes","loc":"Platform","picks":["Commercial Satellite Imagery","Synthetic Aperture Radar Imagery","Government Satellite Release","Annotated Satellite Imagery","Drone Footage","Geotagged Photo","CCTV Footage"]},"ai":{"label":"AI model output","style":"quotes","loc":"Platform","picks":["AI Model Output"]}};
+  function blankOsint(type) {
+    var st = {}; OSINT_KEYS.forEach(function (k) { st[k] = ''; });
+    st.type = OSINT_TYPES.indexOf(type) !== -1 ? type : 'web';
+    st.titleStyle = OSINT_TYPE_INFO && OSINT_TYPE_INFO[st.type] ? OSINT_TYPE_INFO[st.type].style : 'quotes';
+    st.access = []; st.quals = []; st.shortUseTitle = true;
+    return st;
+  }
+  // The full note, the short form, and the generator's own checks for one source as it stands.
+  function osintPreview(st) {
+    if (!CITER) return { full: '', short: '', checks: [], empty: true };
+    var b = CITER.build(Object.assign({}, st, { locator: '' }));
+    if (b.empty) return { full: '', short: '', checks: [], empty: true };
+    return { full: linkUrls(smartHtml(CITER.toHTML(b.seg))), short: smartHtml(CITER.toHTML(CITER.shortForms(Object.assign({}, st, { locator: '' })).short)), checks: b.checks || [], empty: false };
+  }
+  function newOsintSource(st, existing) {
+    var taken = {}; (existing || []).forEach(function (s) { taken[s.key] = 1; });
+    return { key: keyFor(st, taken), kind: 'osint', osintId: 'wpb-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1e6).toString(36), st: st };
+  }
+  // The builder's OSINT sources as a list file the OSINT Citation Generator can open again.
+  function osintListFile(sources, name) {
+    if (!CITER) return '';
+    return CITER.listFile(name || '', (sources || []).filter(function (s) { return s.kind === 'osint'; }).map(function (s) { return { id: s.osintId || 'wpb-' + s.key, st: s.st }; }));
+  }
+
   // ------------------------------------------------------------------ project files
   function projectFile(doc) { return JSON.stringify({ app: 'White Paper Builder', format: 1, savedAt: new Date().toISOString(), paper: normalize(doc) }, null, 1) + '\n'; }
   function parseProject(text) {
@@ -2172,7 +3221,10 @@ var WP = (function () {
   return {
     useCiter: useCiter, defaults: defaults, normalize: normalize, render: render, blocks: blocks, inline: inline, parseData: parseData, parseNumber: parseNumber,
     chartSvg: chartSvg, plainText: plainText, splitLead: splitLead, importOsintList: importOsintList, keyFor: keyFor, sourceLabel: sourceLabel, projectFile: projectFile, parseProject: parseProject,
-    andList: andList, citeNames: citeNames, VISUAL_KINDS: VISUAL_KINDS, MONTHS: MONTHS, PAPER_ACCENT: PAPER_ACCENT, BRIEF_ACCENT: BRIEF_ACCENT, SOURCES_NOTE: SOURCES_NOTE, slug: slug, words: words, invertName: invertName
+    andList: andList, citeNames: citeNames, VISUAL_KINDS: VISUAL_KINDS, MONTHS: MONTHS, PAPER_ACCENT: PAPER_ACCENT, BRIEF_ACCENT: BRIEF_ACCENT, SOURCES_NOTE: SOURCES_NOTE, slug: slug, words: words, invertName: invertName,
+    BOOK_ACCENT: BOOK_ACCENT, TRIMS: TRIMS, COVER_LAYOUTS: COVER_LAYOUTS, COVER_FONTS: COVER_FONTS, numberWord: numberWord, roman: roman, setMeasure: setMeasure,
+    coverSvg: coverSvg, coverSize: coverSize, coverFamilies: coverFamilies, epubFiles: epubFiles, epub: epub, zipStore: zipStore, xhtml: xhtml, w3cDate: w3cDate,
+    OSINT_TYPES: OSINT_TYPES, OSINT_KEYS: OSINT_KEYS, OSINT_TYPE_INFO: OSINT_TYPE_INFO, blankOsint: blankOsint, osintPreview: osintPreview, newOsintSource: newOsintSource, osintListFile: osintListFile, sourceKeyFor: keyFor
   };
 })();
 if (typeof module !== 'undefined') module.exports = WP;
@@ -2182,8 +3234,17 @@ if (typeof module !== 'undefined') module.exports = WP;
   function $(id) { return document.getElementById(id); }
   function has(o, k) { return Object.prototype.hasOwnProperty.call(o, k); }
   WP.useCiter(OSINT);
-  var PAPER_CSS = $('paper-css').textContent, BRIEF_CSS = $('brief-css').textContent;
-  var K_DOC = 'wpb-paper-v1', K_THEME = 'wpb-theme-v1', K_TAB = 'wpb-tab-v1';
+  var PAPER_CSS = $('paper-css').textContent, BRIEF_CSS = $('brief-css').textContent, BOOK_CSS = $('book-css').textContent, EPUB_CSS = $('epub-css').textContent;
+  // Kept apart from the White Paper and Intel Briefing builders, which may share this site's storage.
+  var K_DOC = 'ebb-doc-v1', K_THEME = 'ebb-theme-v1', K_TAB = 'ebb-tab-v1';
+  var ACCENTS = { paper: WP.PAPER_ACCENT, brief: WP.BRIEF_ACCENT, book: WP.BOOK_ACCENT };
+  function uuid() {
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    var b = new Uint8Array(16); (window.crypto || {}).getRandomValues ? crypto.getRandomValues(b) : b.forEach(function (x, i) { b[i] = Math.floor(Math.random() * 256); });
+    b[6] = (b[6] & 15) | 64; b[8] = (b[8] & 63) | 128;
+    var h = Array.prototype.map.call(b, function (x) { return (x < 16 ? '0' : '') + x.toString(16); }).join('');
+    return h.slice(0, 8) + '-' + h.slice(8, 12) + '-' + h.slice(12, 16) + '-' + h.slice(16, 20) + '-' + h.slice(20);
+  }
 
   // ------------------------------------------------------------------ a new paper: the template, with its guidance in square brackets
   function monthYear() { var d = new Date(); return WP.MONTHS[d.getMonth()] + ' ' + d.getFullYear(); }
@@ -2262,7 +3323,44 @@ if (typeof module !== 'undefined') module.exports = WP;
     d.back.include = false;
     return d;
   }
-  function starterOf(kind) { return kind === 'brief' ? briefStarter() : starter(); }
+  // A new eBook: front matter filled with guidance, an unnumbered introduction, a part, and
+  // chapters that show each kind of block.
+  function bookStarter() {
+    var d = WP.defaults(), y = new Date().getFullYear();
+    Object.assign(d.meta, { kind: 'book', title: '[Book title]', subtitle: '[Subtitle: what the book is about, in one line]', date: monthYear(), accent: WP.BOOK_ACCENT,
+      publisher: '[Publisher]', site: '[Website]', colophon: '[Colophon: who publishes the book and for whom. For example: This eBook is an official product of [Publisher], made for paid subscribers of [Publication].]' });
+    d.authors = [{ name: '[Author name]', bio: '[Two or three sentences: background, and what qualifies the author to write this book.]', org: false }];
+    Object.assign(d.book, { copyright: '\u00A9 ' + y + ' [Publisher]. All rights reserved.', edition: 'First edition, ' + monthYear(),
+      dedication: '[Dedication: for whom the book is written. Delete it if you do not want one.]', epigraph: '[An epigraph: a short quotation that sets up the book. Delete it if you do not want one.]', epigraphBy: '[Who said it, and where]',
+      description: '[Two or three sentences on what the book covers, for reading apps and store listings.]', bookId: uuid() });
+    d.book.cover.kicker = '';
+    d.body = [
+      '# Introduction {-}', '',
+      '[An unnumbered chapter: an introduction, preface, or foreword. Put {-} after a heading to leave it unnumbered. Notes go where they belong.^[A note is written where it belongs: a caret and the note in square brackets. Notes are numbered afresh in each chapter.] To cite a source from your OSINT list, write its key in square brackets with an at sign, as Sources explains.]', '',
+      '[Paragraphs are indented after the first, as in a printed book. Leave a blank line between paragraphs.]', '',
+      '# [Title of the first part] {part}', '',
+      '[A part gets a page of its own, numbered Part One. Leave parts out if the book does not need them.]', '',
+      '# [Chapter title]', '',
+      '[Each # heading starts a numbered chapter on a new page: Chapter One, Two, Three. The chapter title runs at the top of its pages.]', '',
+      '## [A section heading inside the chapter]', '',
+      '[Text.]', '',
+      '* * *', '',
+      '[A line of three asterisks is a scene break, for a shift in time or place.]', '',
+      '[[fig-trend]]', '',
+      '# [Second chapter title]', '',
+      '[Chapter text.]', '',
+      '!> [A pull quote: the sentence a reader would underline.]', '',
+      '> [A block quotation, in the source\'s own words.]', '',
+      '?> [A boxed aside. Its heading is set under Book, Layout.]'
+    ].join('\n');
+    d.appendix = ['# Acknowledgments', '', '[Thanks to the people who helped.]', '', '# A note on sources', '', '[How the research was done, and how the sources are rated.]', '', '[[rating-key]]'].join('\n');
+    d.visuals = [
+      { id: 'fig-trend', kind: 'bar', title: '[Chart title: state the finding, not the variable]', subtitle: '[Unit of measure, date range]', source: '[Source: dataset, publisher, year.]', note: 'Placeholder numbers. Replace them under Visuals.', data: 'Year,Value\n2019,28\n2020,34\n2021,31\n2022,46\n2023,58\n2024,82\n2025,71', highlight: '2024', image: '', wide: false }
+    ];
+    d.back.include = false;
+    return d;
+  }
+  function starterOf(kind) { return kind === 'brief' ? briefStarter() : kind === 'book' ? bookStarter() : starter(); }
 
   // ------------------------------------------------------------------ state
   var doc = null, saveTimer = null, renderTimer = null, rendering = false, renderAgain = false, lastTarget = null, statusTimer = null;
@@ -2288,27 +3386,34 @@ if (typeof module !== 'undefined') module.exports = WP;
     Array.prototype.forEach.call(document.querySelectorAll('[data-k]'), function (el) {
       var v = get(el.getAttribute('data-k'));
       if (el.type === 'checkbox') el.checked = !!v;
-      else if (el.type === 'color') el.value = /^#[0-9a-f]{6}$/i.test(v || '') ? v : doc.meta.kind === 'brief' ? WP.BRIEF_ACCENT : WP.PAPER_ACCENT;
+      else if (el.type === 'color') el.value = /^#[0-9a-f]{6}$/i.test(v || '') ? v : ACCENTS[doc.meta.kind] || WP.PAPER_ACCENT;
       else el.value = v == null ? '' : v;
     });
     $('coverInfo').textContent = doc.meta.coverImage ? 'Image chosen.' : 'No image.';
     $('bcoverInfo').textContent = doc.meta.coverImage ? 'Photo chosen.' : 'No photo yet.';
+    $('ccoverInfo').textContent = doc.meta.coverImage ? 'Image chosen.' : 'No image yet.';
     applyKind();
-    renderAuthors(); renderVisualList(); renderSources();
+    renderAuthors(); renderVisualList(); renderSources(); paintCover();
   }
   Array.prototype.forEach.call(document.querySelectorAll('[data-k]'), function (el) {
     el.addEventListener(el.type === 'checkbox' || el.tagName === 'SELECT' || el.type === 'color' ? 'change' : 'input', function () {
-      put(el.getAttribute('data-k'), el.type === 'checkbox' ? el.checked : el.value);
+      put(el.getAttribute('data-k'), el.type === 'checkbox' ? el.checked : el.type === 'range' ? +el.value : el.value);
+      // Duplicate fields (the same value under two kinds) stay in step.
+      Array.prototype.forEach.call(document.querySelectorAll('[data-k="' + el.getAttribute('data-k') + '"]'), function (o) { if (o !== el && o.type !== 'checkbox') o.value = el.value; });
+      if (/^book\.cover\.|^meta\.(title|subtitle|publisher|accent|coverImage)$|^book\.trim$/.test(el.getAttribute('data-k'))) paintCover();
       changed(el.type === 'checkbox' || el.tagName === 'SELECT' || el.type === 'color');
     });
     if (el.hasAttribute('data-cite')) el.addEventListener('focus', function () { lastTarget = el; });
   });
+
+  Object.keys(WP.TRIMS).forEach(function (k) { var o = document.createElement('option'); o.value = k; o.textContent = WP.TRIMS[k].label; $('b-trim').appendChild(o); });
 
   // ------------------------------------------------------------------ tabs
   function showTab(name) {
     Array.prototype.forEach.call(document.querySelectorAll('#tabs [data-tab]'), function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-tab') === name)); });
     Array.prototype.forEach.call(document.querySelectorAll('#panes [data-pane]'), function (p) { p.hidden = p.getAttribute('data-pane') !== name; });
     store(K_TAB, name);
+    if (name === 'cover') paintCover();
   }
   $('tabs').addEventListener('click', function (e) { var b = e.target.closest('[data-tab]'); if (b) showTab(b.getAttribute('data-tab')); });
 
@@ -2364,11 +3469,28 @@ if (typeof module !== 'undefined') module.exports = WP;
     ['Visual', function (ta) { var ids = doc.visuals.map(function (v) { return v.id; }); lineStart(ta, '[[', ids[0] || 'name'); insert(ta, '', ']]'); }, 'Place a chart, table, or image'],
     ['Page break', function (ta) { lineStart(ta, '---', ''); insert(ta, '\n\n', ''); }, 'Start a new page']
   ];
+  var BOOK_TOOLS = [
+    ['Chapter', function (ta) { lineStart(ta, '# ', 'Chapter title'); }, '# starts a numbered chapter on a new page'],
+    ['Unnumbered', function (ta) { lineStart(ta, '# ', 'Introduction'); insert(ta, '', ' {-}'); }, '# Title {-}: an unnumbered chapter, such as a preface or introduction'],
+    ['Part', function (ta) { lineStart(ta, '# ', 'Part title'); insert(ta, '', ' {part}'); }, '# Title {part}: a part, on a page of its own'],
+    ['Section', function (ta) { lineStart(ta, '## ', 'Section heading'); }, '## a section heading inside a chapter'],
+    ['Scene break', function (ta) { lineStart(ta, '* * *', ''); insert(ta, '\n\n', ''); }, 'Three asterisks: a break for a shift in time or place'],
+    ['Note', function (ta) { insert(ta, '^[', ']', 'note text'); }, 'A footnote at the cursor'],
+    ['Cite', function (ta) { lastTarget = ta; showTab('sources'); setStatus('Pick a source and click Cite. It goes where your cursor was.'); }, 'Cite a source from your list'],
+    ['Bold', function (ta) { insert(ta, '**', '**', 'bold text'); }, 'Bold: **text**'],
+    ['Italic', function (ta) { insert(ta, '*', '*', 'italic text'); }, 'Italic: *text*'],
+    ['Quote', function (ta) { lineStart(ta, '> ', 'Quoted text'); }, 'A block quotation'],
+    ['Pull quote', function (ta) { lineStart(ta, '!> ', 'The sentence a reader would underline.'); }, 'A pull quote, set large between rules'],
+    ['Box', function (ta) { lineStart(ta, '?> ', 'An aside in a box.'); }, 'A boxed aside, with the heading set under Book'],
+    ['List', function (ta) { lineStart(ta, '- ', 'Item'); }, 'A bulleted list'],
+    ['Visual', function (ta) { var ids = doc.visuals.map(function (v) { return v.id; }); lineStart(ta, '[[', ids[0] || 'name'); insert(ta, '', ']]'); }, 'Place a chart, table, or image'],
+    ['Page break', function (ta) { lineStart(ta, '---', ''); insert(ta, '\n\n', ''); }, 'Start a new page in the PDF']
+  ];
   function buildToolbars(kind) {
   Array.prototype.forEach.call(document.querySelectorAll('.toolbar'), function (bar) {
     var ta = $('t-' + bar.getAttribute('data-for'));
     bar.textContent = '';
-    (kind === 'brief' ? BRIEF_TOOLS : TOOLS).forEach(function (t) {
+    (kind === 'brief' ? BRIEF_TOOLS : kind === 'book' ? BOOK_TOOLS : TOOLS).forEach(function (t) {
       var b = document.createElement('button'); b.type = 'button'; b.className = 'btn'; b.textContent = t[0]; b.title = t[2];
       b.addEventListener('mousedown', function (e) { e.preventDefault(); });
       b.addEventListener('click', function () { t[1](ta); });
@@ -2411,48 +3533,75 @@ if (typeof module !== 'undefined') module.exports = WP;
     ['[[name]]', 'Places the chart, table, or image with that name from Visuals.'],
     ['---', 'Starts a new page.']
   ];
+  var BOOK_HELP = [
+    ['# Title', 'A numbered chapter: Chapter One, Two, Three. Each starts a new page and is listed in the contents.'],
+    ['# Title {-}', 'An unnumbered chapter: an introduction, preface, foreword, prologue, or epilogue.'],
+    ['# Title {part}', 'A part, on a page of its own: Part One. The chapters after it belong to it.'],
+    ['## Title', 'A section heading inside a chapter.'],
+    ['### Title', 'A small heading, in italics.'],
+    ['(blank line)', 'Starts a new paragraph. Paragraphs after the first are indented, unless you choose spaced paragraphs under Book.'],
+    ['* * *', 'A scene break.'],
+    ['*italic*  **bold**', 'Italic and bold. [text](https://...) makes a link.'],
+    ['^[note text]', 'A note. In the PDF it prints at the foot of the page or at the back of the book; in the ePUB, at the end of the chapter. Numbered afresh in each chapter.'],
+    ['[@key, p. 45]', 'Cites a source from Sources in a note. The first citation of a source in each chapter prints in full, later ones in short form. [@a; @b, p. 3] cites two in one note.'],
+    ['> text', 'A block quotation.'],
+    ['!> text', 'A pull quote, set large between rules.'],
+    ['?> text', 'A boxed aside, with the heading set under Book. A line with only ?> starts a new paragraph inside it.'],
+    ['>> text', 'A short aside in italics, with a rule beside it.'],
+    ['- item  /  1. item', 'Bulleted and numbered lists.'],
+    ['{Label} text', 'A row with a label, for terms, dates, or recommendations.'],
+    ['[[name]]', 'Places the chart, table, or image with that name from Visuals.'],
+    ['---', 'Starts a new page in the PDF. The ePUB ignores it.']
+  ];
   function paintHelp(kind) {
-    $('helpTitle').textContent = kind === 'brief' ? 'How to write the stories' : 'How to write the body';
-    $('helpTable').innerHTML = (kind === 'brief' ? BRIEF_HELP : HELP).map(function (h) { return '<tr><td>' + esc(h[0]) + '</td><td>' + esc(h[1]) + '</td></tr>'; }).join('');
+    $('helpTitle').textContent = kind === 'brief' ? 'How to write the stories' : kind === 'book' ? 'How to write the chapters' : 'How to write the body';
+    $('helpTable').innerHTML = (kind === 'brief' ? BRIEF_HELP : kind === 'book' ? BOOK_HELP : HELP).map(function (h) { return '<tr><td>' + esc(h[0]) + '</td><td>' + esc(h[1]) + '</td></tr>'; }).join('');
   }
 
   // ------------------------------------------------------------------ white paper or brief
   var shownKind = null;
+  var NAMES = { paper: 'paper', brief: 'brief', book: 'book' };
   function applyKind() {
-    var k = doc.meta.kind === 'brief' ? 'brief' : 'paper';
-    $(k === 'brief' ? 'kindBrief' : 'kindPaper').checked = true;
-    Array.prototype.forEach.call(document.querySelectorAll('[data-only]'), function (el) { el.hidden = el.getAttribute('data-only') !== k; });
-    $('tabs').querySelector('[data-tab="paper"]').textContent = k === 'brief' ? 'Brief' : 'Paper';
-    $('tabs').querySelector('[data-tab="body"]').textContent = k === 'brief' ? 'Stories' : 'Body';
-    $('t-body').setAttribute('aria-label', k === 'brief' ? 'Stories' : 'Body text');
-    if (!newArmed) $('newBtn').textContent = k === 'brief' ? 'New brief' : 'New paper';
+    var k = NAMES[doc.meta.kind] || 'paper';
+    $({ paper: 'kindPaper', brief: 'kindBrief', book: 'kindBook' }[k]).checked = true;
+    Array.prototype.forEach.call(document.querySelectorAll('[data-only]'), function (el) { el.hidden = el.getAttribute('data-only').split(' ').indexOf(k) === -1; });
+    var tabs = $('tabs');
+    tabs.querySelector('[data-tab="paper"]').textContent = { paper: 'Paper', brief: 'Brief', book: 'Book' }[k];
+    tabs.querySelector('[data-tab="body"]').textContent = { paper: 'Body', brief: 'Stories', book: 'Chapters' }[k];
+    tabs.querySelector('[data-tab="appendix"]').textContent = k === 'book' ? 'Back matter' : 'Appendix';
+    $('t-body').setAttribute('aria-label', { paper: 'Body text', brief: 'Stories', book: 'Chapters' }[k]);
+    $('t-appendix').setAttribute('aria-label', k === 'book' ? 'Back matter' : 'Appendix text');
+    if (!newArmed) $('newBtn').textContent = 'New ' + k;
     if (shownKind !== k) { shownKind = k; buildToolbars(k); paintHelp(k); }
     var cur = document.querySelector('#tabs [aria-selected="true"]');
     if (cur && cur.hidden) showTab('paper');
   }
-  ['kindPaper', 'kindBrief'].forEach(function (id) {
+  ['kindPaper', 'kindBrief', 'kindBook'].forEach(function (id) {
     $(id).addEventListener('change', function () {
-      var k = $(id).value;
-      if (!$(id).checked || doc.meta.kind === k) return;
-      var other = k === 'brief' ? 'paper' : 'brief';
+      var k = $(id).value, from = doc.meta.kind;
+      if (!$(id).checked || from === k) return;
       // The untouched template of one becomes the template of the other.
-      var fresh = starterOf(other);
+      var fresh = starterOf(from);
       if (doc.body === fresh.body) {
         var next = starterOf(k);
         doc.body = next.body; doc.visuals = next.visuals;
-        Object.keys(next.meta).forEach(function (f) { if (doc.meta[f] === '' || doc.meta[f] === fresh.meta[f] && /^\[/.test(String(fresh.meta[f]))) doc.meta[f] = next.meta[f]; });
+        Object.keys(next.meta).forEach(function (f) { if (f !== 'kind' && (doc.meta[f] === '' || doc.meta[f] === fresh.meta[f] && /^\[/.test(String(fresh.meta[f])))) doc.meta[f] = next.meta[f]; });
+        if (!doc.appendix.trim() || doc.appendix === fresh.appendix) doc.appendix = next.appendix;
         if (k === 'paper') {
           Object.keys(next.summary).forEach(function (f) { if (!doc.summary[f].trim()) doc.summary[f] = next.summary[f]; });
-          ['appendix', 'aboutSeries'].forEach(function (f) { if (!doc[f].trim()) doc[f] = next[f]; });
+          if (!doc.aboutSeries.trim()) doc.aboutSeries = next.aboutSeries;
           Object.keys(next.back).forEach(function (f) { if (doc.back[f] === '' || f === 'include') doc.back[f] = next.back[f]; });
-          if (!doc.authors.length) doc.authors = next.authors;
         }
+        if (k === 'book') Object.keys(next.book).forEach(function (f) { if (f !== 'cover' && doc.book[f] === '') doc.book[f] = next.book[f]; });
+        if (!doc.authors.length && next.authors.length) doc.authors = next.authors;
+        if (k === 'brief' && doc.authors.length === 1 && doc.authors[0].name === fresh.authors[0].name) doc.authors = [];
       }
+      if (k === 'book' && !doc.book.bookId) doc.book.bookId = uuid();
       var was = String(doc.meta.accent || '').toUpperCase();
-      if (was === (k === 'brief' ? WP.PAPER_ACCENT : WP.BRIEF_ACCENT).toUpperCase() || !/^#[0-9A-F]{6}$/.test(was)) doc.meta.accent = k === 'brief' ? WP.BRIEF_ACCENT : WP.PAPER_ACCENT;
+      if (was === String(ACCENTS[from]).toUpperCase() || !/^#[0-9A-F]{6}$/.test(was)) doc.meta.accent = ACCENTS[k];
       doc.meta.kind = k;
       fillFields(); changed(true);
-      setStatus(k === 'brief' ? 'Now building an intelligence brief.' : 'Now building a white paper.');
+      setStatus({ paper: 'Now building a white paper.', brief: 'Now building an intelligence brief.', book: 'Now building an eBook.' }[k]);
     });
   });
   function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
@@ -2479,8 +3628,70 @@ if (typeof module !== 'undefined') module.exports = WP;
     rd.readAsDataURL(file);
   }
   $('coverPick').addEventListener('click', function () { $('coverFile').click(); });
-  $('coverFile').addEventListener('change', function () { readImage($('coverFile').files[0], function (u) { doc.meta.coverImage = u; $('coverFile').value = ''; $('coverInfo').textContent = 'Image chosen.'; $('bcoverInfo').textContent = 'Photo chosen.'; changed(true); }); });
-  $('coverClear').addEventListener('click', function () { doc.meta.coverImage = ''; $('coverInfo').textContent = 'No image.'; changed(true); });
+  // The cover designer needs the image's shape to place it; a new image starts centered.
+  $('coverFile').addEventListener('change', function () {
+    readImage($('coverFile').files[0], function (u) {
+      doc.meta.coverImage = u; $('coverFile').value = '';
+      $('coverInfo').textContent = 'Image chosen.'; $('bcoverInfo').textContent = 'Photo chosen.'; $('ccoverInfo').textContent = 'Image chosen.';
+      var im = new Image();
+      im.onload = function () { Object.assign(doc.book.cover, { imgW: im.naturalWidth, imgH: im.naturalHeight, focusX: 50, focusY: 50, zoom: 100 }); fillFields(); changed(true); };
+      im.onerror = function () { doc.book.cover.imgW = doc.book.cover.imgH = 0; fillFields(); changed(true); };
+      im.src = u;
+    });
+  });
+  function clearCover() { doc.meta.coverImage = ''; doc.book.cover.imgW = doc.book.cover.imgH = 0; $('coverInfo').textContent = 'No image.'; $('bcoverInfo').textContent = 'No photo yet.'; $('ccoverInfo').textContent = 'No image yet.'; paintCover(); changed(true); }
+  $('coverClear').addEventListener('click', clearCover);
+  $('ccoverPick').addEventListener('click', function () { $('coverFile').click(); });
+  $('ccoverClear').addEventListener('click', clearCover);
+
+  // ------------------------------------------------------------------ the eBook cover
+  var measureCtx = document.createElement('canvas').getContext('2d');
+  function measure(text, font) { measureCtx.font = font; return measureCtx.measureText(text).width; }
+  function paintCover() {
+    if (!doc || doc.meta.kind !== 'book') return;
+    var box = $('coverPreview'); if (!box) return;
+    box.innerHTML = WP.coverSvg(doc, { idPrefix: 'cvp', measure: measure });
+    var art = doc.book.cover.layout === 'art';
+    Array.prototype.forEach.call(document.querySelectorAll('.sliders input'), function (r) { r.disabled = !doc.meta.coverImage && r.getAttribute('data-k') !== 'book.cover.shade'; });
+    $('coverHint').textContent = art ? 'The image is used as it is, with no text over it: make sure it carries the title. An upright image about 1600 × ' + WP.coverSize(doc).h + ' pixels fits this page size exactly.'
+      : 'Drag the sliders to place the image. For a finished cover made elsewhere, choose the last layout. An upright image about 1600 × ' + WP.coverSize(doc).h + ' pixels fits this page size best.';
+  }
+  // The page's own font files, as @font-face rules and as bytes, for the cover image and the ePUB.
+  function fontRules(families) {
+    var css = $('fonts').textContent, out = [], re = /@font-face\{font-family:'([^']+)';font-style:(\w+);font-weight:(\d+);[^}]*?base64,([A-Za-z0-9+\/=]+)\)[^}]*?unicode-range:([^}]*)\}/g, mm;
+    while ((mm = re.exec(css))) if (families.indexOf(mm[1]) !== -1) out.push({ family: mm[1], style: mm[2], weight: +mm[3], b64: mm[4], range: mm[5], css: mm[0] });
+    return out;
+  }
+  function b64bytes(b64) { var bin = atob(b64), a = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) a[i] = bin.charCodeAt(i); return a; }
+  // Draws the cover to a canvas: a JPEG for the ePUB and for saving. Resolves to null if the
+  // browser will not allow it, and the ePUB then carries the cover as a drawing (SVG).
+  function coverJpeg() {
+    var css = fontRules(WP.coverFamilies(doc)).map(function (r) { return r.css; }).join('');
+    var size = WP.coverSize(doc), svg = WP.coverSvg(doc, { standalone: true, fontCss: css, idPrefix: 'cvx', measure: measure });
+    return new Promise(function (resolve) {
+      var img = new Image();
+      img.onload = function () {
+        // Fonts inside an SVG image can take a moment to be ready; draw once they have had it.
+        setTimeout(function () {
+          try {
+            var c = document.createElement('canvas'); c.width = size.w; c.height = size.h;
+            var g = c.getContext('2d'); g.fillStyle = doc.book.cover.bg; g.fillRect(0, 0, size.w, size.h); g.drawImage(img, 0, 0, size.w, size.h);
+            c.toBlob(function (b) { if (!b) { resolve(null); return; } b.arrayBuffer().then(function (buf) { resolve(new Uint8Array(buf)); }, function () { resolve(null); }); }, 'image/jpeg', 0.9);
+          } catch (e) { resolve(null); }
+        }, 150);
+      };
+      img.onerror = function () { resolve(null); };
+      img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    });
+  }
+  $('coverSave').addEventListener('click', function () {
+    setStatus('Drawing the cover…');
+    coverJpeg().then(function (bytes) {
+      if (!bytes) { setStatus('This browser would not draw the cover as an image. Try Chrome or Edge.', true); return; }
+      var name = (WP.slug(String(doc.meta.title || 'book').replace(/[\[\]]/g, '')).slice(0, 60) || 'book') + '-cover.jpg';
+      giveFile(name, bytes, 'image/jpeg').then(function (ok) { setStatus(ok ? 'Saved ' + name + '.' : 'The file could not be saved from this view.', !ok); });
+    });
+  });
   $('bcoverPick').addEventListener('click', function () { $('coverFile').click(); });
   $('bcoverClear').addEventListener('click', function () { doc.meta.coverImage = ''; $('bcoverInfo').textContent = 'No photo yet.'; changed(true); });
 
@@ -2512,7 +3723,7 @@ if (typeof module !== 'undefined') module.exports = WP;
       var orgL = document.createElement('label'); orgL.className = 'check';
       var org = document.createElement('input'); org.type = 'checkbox'; org.checked = !!a.org;
       org.addEventListener('change', function () { a.org = org.checked; changed(true); });
-      var orgS = document.createElement('span'); orgS.textContent = 'An organization: keep the name as written in "Cite as"';
+      var orgS = document.createElement('span'); orgS.textContent = 'An organization, not a person: keep the name as written';
       orgL.appendChild(org); orgL.appendChild(orgS);
       card.appendChild(top); card.appendChild(bio); card.appendChild(orgL);
       box.appendChild(card);
@@ -2581,7 +3792,7 @@ if (typeof module !== 'undefined') module.exports = WP;
       var grow = document.createElement('span'); grow.className = 'grow';
       var place = document.createElement('button'); place.type = 'button'; place.className = 'btn small'; place.textContent = 'Place in body';
       place.title = 'Adds [[' + v.id + ']] at the cursor in the body';
-      place.textContent = doc.meta.kind === 'brief' ? 'Place in stories' : 'Place in body';
+      place.textContent = { brief: 'Place in stories', book: 'Place in chapters' }[doc.meta.kind] || 'Place in body';
       place.addEventListener('click', function () { showTab('body'); var ta = $('t-body'); lineStart(ta, '[[' + v.id + ']]', ''); });
       var del = document.createElement('button'); del.type = 'button'; del.className = 'btn small quiet danger'; del.textContent = 'Delete';
       var armed = false;
@@ -2607,14 +3818,14 @@ if (typeof module !== 'undefined') module.exports = WP;
       }
       if (/^(bar|hbar|line|table)$/.test(v.kind)) vfield(card, v, 'highlight', v.kind === 'table' ? 'Row to highlight (its first cell)' : 'Label to highlight in the accent color');
       vfield(card, v, 'source', 'Source', 'text', { placeholder: 'Source: dataset or document, publisher, year.' });
-      if (v.kind !== 'stats') vfield(card, v, 'note', doc.meta.kind === 'brief' ? 'Reading note (under the figure, optional)' : 'Reading note (in the margin, optional)');
+      if (v.kind !== 'stats') vfield(card, v, 'note', doc.meta.kind === 'paper' ? 'Reading note (in the margin, optional)' : 'Reading note (under the figure, optional)');
       if (v.kind === 'table') {
         var hw = document.createElement('label'); hw.className = 'check';
         var hb = document.createElement('input'); hb.type = 'checkbox'; hb.checked = !v.noHeader;
         hb.addEventListener('change', function () { v.noHeader = !hb.checked; changed(true); });
         hw.appendChild(hb); var hs = document.createElement('span'); hs.textContent = 'The first row is the header'; hw.appendChild(hs); card.appendChild(hw);
       }
-      if ((v.kind === 'image' || v.kind === 'table') && doc.meta.kind !== 'brief') {
+      if ((v.kind === 'image' || v.kind === 'table') && doc.meta.kind === 'paper') {
         var w = document.createElement('label'); w.className = 'check';
         var cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = !!v.wide;
         cb.addEventListener('change', function () { v.wide = cb.checked; changed(true); });
@@ -2642,6 +3853,9 @@ if (typeof module !== 'undefined') module.exports = WP;
         s.key = nk; fillFields(); changed();
       });
       var acts = document.createElement('div'); acts.className = 'acts';
+      var edit = document.createElement('button'); edit.type = 'button'; edit.className = 'btn small'; edit.textContent = editing === s ? 'Close' : 'Edit';
+      edit.title = 'Correct this source here. Every note that cites it follows.';
+      edit.addEventListener('click', function () { editing = editing === s ? null : s; renderSources(); if (editing) { var f = $('srcList').querySelector('.sedit input, .sedit select'); if (f) f.focus(); } });
       var cite = document.createElement('button'); cite.type = 'button'; cite.className = 'btn small primary'; cite.textContent = 'Cite';
       cite.title = 'Insert [@' + s.key + '] where your cursor was';
       cite.addEventListener('click', function () {
@@ -2656,12 +3870,129 @@ if (typeof module !== 'undefined') module.exports = WP;
         if (!armedDel) { armedDel = true; del.textContent = 'Click again to remove'; setTimeout(function () { armedDel = false; del.textContent = 'Remove'; }, 3000); return; }
         doc.sources.splice(doc.sources.indexOf(s), 1); renderSources(); changed();
       });
-      acts.appendChild(cite); acts.appendChild(del);
-      var txt = document.createElement('div'); txt.className = 'txt'; txt.textContent = WP.sourceLabel(s);
+      acts.appendChild(edit); acts.appendChild(cite); acts.appendChild(del);
+      var txt = document.createElement('div'); txt.className = 'txt'; txt.textContent = WP.sourceLabel(s) || '(empty: fill it in below)';
       row.appendChild(key); row.appendChild(acts); row.appendChild(txt);
+      if (editing === s) row.classList.add('editing');
       box.appendChild(row);
+      if (editing === s) box.appendChild(sourceEditor(s, txt));
     });
   }
+
+  // ---- Editing a source inside the builder. The fields are the OSINT Citation Generator's;
+  // the full note, the short form, and the generator's checks update as you type.
+  var editing = null, snapshot = null;
+  var ACCESS = [['paywalled', 'Paywalled'], ['metered paywall', 'Metered paywall'], ['free registration required', 'Free registration required'], ['institutional access', 'Institutional access'], ['region-restricted', 'Region-restricted'], ['app only', 'App only']];
+  function sourceEditor(s, txt) {
+    var card = document.createElement('div'); card.className = 'sedit';
+    if (snapshot === null || snapshot.src !== s) snapshot = { src: s, data: JSON.stringify(s) };
+    function field(label, el, hint) {
+      var f = document.createElement('div'); f.className = 'field';
+      var id = 'se-' + Math.random().toString(36).slice(2); el.id = id;
+      var l = document.createElement('label'); l.htmlFor = id; l.textContent = label; f.appendChild(l); f.appendChild(el);
+      if (hint) { var h = document.createElement('p'); h.className = 'hint'; h.textContent = hint; f.appendChild(h); }
+      return f;
+    }
+    function input(obj, k, ph, rows) {
+      var el = rows ? document.createElement('textarea') : document.createElement('input');
+      if (rows) el.rows = rows; else el.type = 'text';
+      el.value = obj[k] || ''; if (ph) el.placeholder = ph;
+      el.addEventListener('input', function () { obj[k] = el.value; update(); });
+      return el;
+    }
+    function select(obj, k, opts) {
+      var el = document.createElement('select');
+      opts.forEach(function (o) { var op = document.createElement('option'); op.value = o[0]; op.textContent = o[1]; el.appendChild(op); });
+      el.value = obj[k] || ''; el.addEventListener('change', function () { obj[k] = el.value; update(); });
+      return el;
+    }
+    function row() { var r = document.createElement('div'); r.className = 'row'; Array.prototype.slice.call(arguments).forEach(function (x) { r.appendChild(x); }); return r; }
+    var pvFull = document.createElement('div'), pvShort = document.createElement('div'), checks = document.createElement('ul');
+    pvFull.className = pvShort.className = 'pv'; checks.className = 'gchecks';
+    function update() {
+      if (s.kind === 'osint') {
+        var p = WP.osintPreview(s.st);
+        pvFull.innerHTML = '<span class="k">First citation</span>' + (p.empty ? '<i>Fill in the fields to build the note.</i>' : p.full);
+        pvShort.innerHTML = '<span class="k">Later citations</span>' + (p.empty ? '' : p.short);
+        checks.innerHTML = p.checks.filter(function (c) { return c.level !== 'note'; }).map(function (c) { return '<li>' + esc(c.msg) + '</li>'; }).join('');
+      } else {
+        pvFull.innerHTML = '<span class="k">First citation</span>' + esc(s.full);
+        pvShort.innerHTML = '<span class="k">Later citations</span>' + esc(s.short || s.full);
+      }
+      txt.textContent = WP.sourceLabel(s) || '(empty: fill it in below)';
+      changed();
+    }
+    if (s.kind === 'typed') {
+      card.appendChild(field('Full citation, as the first note should read', input(s, 'full', '', 3), 'Use *asterisks* for italics.'));
+      card.appendChild(field('Short form, for later notes', input(s, 'short', 'Beckley, *Unrivaled*.')));
+    } else {
+      var st = s.st, info = WP.OSINT_TYPE_INFO[st.type] || WP.OSINT_TYPE_INFO.web;
+      var type = select(st, 'type', WP.OSINT_TYPES.map(function (t) { return [t, WP.OSINT_TYPE_INFO[t].label]; }));
+      type.addEventListener('change', function () { st.titleStyle = WP.OSINT_TYPE_INFO[st.type].style; renderSources(); });
+      card.appendChild(field('Kind of source', type));
+      card.appendChild(field('Authors, one per line', input(st, 'authors', 'First name then surname. No named author: the organization, or the outlet plus Staff.', 2)));
+      var style = select(st, 'titleStyle', [['quotes', '"Quotes" (short work)'], ['italics', 'Italics (larger work)'], ['plain', 'Plain (no title)']]);
+      var tr = row(field('Title', input(st, 'title', 'As the source gives it')), field('Set as', style)); tr.style.gridTemplateColumns = 'minmax(0, 2fr) minmax(0, 1fr)';
+      card.appendChild(tr);
+      card.appendChild(field(info.loc, input(st, 'location', '')));
+      var desc = input(st, 'descType', 'Choose or type'); desc.setAttribute('list', 'descPicks');
+      $('descPicks').innerHTML = info.picks.map(function (x) { return '<option value="' + esc(x) + '">'; }).join('');
+      card.appendChild(row(field('Description, in the square brackets', desc), field('Details (volume, issue, report number)', input(st, 'descDetails', ''))));
+      var rel = select({ v: (st.rating || '').charAt(0) }, 'v', [['', 'Not rated']].concat('ABCDEF'.split('').map(function (x) { return [x, x]; })));
+      var cred = select({ v: (st.rating || '').charAt(1) }, 'v', [['', '\u2013']].concat('123456'.split('').map(function (x) { return [x, x]; })));
+      var setRating = function () { st.rating = rel.value && cred.value ? rel.value + cred.value : ''; update(); };
+      rel.addEventListener('change', setRating); cred.addEventListener('change', setRating);
+      card.appendChild(row(field('Reliability of the source', rel), field('Credibility of the information', cred), field('Publisher', input(st, 'publisher', ''))));
+      var dk = select(st, 'dateKind', [['', 'Published'], ['updated', 'Last updated'], ['captured', 'Captured (imagery)']]);
+      card.appendChild(row(field('Date', input(st, 'date', '2/12/2026, Feb 12 2026, or 2018')), field('This date is when it was', dk), field('Accessed', input(st, 'accessed', ''))));
+      card.appendChild(field('Web address or DOI', input(st, 'url', 'https://')));
+      card.appendChild(row(field('Page or place cited, by default', input(st, 'locator', '25-27')), field('Commentary (optional)', input(st, 'note', ''))));
+      var more = document.createElement('details'), sum = document.createElement('summary'), inner = document.createElement('div');
+      sum.textContent = 'More: editors, translation, access, archive, short form'; inner.className = 'inner';
+      more.appendChild(sum); more.appendChild(inner);
+      inner.appendChild(row(field('Editors, one per line', input(st, 'editors', '', 2)), field('Translators, one per line', input(st, 'translators', '', 2)), field('Contributors, one per line', input(st, 'contributors', '', 2))));
+      inner.appendChild(row(field('Title in English', input(st, 'transTitle', '')), field('Original language', input(st, 'origLang', ''))));
+      var acc = document.createElement('div'); acc.className = 'access';
+      ACCESS.forEach(function (a) {
+        var l = document.createElement('label'); l.className = 'check'; var c = document.createElement('input'); c.type = 'checkbox'; c.checked = st.access.indexOf(a[0]) !== -1;
+        c.addEventListener('change', function () { st.access = st.access.filter(function (x) { return x !== a[0]; }); if (c.checked) st.access.push(a[0]); update(); });
+        var sp = document.createElement('span'); sp.textContent = a[1]; l.appendChild(c); l.appendChild(sp); acc.appendChild(l);
+      });
+      var af = document.createElement('div'); af.className = 'field'; var al = document.createElement('span'); al.className = 'label'; al.textContent = 'Access'; af.appendChild(al); af.appendChild(acc); inner.appendChild(af);
+      var quals = document.createElement('input'); quals.type = 'text'; quals.value = st.quals.join(', '); quals.placeholder = 'peer-reviewed, preprint, leaked';
+      quals.addEventListener('input', function () { st.quals = quals.value.split(',').map(function (x) { return x.trim(); }).filter(Boolean); update(); });
+      inner.appendChild(field('Qualifiers, separated by commas', quals));
+      inner.appendChild(row(field('Archive link', input(st, 'archiveUrl', 'https://web.archive.org/...')), field('Archive captured', input(st, 'archiveDate', ''))));
+      inner.appendChild(row(field('Short name, for later notes', input(st, 'shortName', 'Worked out from the authors')), field('Short title', input(st, 'shortTitle', 'Worked out from the title'))));
+      card.appendChild(more);
+    }
+    card.appendChild(pvFull); card.appendChild(pvShort); card.appendChild(checks);
+    var bar = document.createElement('div'); bar.className = 'row'; bar.style.gridTemplateColumns = 'auto auto 1fr';
+    var done = document.createElement('button'); done.type = 'button'; done.className = 'btn small primary'; done.textContent = 'Done';
+    done.addEventListener('click', function () {
+      // A new source gets its key from what was filled in, until it is cited.
+      if (s.fresh) { delete s.fresh; var cited = new RegExp('@' + s.key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b').test(doc.body + doc.appendix); if (!cited && s.kind === 'osint') { var others = doc.sources.filter(function (x) { return x !== s; }); s.key = WP.newOsintSource(s.st, others).key; } }
+      editing = null; snapshot = null; renderSources(); changed();
+    });
+    var undo = document.createElement('button'); undo.type = 'button'; undo.className = 'btn small quiet'; undo.textContent = 'Undo these changes';
+    undo.addEventListener('click', function () { var old = JSON.parse(snapshot.data); Object.keys(old).forEach(function (k) { s[k] = old[k]; }); renderSources(); changed(true); setStatus('Changes to @' + s.key + ' undone.'); });
+    bar.appendChild(done); bar.appendChild(undo); bar.appendChild(document.createElement('span'));
+    card.appendChild(bar);
+    update();
+    return card;
+  }
+  $('srcNew').addEventListener('click', function () {
+    var s = WP.newOsintSource(WP.blankOsint('web'), doc.sources); s.fresh = true;
+    doc.sources.unshift(s); editing = s; renderSources(); changed();
+    var f = $('srcList').querySelector('.sedit select'); if (f) f.focus();
+  });
+  $('srcExport').addEventListener('click', function () {
+    var n = doc.sources.filter(function (x) { return x.kind === 'osint'; }).length;
+    if (!n) { srcSay('There are no OSINT sources to save. Sources added by hand have no fields to save.', true); return; }
+    var title = String(doc.meta.title || doc.meta.briefName || 'sources').replace(/[\[\]]/g, '');
+    var name = 'sources-' + (WP.slug(title).slice(0, 50) || 'list') + '.json';
+    giveFile(name, WP.osintListFile(doc.sources, title)).then(function (ok) { srcSay(ok ? 'Saved ' + n + ' source' + (n === 1 ? '' : 's') + ' to ' + name + '.' : 'The file could not be saved from this view.', !ok); });
+  });
   function srcSay(msg, bad) { var e = $('srcMsg'); e.textContent = msg; e.className = 'filemsg' + (bad ? ' bad' : ''); }
   $('srcOpen').addEventListener('click', function () { $('srcPick').click(); });
   $('srcPick').addEventListener('change', function () {
@@ -2689,7 +4020,7 @@ if (typeof module !== 'undefined') module.exports = WP;
   });
 
   // ------------------------------------------------------------------ layout with Paged.js
-  var lastResult = null, pageCount = 0;
+  var lastResult = null, pageCount = 0, pageWidth = 816;
   function whenIdle() {
     return new Promise(function (resolve) { (function poll() { if (rendering) setTimeout(poll, 80); else resolve(); })(); });
   }
@@ -2698,23 +4029,32 @@ if (typeof module !== 'undefined') module.exports = WP;
     if (rendering) { renderAgain = true; return Promise.resolve(); }
     rendering = true; $('busy').hidden = false;
     var r;
-    try { r = WP.render(doc); } catch (e) { rendering = false; $('busy').hidden = true; setStatus('Something went wrong building the paper: ' + e.message, true); return Promise.resolve(); }
+    try { r = WP.render(doc, { measure: measure }); } catch (e) { rendering = false; $('busy').hidden = true; setStatus('Something went wrong building the paper: ' + e.message, true); return Promise.resolve(); }
     lastResult = r;
     paintChecks(r.problems);
     Array.prototype.forEach.call(document.querySelectorAll('style[data-pagedjs-inserted-styles]'), function (s) { s.remove(); });
     var stage = $('stage'); stage.textContent = '';
     var previewer = new PagedModule.Previewer();
-    var isBrief = doc.meta.kind === 'brief';
-    return previewer.preview(r.html, [{ 'paper.css': (isBrief ? BRIEF_CSS : PAPER_CSS) + '\n' + r.vars }], stage).then(function (flow) {
+    var isBrief = doc.meta.kind === 'brief', isBook = doc.meta.kind === 'book';
+    pageWidth = r.size ? r.size.w : 816;
+    return previewer.preview(r.html, [{ 'paper.css': (isBrief ? BRIEF_CSS : isBook ? BOOK_CSS : PAPER_CSS) + '\n' + r.vars }], stage).then(function (flow) {
       pageCount = flow.total;
       Array.prototype.forEach.call(stage.querySelectorAll('.cover-length'), function (el) { el.textContent = String(flow.total); });
       var pages = $('pages'); pages.textContent = '';
       var holder = stage.querySelector('.pagedjs_pages');
+      // Paged.js can leave a filler page (before a chapter that starts on a right-hand page) unmarked;
+      // marked blank, it loses its running head and page number, as a blank page should.
+      if (isBook && holder) Array.prototype.forEach.call(holder.querySelectorAll('.pagedjs_page'), function (pg) {
+        var c = pg.querySelector('.pagedjs_page_content');
+        if (c && !c.textContent.trim() && !c.querySelector('img, svg, table, hr')) pg.classList.add('pagedjs_blank_page');
+      });
       if (holder) pages.appendChild(holder);
       fit();
       var sumPages = Array.prototype.filter.call(pages.querySelectorAll('.pagedjs_page'), function (pg) { var sec = pg.querySelector('section.summary'); return sec && sec.textContent.trim(); }).length;
       if (sumPages > 1) paintChecks(r.problems.concat([{ level: 'check', msg: 'The executive summary runs to ' + sumPages + ' pages. The template keeps it to one.', where: 'summary' }]));
-      $('viewStats').innerHTML = isBrief
+      $('viewStats').innerHTML = isBook
+        ? '<b>' + flow.total + '</b> pages · <b>' + r.stats.chapters + '</b> ' + (r.stats.chapters === 1 ? 'chapter' : 'chapters') + ' · <b>' + r.stats.words.toLocaleString() + '</b> words · <b>' + r.stats.notes + '</b> ' + (r.stats.notes === 1 ? 'note' : 'notes') + ' · <b>' + r.stats.cited + '</b> ' + (r.stats.cited === 1 ? 'source' : 'sources')
+        : isBrief
         ? '<b>' + flow.total + '</b> pages · <b>' + r.stats.stories + '</b> ' + (r.stats.stories === 1 ? 'story' : 'stories') + ' · <b>' + r.stats.words.toLocaleString() + '</b> words · <b>' + r.stats.cited + '</b> sources'
         : '<b>' + flow.total + '</b> pages · <b>' + r.stats.words.toLocaleString() + '</b> words · <b>' + r.stats.notes + '</b> notes · <b>' + r.stats.figures + '</b> figures and tables';
     }).catch(function (e) { setStatus('The pages could not be laid out: ' + (e && e.message ? e.message : e), true); }).then(function () {
@@ -2724,11 +4064,11 @@ if (typeof module !== 'undefined') module.exports = WP;
     });
   }
   function fit() {
-    var w = $('scroller').clientWidth - 40, z = Math.min(1, Math.max(0.3, w / 816));
+    var w = $('scroller').clientWidth - 40, z = Math.min(1, Math.max(0.3, w / pageWidth));
     $('pages').style.zoom = String(z);
   }
   window.addEventListener('resize', function () { fit(); });
-  var WHERE = { paper: 'paper', summary: 'summary', body: 'body', visuals: 'visuals', sources: 'sources', back: 'back' };
+  var WHERE = { paper: 'paper', summary: 'summary', body: 'body', visuals: 'visuals', sources: 'sources', back: 'back', cover: 'cover', appendix: 'appendix' };
   function paintChecks(list) {
     var ul = $('checks'); ul.textContent = '';
     list.forEach(function (x) {
@@ -2742,13 +4082,14 @@ if (typeof module !== 'undefined') module.exports = WP;
   // ------------------------------------------------------------------ files and printing
   var inViewer = !!(window.claude && typeof window.claude.use === 'function'), dl = Promise.resolve(null);
   if (inViewer) { try { dl = Promise.resolve(window.claude.use('downloads')).catch(function () { return null; }); } catch (e) {} }
-  function giveFile(name, text) {
-    var blob = new Blob([text], { type: 'application/json' });
+  function giveFile(name, data, type) {
+    var blob = new Blob([data], { type: type || 'application/json' });
     if (inViewer) return dl.then(function (d) { return d ? d.save({ filename: name, data: blob }).then(function () { return true; }, function () { return false; }) : false; });
     try { var u = URL.createObjectURL(blob), a = document.createElement('a'); a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(u); }, 4000); return Promise.resolve(true); }
     catch (e) { return Promise.resolve(false); }
   }
   function fileName() {
+    if (doc.meta.kind === 'book') return (WP.slug(String(doc.meta.title || 'book').replace(/[\[\]]/g, '')).slice(0, 60) || 'book') + '.json';
     if (doc.meta.kind === 'brief') return (WP.slug('brief-' + (doc.meta.number || '') + '-' + String(doc.meta.briefName || '').replace(/[\[\]]/g, '')).slice(0, 60) || 'brief') + '.json';
     var base = WP.slug((doc.meta.number ? 'wp-' + doc.meta.number + '-' : '') + (doc.meta.shortTitle || doc.meta.title || 'white-paper').replace(/[\[\]]/g, '')).slice(0, 60) || 'white-paper';
     return base + '.json';
@@ -2771,16 +4112,36 @@ if (typeof module !== 'undefined') module.exports = WP;
   });
   var newArmed = false;
   $('newBtn').addEventListener('click', function () {
-    var b = $('newBtn'), k = doc.meta.kind === 'brief' ? 'brief' : 'paper', label = k === 'brief' ? 'New brief' : 'New paper';
-    if (!newArmed) { newArmed = true; b.textContent = 'Click again: this clears the current ' + (k === 'brief' ? 'brief' : 'paper'); setTimeout(function () { newArmed = false; $('newBtn').textContent = doc.meta.kind === 'brief' ? 'New brief' : 'New paper'; }, 4000); return; }
-    newArmed = false; b.textContent = label;
-    doc = starterOf(k); fillFields(); changed(true); showTab('paper'); setStatus('Started a new ' + (k === 'brief' ? 'brief' : 'paper') + ' from the template. Save a project file first if you need the old one.');
+    var b = $('newBtn'), k = doc.meta.kind;
+    if (!newArmed) { newArmed = true; b.textContent = 'Click again: this clears the current ' + k; setTimeout(function () { newArmed = false; $('newBtn').textContent = 'New ' + doc.meta.kind; }, 4000); return; }
+    newArmed = false; b.textContent = 'New ' + k;
+    editing = null; doc = starterOf(k); fillFields(); changed(true); showTab('paper'); setStatus('Started a new ' + k + ' from the template. Save a project file first if you need the old one.');
+  });
+  // The ePUB: the cover drawn as a JPEG, the book's typefaces, and every chapter as its own file.
+  var EPUB_FACES = { garamond: ['Garamond Body', 'Garamond Display'], plex: ['Plex Serif', 'Plex Sans Cond', 'Plex Mono'] };
+  $('epubBtn').addEventListener('click', function () {
+    if (doc.meta.kind !== 'book') return;
+    if (!doc.book.bookId) { doc.book.bookId = uuid(); changed(); }
+    setStatus('Building the ePUB…');
+    coverJpeg().then(function (jpeg) {
+      var fonts = fontRules(EPUB_FACES[doc.book.face]).map(function (f) { return { family: f.family, style: f.style, weight: f.weight, range: f.range, data: b64bytes(f.b64) }; });
+      var bytes;
+      try { bytes = WP.epub(doc, { cover: jpeg ? { data: jpeg, type: 'image/jpeg' } : null, fonts: fonts, css: EPUB_CSS, measure: measure }); }
+      catch (e) { setStatus('The ePUB could not be built: ' + e.message, true); return; }
+      var name = fileName().replace(/\.json$/, '.epub');
+      giveFile(name, bytes, 'application/epub+zip').then(function (ok) {
+        setStatus(ok ? 'Saved ' + name + (jpeg ? '.' : '. The cover went in as a drawing, since this browser would not make it an image.') : 'The file could not be saved from this view.', !ok);
+      });
+    });
   });
   $('printBtn').addEventListener('click', function () {
     clearTimeout(renderTimer);
     var go = function () {
       if (!pageCount) { setStatus('The pages are not ready yet.', true); return; }
       setStatus('In the print dialog, choose Save as PDF, and turn on Background graphics if the page color is missing.');
+      // The PDF takes its file name from the page title.
+      var was = document.title, t = String(doc.meta.kind === 'brief' ? (doc.meta.briefName + ' ' + doc.meta.number) : doc.meta.title || '').replace(/[\[\]*]/g, '').replace(/[\\/:?"<>|]+/g, ' ').trim();
+      if (t) { document.title = t; setTimeout(function () { document.title = was; }, 1500); }
       try { window.print(); } catch (e) { setStatus('Printing is blocked in this view. Open the page in its own browser tab and try again.', true); }
     };
     whenIdle().then(function () { return layout(); }).then(go);
@@ -2796,12 +4157,13 @@ if (typeof module !== 'undefined') module.exports = WP;
 
   // ------------------------------------------------------------------ boot
   var saved = load(K_DOC);
-  doc = saved ? WP.normalize(saved) : starter();
+  doc = saved ? WP.normalize(saved) : bookStarter();
+  if (doc.meta.kind === 'book' && !doc.book.bookId) doc.book.bookId = uuid();
   fillFields();
   var tab = load(K_TAB); showTab(typeof tab === 'string' && document.querySelector('[data-pane="' + tab + '"]') ? tab : 'paper');
   lastTarget = $('t-body');
-  var fontsReady = document.fonts && document.fonts.load ? Promise.all(['400 16px "Plex Serif"', 'italic 400 16px "Plex Serif"', '600 16px "Plex Serif"', '700 40px "Plex Sans Cond"', '600 22px "Plex Sans Cond"', '400 12px "Plex Mono"', '700 12px "Plex Mono"', '400 16px "Garamond Body"', 'italic 400 16px "Garamond Body"', '600 16px "Garamond Body"', '600 30px "Garamond Display"', '500 60px "Garamond Display"'].map(function (f) { return document.fonts.load(f); })) : Promise.resolve();
-  fontsReady.then(function () { layout(); }, function () { layout(); });
+  var fontsReady = document.fonts && document.fonts.load ? Promise.all(['400 16px "Plex Serif"', 'italic 400 16px "Plex Serif"', '600 16px "Plex Serif"', '700 40px "Plex Sans Cond"', '600 22px "Plex Sans Cond"', '400 12px "Plex Mono"', '700 12px "Plex Mono"', '400 16px "Garamond Body"', 'italic 400 16px "Garamond Body"', '600 16px "Garamond Body"', '600 30px "Garamond Display"', '500 60px "Garamond Display"', '500 16px "Plex Sans Cond"', '500 12px "Plex Mono"'].map(function (f) { return document.fonts.load(f); })) : Promise.resolve();
+  fontsReady.then(function () { paintCover(); layout(); }, function () { layout(); });
 })();
 </script>
 </body>

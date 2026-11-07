@@ -59,6 +59,8 @@ parts = {
     'FONTS': font_faces(),
     'PAPERCSS': read(SRC / 'paper.css'),
     'BRIEFCSS': read(SRC / 'brief.css'),
+    'BOOKCSS': read(SRC / 'book.css'),
+    'EPUBCSS': read(SRC / 'epub.css'),
     # Paged.js has one literal U+FFFD inside a string; written as an escape it means the same.
     'PAGED': read(V / 'paged.min.js').replace('\ufffd', '\\uFFFD'),
     'OSINT': read(V / 'osint-core.js'),

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <!--
-  White Paper Builder
+  eBook Builder (White Paper Builder, version 2)
   Copyright (c) 2026 G. Michael Rapp. MIT License; see LICENSE.
 
   Contains Paged.js (c) Coko Foundation, MIT License; the OSINT Citation Generator core,
@@ -11,8 +11,8 @@
   and Cormorant Garamond (c) The Cormorant Project Authors, SIL Open Font License 1.1. See NOTICE.md.
 -->
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Write a white paper or an intelligence brief and get print-ready pages: cover, contents, numbered sections or stories, footnotes, OSINT citations, charts, tables, appendices, and page numbers. Runs entirely in your browser.">
-<title>White Paper Builder</title>
+<meta name="description" content="Build an eBook, a white paper, or an intelligence brief: cover, front matter, contents, chapters, footnotes, OSINT citations, charts, and tables. Save it as a PDF, and an eBook as an ePUB too. Runs entirely in your browser.">
+<title>eBook Builder</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%2315181B'/%3E%3Crect x='7' y='7' width='8' height='3' fill='%23C42A14'/%3E%3Crect x='7' y='13' width='18' height='2' fill='%23F4F5F2'/%3E%3Crect x='7' y='18' width='18' height='2' fill='%23F4F5F2'/%3E%3Crect x='7' y='23' width='12' height='2' fill='%23F4F5F2'/%3E%3C/svg%3E">
 <style id="fonts">
 /*FONTS*/
@@ -94,6 +94,24 @@ body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-si
 #app .src .key { font-family: var(--mono); font-size: 12.5px; width: 100%; padding: 3px 6px; }
 #app .src .txt { grid-column: 1 / -1; font-family: 'Plex Serif', Georgia, serif; font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; }
 #app .src .acts { display: flex; gap: 4px; }
+#app .cover-grid { display: grid; grid-template-columns: minmax(150px, 220px) minmax(0, 1fr); gap: 16px; align-items: start; }
+#app .cover-prev { border: 1px solid var(--line); background: #1F2124; line-height: 0; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 6px 20px rgba(0, 0, 0, 0.12); }
+#app .cover-prev svg { display: block; width: 100%; height: auto; }
+#app .cover-ctl { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+#app .sliders { display: grid; gap: 6px; font-size: 12.5px; }
+#app .sliders label { display: grid; grid-template-columns: 112px minmax(0, 1fr); align-items: center; gap: 8px; }
+#app input[type="range"] { width: 100%; accent-color: var(--accent); }
+#app .sedit { border: 1px solid var(--accent); border-radius: 6px; background: var(--surface); padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+#app .sedit .pv { border-radius: 4px; background: var(--soft); padding: 8px 10px; font-family: 'Plex Serif', Georgia, serif; font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; }
+#app .sedit .pv .k { display: block; font-family: var(--ui); font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
+#app .sedit .pv + .pv { margin-top: -4px; }
+#app .sedit ul.gchecks { margin: 0; padding-left: 18px; font-size: 12px; color: var(--check); }
+#app .sedit details { border-top: 1px solid var(--line); padding-top: 8px; }
+#app .sedit details summary { cursor: pointer; font-size: 12.5px; font-weight: 600; }
+#app .sedit details[open] > .inner { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+#app .sedit .access { display: flex; flex-wrap: wrap; gap: 4px 14px; }
+#app .src.editing { border-color: var(--accent); }
+@media (max-width: 1100px) { #app .cover-grid { grid-template-columns: minmax(0, 1fr); } #app .cover-prev { max-width: 240px; } }
 #app .filemsg { font-size: 12.5px; color: var(--ok); margin: 0; } .filemsg.bad { color: var(--fix); } .filemsg:empty { display: none; }
 #app .view { min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr); }
 #app .viewbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 8px 16px; border-bottom: 1px solid var(--line); background: var(--bg); font-size: 12.5px; color: var(--muted); }
@@ -134,18 +152,20 @@ body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-si
 }
 </style>
 <script>
-(function () { try { var t = JSON.parse(localStorage.getItem('wpb-theme-v1')); if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); } catch (e) {} })();
+(function () { try { var t = JSON.parse(localStorage.getItem('ebb-theme-v1')); if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); } catch (e) {} })();
 </script>
 </head>
 <body>
 <div id="app">
   <header class="bar">
-    <h1><span class="mk"></span>White Paper Builder <span class="ver">v1.3</span></h1>
+    <h1><span class="mk"></span>eBook Builder <span class="ver">v2.0</span></h1>
     <span class="seg kind" role="radiogroup" aria-label="What you are making">
-      <label><input type="radio" name="kind" id="kindPaper" value="paper" checked><span>White paper</span></label>
+      <label><input type="radio" name="kind" id="kindBook" value="book" checked><span>eBook</span></label>
+      <label><input type="radio" name="kind" id="kindPaper" value="paper"><span>White paper</span></label>
       <label><input type="radio" name="kind" id="kindBrief" value="brief"><span>Intelligence brief</span></label>
     </span>
     <button type="button" class="btn primary" id="printBtn">Print or save as PDF</button>
+    <button type="button" class="btn primary" id="epubBtn" data-only="book">Save ePUB</button>
     <button type="button" class="btn" id="saveBtn">Save project</button>
     <button type="button" class="btn" id="openBtn">Open project</button>
     <button type="button" class="btn quiet" id="newBtn">New paper</button>
@@ -163,10 +183,11 @@ body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-si
     <section class="editor" aria-label="Editor">
       <div class="tabs" role="tablist" id="tabs">
         <button type="button" role="tab" data-tab="paper" aria-selected="true">Paper</button>
+        <button type="button" role="tab" data-tab="cover" aria-selected="false" data-only="book">Cover</button>
         <button type="button" role="tab" data-tab="summary" aria-selected="false" data-only="paper">Summary</button>
         <button type="button" role="tab" data-tab="body" aria-selected="false">Body</button>
         <button type="button" role="tab" data-tab="visuals" aria-selected="false">Visuals</button>
-        <button type="button" role="tab" data-tab="appendix" aria-selected="false" data-only="paper">Appendix</button>
+        <button type="button" role="tab" data-tab="appendix" aria-selected="false" data-only="paper book">Appendix</button>
         <button type="button" role="tab" data-tab="sources" aria-selected="false">Sources</button>
         <button type="button" role="tab" data-tab="back" aria-selected="false" data-only="paper">Back page</button>
       </div>
@@ -193,14 +214,76 @@ body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-si
           <div class="field"><label for="m-baccent">Accent color</label><input type="color" id="m-baccent" data-k="meta.accent"></div>
           </div>
 
-          <div class="part" data-only="paper">
-          <h2>Cover</h2>
+          <div class="part" data-only="paper book">
+          <h2 data-only="paper">Cover</h2>
+          <h2 data-only="book">Title and authors</h2>
           <div class="field"><label for="m-title">Title</label><input type="text" id="m-title" data-k="meta.title" placeholder="The question or the claim, in ten words or fewer"></div>
           <div class="field"><label for="m-subtitle">Subtitle</label><input type="text" id="m-subtitle" data-k="meta.subtitle" placeholder="The scope, the period, or the method"></div>
           <div class="field"><span class="label">Authors</span>
             <div class="authors" id="authorList"></div>
             <div><button type="button" class="btn small" id="addAuthor">+ Add an author</button></div>
-            <p class="hint">In the order they appear on the cover and in "Cite as". Biographies print on the "About this paper" page.</p></div>
+            <p class="hint" data-only="paper">In the order they appear on the cover and in "Cite as". Biographies print on the "About this paper" page.</p>
+            <p class="hint" data-only="book">In the order they appear on the cover and title page. Biographies print on the "About the author" page at the back.</p></div>
+          </div>
+
+          <div class="part" data-only="book">
+          <div class="row">
+            <div class="field"><label for="b-date">Date</label><input type="text" id="b-date" data-k="meta.date" placeholder="November 2026"></div>
+            <div class="field"><label for="b-short">Short title, for the running heads</label><input type="text" id="b-short" data-k="meta.shortTitle" placeholder="Leave blank to use the title"></div>
+          </div>
+          <div class="row">
+            <div class="field"><label for="b-series">Series (optional)</label><input type="text" id="b-series" data-k="book.series" placeholder="Global Warning Books"></div>
+            <div class="field"><label for="b-seriesNo">Number in the series</label><input type="text" id="b-seriesNo" data-k="book.seriesNo" placeholder="1"></div>
+            <div class="field"><label for="b-lang">Language</label><input type="text" id="b-lang" data-k="book.lang" list="langList" placeholder="en"><datalist id="langList"><option value="en">English</option><option value="en-US">English (US)</option><option value="en-GB">English (UK)</option><option value="es">Spanish</option><option value="fr">French</option><option value="de">German</option><option value="uk">Ukrainian</option><option value="ru">Russian</option></datalist></div>
+          </div>
+          <h2>Front matter</h2>
+          <label class="check"><input type="checkbox" id="b-halfTitle" data-k="book.halfTitle"> <span>Begin with a half-title page (the title alone) before the title page</span></label>
+          <div class="field"><label for="b-dedication">Dedication (optional)</label><textarea id="b-dedication" data-k="book.dedication" rows="2" placeholder="For the analysts who check the sources."></textarea></div>
+          <div class="field"><label for="b-epigraph">Epigraph (optional)</label><textarea id="b-epigraph" data-k="book.epigraph" rows="3" placeholder="A quotation that sets up the book."></textarea>
+            <input type="text" id="b-epigraphBy" data-k="book.epigraphBy" placeholder="Who said it, and where: Thucydides, *History of the Peloponnesian War*"></div>
+          <h2>Copyright page and colophon</h2>
+          <p class="hint">These print together on the page after the title page, set small at the foot of the page, as in a printed book.</p>
+          <div class="field"><label for="b-copyright">Copyright line</label><textarea id="b-copyright" data-k="book.copyright" rows="2" placeholder="© 2026 Publisher name. All rights reserved."></textarea></div>
+          <div class="field"><label for="b-colophon">Colophon</label><textarea id="b-colophon" data-k="meta.colophon" rows="3" placeholder="Who publishes the book, and anything readers should know: an official product of..., distributed to subscribers of..."></textarea></div>
+          <div class="row">
+            <div class="field"><label for="b-edition">Edition</label><input type="text" id="b-edition" data-k="book.edition" placeholder="First edition, November 2026"></div>
+            <div class="field"><label for="b-isbn">ISBN (optional)</label><input type="text" id="b-isbn" data-k="book.isbn" placeholder="978-..."></div>
+            <div class="field"><label for="b-issn">ISSN (optional)</label><input type="text" id="b-issn" data-k="book.issn" placeholder="3143-5645"></div>
+          </div>
+          <div class="field"><label for="b-credits">Credits, one per line</label><textarea id="b-credits" data-k="book.credits" rows="2" placeholder="Edited by ...&#10;Cover design by ..."></textarea><p class="hint">The cover image credit, set under Cover, is added here.</p></div>
+          <div class="row">
+            <div class="field"><label for="b-publisher">Publisher</label><input type="text" id="b-publisher" data-k="meta.publisher" placeholder="Publisher or imprint"></div>
+            <div class="field"><label for="b-site">Website</label><input type="text" id="b-site" data-k="meta.site" placeholder="example.substack.com"></div>
+          </div>
+          <div class="field"><label for="b-url">Link (optional)</label><input type="url" id="b-url" data-k="meta.url" placeholder="https://example.substack.com"></div>
+          <label class="check"><input type="checkbox" id="b-typeNote" data-k="book.typeNote"> <span>Name the typefaces on the copyright page ("Set in EB Garamond...")</span></label>
+          <h2>For reading apps (ePUB)</h2>
+          <div class="field"><label for="b-description">Description</label><textarea id="b-description" data-k="book.description" rows="3" placeholder="Two or three sentences on what the book covers. Reading apps show it beside the cover."></textarea></div>
+          <div class="field"><label for="b-subjects">Subjects, separated by commas</label><input type="text" id="b-subjects" data-k="book.subjects" placeholder="Geopolitics, Military history, Intelligence"></div>
+          <h2>Layout</h2>
+          <div class="row">
+            <div class="field"><label for="b-trim">Page size of the PDF</label><select id="b-trim" data-k="book.trim"></select></div>
+            <div class="field"><label for="b-face">Typeface</label><select id="b-face" data-k="book.face"><option value="garamond">EB Garamond, with Cormorant titles</option><option value="plex">IBM Plex, as in the white paper</option></select></div>
+          </div>
+          <div class="row">
+            <div class="field"><label for="b-numStyle">Chapter numbers</label><select id="b-numStyle" data-k="book.numStyle"><option value="word">In words: One, Two</option><option value="arabic">In figures: 1, 2</option><option value="roman">Roman: I, II</option><option value="none">Not numbered</option></select></div>
+            <div class="field"><label for="b-chapterWord">Word before the number</label><input type="text" id="b-chapterWord" data-k="book.chapterWord" placeholder="Chapter"></div>
+          </div>
+          <div class="row">
+            <div class="field"><label for="b-para">Paragraphs</label><select id="b-para" data-k="book.para"><option value="indent">Indented, as in a book</option><option value="block">Spaced, as on the web</option></select></div>
+            <div class="field"><label for="b-notes">Notes in the PDF</label><select id="b-notes" data-k="book.notes"><option value="foot">At the foot of the page</option><option value="end">At the back of the book</option></select></div>
+          </div>
+          <div class="row" style="align-items:end">
+            <div class="field"><label for="b-accent">Accent color</label><input type="color" id="b-accent" data-k="meta.accent"></div>
+            <div class="field"><label for="b-matter">Heading of the ?&gt; box</label><input type="text" id="b-matter" data-k="meta.matterLabel" placeholder="So, why does this matter?"></div>
+          </div>
+          <label class="check"><input type="checkbox" id="b-openers" data-k="book.openers"> <span>Set the first line of each chapter in small capitals</span></label>
+          <label class="check"><input type="checkbox" id="b-recto" data-k="book.recto"> <span>Start chapters and parts on a right-hand page (adds blank pages, as in print)</span></label>
+          <label class="check"><input type="checkbox" id="b-about" data-k="book.aboutAuthors"> <span>Add an "About the author" page from the biographies</span></label>
+          <p class="hint">Notes in the ePUB always go at the end of each chapter, where reading apps that support it show them as pop-ups.</p>
+          </div>
+
+          <div class="part" data-only="paper">
           <div class="row">
             <div class="field"><label for="m-date">Date</label><input type="text" id="m-date" data-k="meta.date" placeholder="October 2026"></div>
             <div class="field"><label for="m-number">Paper number</label><input type="text" id="m-number" data-k="meta.number" placeholder="001"></div>
@@ -234,6 +317,51 @@ body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-si
           </div>
         </div>
 
+        <div class="pane" data-pane="cover" hidden>
+          <div class="cover-grid">
+            <div class="cover-prev" id="coverPreview" aria-label="Cover preview"></div>
+            <div class="cover-ctl">
+              <div class="field"><label for="c-layout">Layout</label><select id="c-layout" data-k="book.cover.layout">
+                <option value="photo">Photo to every edge, text on a fade</option>
+                <option value="band">Photo above, text on a band of color</option>
+                <option value="framed">Framed photo between title and author</option>
+                <option value="type">Type only, no photo</option>
+                <option value="art">Finished artwork: the image is the whole cover</option></select></div>
+              <div class="field"><span class="label">Image</span>
+                <div class="row" style="grid-template-columns:auto auto 1fr;align-items:center"><button type="button" class="btn small" id="ccoverPick">Choose an image</button><button type="button" class="btn small quiet" id="ccoverClear">Remove</button><span class="hint" id="ccoverInfo"></span></div>
+                <input type="text" id="c-credit" data-k="meta.coverCaption" placeholder="Image credit (optional), printed on the copyright page"></div>
+              <div class="sliders">
+                <label>Across <input type="range" min="0" max="100" data-k="book.cover.focusX"></label>
+                <label>Up and down <input type="range" min="0" max="100" data-k="book.cover.focusY"></label>
+                <label>Zoom <input type="range" min="100" max="300" data-k="book.cover.zoom"></label>
+                <label>Shade behind text <input type="range" min="0" max="100" data-k="book.cover.shade"></label>
+              </div>
+            </div>
+          </div>
+          <p class="hint" id="coverHint">For a finished cover made elsewhere, choose the last layout. Upright images about 1600 × 2400 pixels fit a 6 × 9 page best.</p>
+          <h2>Text</h2>
+          <div class="field"><label for="c-kicker">Line above the title (optional)</label><input type="text" id="c-kicker" data-k="book.cover.kicker" placeholder="A Global Warning book"></div>
+          <div class="row">
+            <div class="field"><label for="c-font">Title face</label><select id="c-font" data-k="book.cover.font"><option value="display">Cormorant Garamond</option><option value="serif">EB Garamond</option><option value="sans">IBM Plex Sans Condensed, bold</option><option value="mono">IBM Plex Mono, bold</option></select></div>
+            <div class="field"><label for="c-scale">Title size</label><input type="range" id="c-scale" min="50" max="150" data-k="book.cover.scale"></div>
+          </div>
+          <div class="row">
+            <div class="field"><label for="c-valign">Text sits</label><select id="c-valign" data-k="book.cover.valign"><option value="bottom">Low</option><option value="middle">In the middle</option><option value="top">High</option></select></div>
+            <div class="field"><label for="c-align">Aligned</label><select id="c-align" data-k="book.cover.align"><option value="center">Centered</option><option value="left">Left</option></select></div>
+          </div>
+          <div class="row" style="align-items:end">
+            <div class="field"><label for="c-bg">Background</label><input type="color" id="c-bg" data-k="book.cover.bg"></div>
+            <div class="field"><label for="c-ink">Text</label><input type="color" id="c-ink" data-k="book.cover.ink"></div>
+            <div class="field"><label for="c-accent">Accent</label><input type="color" id="c-accent" data-k="meta.accent"></div>
+          </div>
+          <label class="check"><input type="checkbox" data-k="book.cover.upper"> <span>Title in capitals</span></label>
+          <label class="check"><input type="checkbox" data-k="book.cover.showSub"> <span>Show the subtitle</span></label>
+          <label class="check"><input type="checkbox" data-k="book.cover.showAuthor"> <span>Show the authors</span></label>
+          <label class="check"><input type="checkbox" data-k="book.cover.showPub"> <span>Show the publisher at the foot</span></label>
+          <div><button type="button" class="btn small" id="coverSave">Save the cover as an image</button></div>
+          <p class="hint">A JPEG, 1600 pixels wide, for a Substack post or a store listing. The ePUB carries the same picture as its cover.</p>
+        </div>
+
         <div class="pane" data-pane="summary" hidden>
           <p class="hint">One page, about 300 words. Notes and citations work here too.</p>
           <div class="field"><label for="s-lead">The problem in brief</label><textarea id="s-lead" data-k="summary.lead" class="code" rows="6" data-cite></textarea><p class="hint">What is happening, and why it will still matter in five years. A blank line starts a new paragraph.</p></div>
@@ -254,7 +382,8 @@ body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-si
         </div>
 
         <div class="pane" data-pane="appendix" hidden>
-          <p class="hint">Each # heading starts Appendix A, B, C. ## headings are numbered A.1, A.2. [[rating-key]] adds the source rating key table.</p>
+          <p class="hint" data-only="paper">Each # heading starts Appendix A, B, C. ## headings are numbered A.1, A.2. [[rating-key]] adds the source rating key table.</p>
+          <p class="hint" data-only="book">After the last chapter: acknowledgments, appendices, a glossary, a note on sources. Each # heading starts a new page and is listed in the contents, unnumbered. Notes, citations, and visuals work here as in the chapters. [[rating-key]] adds the source rating key table.</p>
           <div class="toolbar" data-for="appendix"></div>
           <textarea id="t-appendix" data-k="appendix" class="code big" spellcheck="true" data-cite aria-label="Appendix text"></textarea>
         </div>
@@ -262,12 +391,14 @@ body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-si
         <div class="pane" data-pane="sources" hidden>
           <p class="hint">Cite sources from your OSINT Citation Generator lists. In the generator, save your list to a file; open that file here. Each source gets a short key.</p>
           <p class="hint" data-only="paper">Write [@key] or [@key, p. 45] in the text: the first citation of a source prints in full in a footnote, later ones in short form.</p>
+          <p class="hint" data-only="book" hidden>Write [@key] or [@key, p. 45] in the text: each chapter gives its first citation of a source in full, in a note, and later ones in short form. Click Edit on a source to correct it here; the notes follow.</p>
           <p class="hint" data-only="brief" hidden>Write [@key] in a story where you use the source. A small source number prints there, linked to the source's entry in the numbered list on the last page; sources are numbered in order of first citation. [ORIGINAL STORY: @key] puts that label in front of its entry. You can turn the numbers off under Brief.</p>
           <div class="row" style="grid-template-columns:auto auto 1fr;align-items:center">
             <button type="button" class="btn" id="srcOpen">Open an OSINT list file</button>
+            <button type="button" class="btn" id="srcNew">New OSINT source</button>
             <button type="button" class="btn quiet" id="srcAddTyped">Add a source by hand</button>
-            <span></span>
           </div>
+          <div class="row" style="grid-template-columns:auto 1fr;align-items:center"><button type="button" class="btn small quiet" id="srcExport">Save these sources as an OSINT list file</button><span class="hint">Opens in the OSINT Citation Generator, edits included.</span></div>
           <input type="file" id="srcPick" accept=".json,application/json" multiple hidden>
           <p class="filemsg" id="srcMsg" role="status"></p>
           <div class="card" id="typedForm" hidden>
@@ -277,6 +408,7 @@ body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-si
             <div class="row" style="grid-template-columns:auto auto 1fr"><button type="button" class="btn small primary" id="tySave">Add source</button><button type="button" class="btn small quiet" id="tyCancel">Cancel</button></div>
             <p class="hint">Use *asterisks* for italics. A page number in [@key, p. 4] goes before the final period.</p>
           </div>
+          <datalist id="descPicks"></datalist>
           <div class="srcs" id="srcList"></div>
           <p class="hint" id="srcEmpty">No sources yet. You can still write notes by hand with ^[note text].</p>
         </div>
@@ -305,6 +437,8 @@ body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-si
 
 <script type="text/plain" id="paper-css">/*PAPERCSS*/</script>
 <script type="text/plain" id="brief-css">/*BRIEFCSS*/</script>
+<script type="text/plain" id="book-css">/*BOOKCSS*/</script>
+<script type="text/plain" id="epub-css">/*EPUBCSS*/</script>
 <script id="pagedjs">/*PAGED*/</script>
 <script id="osint">/*OSINT*/</script>
 <script id="core">/*CORE*/</script>

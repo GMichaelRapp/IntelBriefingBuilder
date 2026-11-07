@@ -1,6 +1,6 @@
 # Notices
 
-White Paper Builder is © 2026 G. Michael Rapp and is free software under the MIT License (see `LICENSE`).
+eBook Builder (White Paper Builder, version 2) is © 2026 G. Michael Rapp and is free software under the MIT License (see `LICENSE`).
 
 `index.html` contains the following works by others, unmodified.
 
@@ -18,8 +18,12 @@ The paper is set in IBM Plex Serif, IBM Plex Sans Condensed, and IBM Plex Mono, 
 
 ## EB Garamond and Cormorant Garamond
 
-The intelligence brief is set in EB Garamond (© 2017 The EB Garamond Project Authors, https://github.com/octaviopardo/EBGaramond12) and Cormorant Garamond (© 2015 The Cormorant Project Authors, https://github.com/CatharsisFonts/Cormorant). Both are licensed under the SIL Open Font License, version 1.1; the license texts are in `src/vendor/fonts/`. The font files come from the Fontsource packages `@fontsource/eb-garamond` and `@fontsource/cormorant-garamond`, version 5.3.0, embedded unmodified as Fontsource subsets them: Latin, Latin Extended, and Cyrillic.
+The intelligence brief, and the eBook in its default face, are set in EB Garamond (© 2017 The EB Garamond Project Authors, https://github.com/octaviopardo/EBGaramond12) and Cormorant Garamond (© 2015 The Cormorant Project Authors, https://github.com/CatharsisFonts/Cormorant). Both are licensed under the SIL Open Font License, version 1.1; the license texts are in `src/vendor/fonts/`. The font files come from the Fontsource packages `@fontsource/eb-garamond` and `@fontsource/cormorant-garamond`, version 5.3.0, embedded unmodified as Fontsource subsets them: Latin, Latin Extended, and Cyrillic.
 
 ## Design
 
 The white paper's design follows the white paper series template made for Ryan McBeth's publication, published at ryanmcbeth.substack.com. The intelligence brief's design follows the Global Warning intelligence brief.
+
+## The ePUB
+
+An ePUB saved by this page embeds the font files of the face the book is set in (EB Garamond and Cormorant Garamond, or IBM Plex), unmodified. The SIL Open Font License 1.1 allows fonts to be embedded in documents.

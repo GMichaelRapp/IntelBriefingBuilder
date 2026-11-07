@@ -1,0 +1,115 @@
+/*
+ * The ePUB's stylesheet. Reflowable: sizes are relative, so the reader's own text size,
+ * margins, and night mode still work. --ACCENT-- is replaced with the book's accent color
+ * when the ePUB is written; the book's typefaces, when embedded, are declared above this.
+ */
+body { margin: 0 3%; font-family: "Garamond Body", "EB Garamond", Garamond, Georgia, serif; line-height: 1.5; font-kerning: normal; widows: 2; orphans: 2; }
+body.face-plex { font-family: "Plex Serif", "IBM Plex Serif", Georgia, serif; }
+.face-garamond h1, .face-garamond h2, .face-garamond h3, .face-garamond .pull, .face-garamond .vtitle, .face-garamond .stat .big, .face-garamond .tp-title { font-family: "Garamond Display", "Cormorant Garamond", "Garamond Body", Garamond, serif; font-weight: 600; }
+.face-plex h1, .face-plex h2, .face-plex h3, .face-plex .pull, .face-plex .vtitle, .face-plex .stat .big, .face-plex .tp-title { font-family: "Plex Sans Cond", "IBM Plex Sans Condensed", "Arial Narrow", sans-serif; font-weight: 700; }
+a { color: inherit; }
+a.url { word-wrap: break-word; overflow-wrap: anywhere; }
+b { font-weight: 600; }
+
+/* Cover. */
+.cover-page { margin: 0; padding: 0; text-align: center; page-break-after: always; }
+.cover-page img { max-width: 100%; max-height: 100vh; height: auto; }
+
+/* Title page, copyright page, dedication, epigraph. */
+.titlepage { text-align: center; margin-top: 18%; }
+.tp-series, .tp-by, .tp-pub, .ch-num, .m-label, .vlabel { font-size: 0.72em; letter-spacing: 0.2em; text-transform: uppercase; color: --ACCENT--; }
+.tp-title { font-size: 2.2em; line-height: 1.1; margin: 0.6em 0 0; }
+.tp-sub { font-size: 1.15em; font-style: italic; margin: 0.5em 0 0; }
+.tp-rule { width: 3em; margin: 1.4em auto; border-top: 2px solid --ACCENT--; height: 0; }
+.tp-by { color: inherit; font-size: 0.85em; }
+.tp-foot { margin-top: 4em; }
+.tp-pub { color: inherit; margin: 0; }
+.tp-site { font-size: 0.8em; margin: 0.2em 0 0; }
+.copyright { margin-top: 30%; font-size: 0.8em; line-height: 1.5; }
+.copyright p { margin: 0 0 0.8em; text-indent: 0; }
+.dedication { margin: 30% 10% 0; text-align: center; font-style: italic; }
+.epigraph { margin: 25% 8% 0; }
+.epi { margin: 0; font-style: italic; }
+.epi p { margin: 0 0 0.6em; text-indent: 0; }
+.epi-by { text-align: right; font-style: normal; font-size: 0.9em; }
+
+/* Contents. */
+.contents h1, .fm-h { text-align: center; font-size: 1.8em; margin: 1em 0 1em; }
+.contents ol { list-style: none; margin: 0; padding: 0; }
+.contents ol ol { padding-left: 1.4em; }
+.contents li { margin: 0.45em 0; }
+.contents a { text-decoration: none; }
+
+/* Parts and chapters. */
+.unit { page-break-before: always; }
+.ch-head { margin: 2.5em 0 2em; text-align: center; page-break-after: avoid; }
+.k-part .ch-head { margin-top: 30%; }
+.ch-num { margin: 0 0 0.8em; }
+.ch-title { font-size: 1.9em; line-height: 1.15; margin: 0; }
+.k-part .ch-title { font-size: 2.2em; }
+.ch-head:after { content: ""; display: block; width: 2.6em; margin: 1em auto 0; border-top: 1.5px solid --ACCENT--; }
+.k-back .ch-head { margin-top: 1.5em; }
+
+/* Text. */
+p { margin: 0; }
+.para-indent .unit p + p { text-indent: 1.4em; }
+.para-indent .unit p.scene + p, .para-indent .unit p.pull + p, .para-indent .unit p.aside + p, .para-indent .unit p.scene, .para-indent .unit p.pull, .para-indent .unit p.aside, .para-indent .unit p.fnote, .para-indent .unit .matter p, .para-indent .unit .au p, .para-indent .unit aside p { text-indent: 0; }
+.para-block .unit p { margin-bottom: 0.8em; }
+p.opener:first-line { font-variant: small-caps; letter-spacing: 0.03em; }
+.face-plex p.opener:first-line { font-variant: normal; font-weight: 600; }
+h3.bk-sec { font-size: 1.3em; line-height: 1.2; margin: 1.5em 0 0.5em; page-break-after: avoid; }
+h4.minor { font-size: 1em; font-style: italic; font-weight: normal; margin: 1.2em 0 0.3em; page-break-after: avoid; }
+blockquote { margin: 0.9em 1.5em; font-size: 0.94em; }
+blockquote p { text-indent: 0; }
+.scene { margin: 1em 0; text-align: center; color: --ACCENT--; letter-spacing: 0.2em; }
+.pull { margin: 1.2em 0.5em; padding: 0.6em 0; border-top: 1px solid --ACCENT--; border-bottom: 1px solid --ACCENT--; font-size: 1.25em; line-height: 1.3; text-align: center; page-break-inside: avoid; }
+.aside { margin: 0.9em 0; padding-left: 0.9em; border-left: 1px solid --ACCENT--; font-size: 0.9em; font-style: italic; }
+.matter { display: block; margin: 1.1em 0; padding: 0.1em 0 0.1em 1em; border-left: 3px solid --ACCENT--; page-break-inside: avoid; }
+.matter .m-label { margin: 0 0 0.4em; }
+.matter p + p { margin-top: 0.5em; }
+ul, ol { margin: 0.6em 0 0.7em; padding-left: 1.5em; }
+li { margin: 0 0 0.25em; }
+.labeled { margin: 0.6em 0 0.9em; border-top: 1px solid #CFCAC0; }
+.labeled .li { padding: 0.4em 0; border-bottom: 1px solid #CFCAC0; }
+.labeled .ll { color: --ACCENT--; font-weight: 600; }
+
+/* Figures, tables, timelines, key numbers. */
+figure.vis { margin: 1.2em 0; page-break-inside: avoid; }
+.vtitle { margin: 0; padding-top: 0.5em; border-top: 1px solid --ACCENT--; font-size: 1.15em; line-height: 1.25; }
+.vsub { font-style: italic; font-size: 0.85em; }
+figure.vis svg.chart { display: block; width: 100%; height: auto; margin-top: 0.6em; }
+figure.vis img.vimg { display: block; max-width: 100%; height: auto; margin: 0.6em auto 0; }
+figure.vis .gut { margin-top: 0.45em; font-size: 0.78em; line-height: 1.45; }
+figure.vis .gut div { display: inline; margin-right: 0.8em; }
+figure.vis .vnote { display: block; font-style: italic; }
+.vempty { padding: 1em; border: 1px dashed #A39C8D; font-style: italic; text-align: center; }
+table.dtable { width: 100%; border-collapse: collapse; font-size: 0.85em; line-height: 1.4; margin-top: 0.6em; }
+.dtable th { padding: 0.35em 0.6em 0.35em 0; border-bottom: 1px solid currentColor; text-align: left; font-weight: 600; vertical-align: bottom; }
+.dtable td { padding: 0.35em 0.6em 0.35em 0; border-bottom: 1px solid #CFCAC0; vertical-align: top; }
+.dtable .n { text-align: right; }
+.dtable tr.hot td, .dtable .code { color: --ACCENT--; font-weight: 600; }
+.rnote { font-size: 0.88em; }
+.timeline { list-style: none; padding: 0; margin: 0.6em 0 0; }
+.timeline li { padding: 0.35em 0; border-bottom: 1px solid #CFCAC0; font-size: 0.88em; }
+.timeline .when { display: block; color: --ACCENT--; font-weight: 600; }
+.stats-wrap { margin: 1.2em 0; }
+.stats-title { font-size: 1.15em; margin: 0 0 0.5em; }
+.stats { display: block; }
+.stat { display: inline-block; width: 46%; margin: 0 2% 0.8em 0; padding-top: 0.4em; border-top: 2px solid --ACCENT--; vertical-align: top; }
+.stat .big { font-size: 1.9em; line-height: 1.1; }
+.stat .what { font-size: 0.82em; }
+.stats-src { font-size: 0.78em; }
+.missing { color: #A3271B; font-weight: 600; }
+
+/* Notes: numbered afresh in each chapter, at its end. Reading apps that support it show them as pop-ups. */
+sup.nref { font-size: 0.7em; line-height: 0; vertical-align: super; }
+sup.nref a { text-decoration: none; color: --ACCENT--; font-weight: 600; }
+.notes-rule { width: 5em; margin: 2em 0 0.8em; border: 0; border-top: 1px solid --ACCENT--; }
+aside.fnote, p.fnote { margin: 0 0 0.5em; font-size: 0.85em; line-height: 1.45; }
+aside.fnote p { margin: 0; text-indent: 0; }
+a.nback { text-decoration: none; color: --ACCENT--; font-weight: 600; }
+
+/* About the authors. */
+.au { margin: 0 0 1.4em; }
+.au-name { font-size: 1.25em; margin: 0 0 0.3em; }
+.au p + p { margin-top: 0.6em; }

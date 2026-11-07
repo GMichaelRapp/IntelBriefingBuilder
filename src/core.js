@@ -211,6 +211,7 @@ var WP = (function () {
       if ((m = line.match(/^(#{1,3})\s+(.+)$/))) { flush(); out.push({ t: 'h', level: m[1].length, text: m[2] }); return; }
       if ((m = line.match(/^\[\[\s*([\w.-]+)\s*\]\]$/))) { flush(); out.push({ t: 'visual', id: m[1] }); return; }
       if (/^-{3,}$/.test(line)) { flush(); out.push({ t: 'break' }); return; }
+      if (/^(\*\s*){3,}$/.test(line) || line === '⁂') { flush(); out.push({ t: 'scene' }); return; }
       var kinds = [[/^\?>\s?(.*)$/, 'matter'], [/^!>\s?(.*)$/, 'key'], [/^>>\s?(.*)$/, 'side'], [/^>\s?(.*)$/, 'quote']];
       for (var k = 0; k < kinds.length; k++) {
         if ((m = line.match(kinds[k][0]))) {
@@ -422,7 +423,25 @@ var WP = (function () {
   }
 
   // ------------------------------------------------------------------ the paper
-  var PAPER_ACCENT = '#C42A14', BRIEF_ACCENT = '#D9B063';
+  var PAPER_ACCENT = '#C42A14', BRIEF_ACCENT = '#D9B063', BOOK_ACCENT = '#9E3B22';
+  // eBook page sizes, in inches, with the page margins and text size that suit each (px at 96 per inch).
+  var TRIMS = {
+    '6x9': { w: 6, h: 9, label: '6 × 9 in, trade paperback', m: [62, 52, 70, 64], fs: 15, lh: 22.5 },
+    '5.5x8.5': { w: 5.5, h: 8.5, label: '5.5 × 8.5 in, digest', m: [58, 48, 66, 60], fs: 14.5, lh: 21.5 },
+    'a5': { w: 5.83, h: 8.27, label: 'A5, 148 × 210 mm', m: [58, 48, 66, 60], fs: 14.5, lh: 21.5 },
+    'letter': { w: 8.5, h: 11, label: '8.5 × 11 in, US Letter (easy to print at home)', m: [84, 80, 92, 92], fs: 17, lh: 27 }
+  };
+  var COVER_LAYOUTS = ['photo', 'band', 'framed', 'type', 'art'];
+  // Cover title faces: the family, weight, line height, and a rough width per character
+  // (used to fit the title when the page cannot measure text, as in the tests).
+  var COVER_FONTS = {
+    display: { family: 'Garamond Display', css: "'Garamond Display', 'Cormorant Garamond', Garamond, serif", weight: 600, lh: 1.02, cw: 0.44, small: 'Garamond Body' },
+    serif: { family: 'Garamond Body', css: "'Garamond Body', 'EB Garamond', Garamond, Georgia, serif", weight: 400, lh: 1.08, cw: 0.47, small: 'Garamond Body' },
+    sans: { family: 'Plex Sans Cond', css: "'Plex Sans Cond', 'Arial Narrow', sans-serif", weight: 700, lh: 1.02, cw: 0.47, small: 'Plex Sans Cond' },
+    mono: { family: 'Plex Mono', css: "'Plex Mono', Menlo, monospace", weight: 700, lh: 1.12, cw: 0.6, small: 'Plex Mono' }
+  };
+  var SMALL_CSS = { 'Garamond Body': "'Garamond Body', 'EB Garamond', Garamond, Georgia, serif", 'Plex Sans Cond': "'Plex Sans Cond', 'Arial Narrow', sans-serif", 'Plex Mono': "'Plex Mono', Menlo, monospace" };
+  var SMALL_CW = { 'Garamond Body': 0.47, 'Plex Sans Cond': 0.47, 'Plex Mono': 0.6 };
   var SOURCES_NOTE = 'In order of appearance. Formatted to the OSINT Style Guide v1.5 pattern: Author, “Title,” Location [Description] (Publisher: Date) URL/DOI: Locator.';
   function defaults() {
     return {
@@ -438,6 +457,17 @@ var WP = (function () {
       aboutSeries: '',
       body: '', appendix: '',
       back: { include: true, history: '', series: '', license: '' },
+      // The eBook: its own front matter, layout choices, ePUB details, and cover design.
+      // Title, subtitle, authors, date, publisher, colophon, accent, and cover image are
+      // shared with the paper and the brief, under meta and authors.
+      book: {
+        trim: '6x9', face: 'garamond', para: 'indent', chapterWord: 'Chapter', numStyle: 'word', recto: false, notes: 'foot', halfTitle: true, openers: true,
+        dedication: '', epigraph: '', epigraphBy: '',
+        copyright: '', edition: '', isbn: '', issn: '', credits: '', typeNote: true, aboutAuthors: true,
+        lang: 'en', description: '', subjects: '', series: '', seriesNo: '', bookId: '',
+        cover: { layout: 'photo', bg: '#1F2124', ink: '#FFFFFF', valign: 'bottom', align: 'center', shade: 70, font: 'display', scale: 100, upper: false,
+          kicker: '', showSub: true, showAuthor: true, showPub: true, focusX: 50, focusY: 50, zoom: 100, imgW: 0, imgH: 0 }
+      },
       visuals: [], sources: []
     };
   }
@@ -448,7 +478,28 @@ var WP = (function () {
       var src = doc[k] && typeof doc[k] === 'object' ? doc[k] : {};
       Object.keys(d[k]).forEach(function (f) { if (typeof src[f] === typeof d[k][f]) d[k][f] = src[f]; });
     });
-    if (d.meta.kind !== 'brief') d.meta.kind = 'paper';
+    if (d.meta.kind !== 'brief' && d.meta.kind !== 'book') d.meta.kind = 'paper';
+    var bk = doc.book && typeof doc.book === 'object' ? doc.book : {};
+    Object.keys(d.book).forEach(function (f) { if (f !== 'cover' && typeof bk[f] === typeof d.book[f]) d.book[f] = bk[f]; });
+    var bc = bk.cover && typeof bk.cover === 'object' ? bk.cover : {};
+    Object.keys(d.book.cover).forEach(function (f) {
+      var want = typeof d.book.cover[f], v = bc[f];
+      if (want === 'number' && v !== '' && v !== null && isFinite(+v)) d.book.cover[f] = +v;
+      else if (typeof v === want) d.book.cover[f] = v;
+    });
+    if (!TRIMS[d.book.trim]) d.book.trim = '6x9';
+    if (d.book.face !== 'plex') d.book.face = 'garamond';
+    if (d.book.para !== 'block') d.book.para = 'indent';
+    if (d.book.notes !== 'end') d.book.notes = 'foot';
+    if (['word', 'arabic', 'roman', 'none'].indexOf(d.book.numStyle) === -1) d.book.numStyle = 'word';
+    var C0 = d.book.cover;
+    if (COVER_LAYOUTS.indexOf(C0.layout) === -1) C0.layout = 'photo';
+    if (['top', 'middle', 'bottom'].indexOf(C0.valign) === -1) C0.valign = 'bottom';
+    if (C0.align !== 'left') C0.align = 'center';
+    if (!COVER_FONTS[C0.font]) C0.font = 'display';
+    ['bg', 'ink'].forEach(function (k) { if (!/^#[0-9a-f]{6}$/i.test(C0[k])) C0[k] = k === 'bg' ? '#1F2124' : '#FFFFFF'; });
+    C0.shade = Math.max(0, Math.min(100, C0.shade)); C0.scale = Math.max(50, Math.min(150, C0.scale)); C0.zoom = Math.max(100, Math.min(300, C0.zoom));
+    C0.focusX = Math.max(0, Math.min(100, C0.focusX)); C0.focusY = Math.max(0, Math.min(100, C0.focusY));
     if (Array.isArray(doc.authors)) d.authors = doc.authors.filter(function (a) { return a && typeof a === 'object'; }).map(function (a) {
       return { name: String(a.name == null ? '' : a.name), bio: String(a.bio == null ? '' : a.bio), org: !!a.org };
     }).filter(function (a) { return clean(a.name) || clean(a.bio); }).slice(0, 40);
@@ -476,9 +527,10 @@ var WP = (function () {
     return d;
   }
 
-  function render(input) {
+  function render(input, opts) {
+    opts = opts || {};
     var doc = normalize(input), m = doc.meta, brief = m.kind === 'brief';
-    var accent = /^#[0-9a-f]{6}$/i.test(m.accent) ? m.accent : brief ? BRIEF_ACCENT : PAPER_ACCENT;
+    var accent = /^#[0-9a-f]{6}$/i.test(m.accent) ? m.accent : brief ? BRIEF_ACCENT : m.kind === 'book' ? BOOK_ACCENT : PAPER_ACCENT;
     var problems = [], notes = 0, srcByKey = {}, seen = {}, usedKeys = {}, order = [], firstLoc = {}, labelOf = {};
     doc.sources.forEach(function (s) { srcByKey[s.key] = s; });
     var visById = {}; doc.visuals.forEach(function (v) { visById[v.id] = v; });
@@ -574,6 +626,7 @@ var WP = (function () {
 
     function paras(text) { return String(text).split(/\n\n/).map(clean).filter(Boolean).map(function (p) { return '<p>' + inline(p, ctx) + '</p>'; }).join(''); }
     if (brief) return renderBrief();
+    if (m.kind === 'book') return renderBook(opts.target === 'epub');
 
     var title = clean(m.title) || 'Untitled paper', shortTitle = clean(m.shortTitle) || title;
     if (!clean(m.title)) problem('fix', 'The paper has no title yet. Fill it in under Paper.', 'paper');
@@ -735,6 +788,213 @@ var WP = (function () {
         runningLeft: foot, shortTitle: name || 'Brief'
       };
     }
+    // ---------------------------------------------------------------- the eBook
+    // Cover, half title, title page, copyright page, dedication, epigraph, contents, then
+    // parts and chapters, back matter, notes, and the authors. For print, Paged.js lays it
+    // out on the chosen page size; for an ePUB (epub true) each part, chapter, and front
+    // page is kept apart, with its notes, for epubFiles to write as its own file.
+    function renderBook(epub) {
+      var B = doc.book, T = TRIMS[B.trim];
+      var title = clean(m.title) ? plainText(m.title) : 'Untitled book', sub = clean(m.subtitle) ? plainText(m.subtitle) : '';
+      var authors = doc.authors.filter(function (a) { return clean(a.name); }), names = authors.map(function (a) { return clean(a.name); });
+      if (!clean(m.title)) problem('fix', 'The book has no title yet. Fill it in under Book.', 'paper');
+      if (!authors.length) problem('check', 'No author is given. Add one under Book.', 'paper');
+      if (!clean(B.copyright)) problem('check', 'The copyright page has no copyright line. Fill it in under Book.', 'paper');
+      if (!clean(B.description)) problem('note', 'No description yet. Reading apps show it with the ePUB; write two or three sentences under Book.', 'paper');
+      if (!safeImage(m.coverImage) && B.cover.layout !== 'type') problem('note', 'The cover has no image yet. Choose one under Cover, or pick the type-only layout.', 'cover');
+      var units = [], cur = null, part = 0, chap = 0, totalNotes = 0, unitN = 0, partOpen = null;
+      var dataRun = function (s) { return esc(s); };
+
+      ctx.note = function (html) {
+        totalNotes++; notes++;
+        var u = cur || newUnit('plain', '', false), n = u.notes.length + 1, id = u.idx + '-' + n;
+        if (epub) { u.notes.push({ n: n, html: html }); return '<sup class="nref"><a epub:type="noteref" role="doc-noteref" id="fnr-' + id + '" href="#fn-' + id + '">' + n + '</a></sup>'; }
+        if (B.notes === 'end') { u.notes.push({ n: n, html: html }); return '<sup class="en-call"><a id="enr-' + id + '" href="#en-' + id + '">' + n + '</a></sup>'; }
+        u.notes.push({ n: n, html: html });
+        return '<span class="fn"><span class="fn-n">' + n + '</span> ' + html + '</span><sup class="fn-call">' + n + '</sup>';
+      };
+      // A heading's role, from a trailing {-} (unnumbered) or {part}.
+      function headKind(text, back) {
+        var mm = String(text).match(/\s*\{\s*(-|part|unnumbered)\s*\}\s*$/i);
+        var t = mm ? String(text).slice(0, mm.index) : String(text);
+        if (back) return { kind: 'back', text: t };
+        if (mm && /part/i.test(mm[1])) return { kind: 'part', text: t };
+        return { kind: mm ? 'unnumbered' : 'chapter', text: t };
+      }
+      function newUnit(kind, text, back) {
+        unitN++;
+        var u = { idx: unitN, kind: kind, back: !!back, id: 'u' + unitN, file: 'u' + pad2(unitN) + '.xhtml', label: '', title: '', plain: '', out: [], notes: [], opened: false, role: '' };
+        if (kind === 'chapter') { chap++; u.label = chapterLabel(chap); u.num = chap; }
+        if (kind === 'part') { part++; u.label = 'Part ' + (B.numStyle === 'arabic' ? String(part) : B.numStyle === 'roman' ? roman(part) : numberWord(part)); }
+        if (text) { u.title = inline(text, ctx, false); u.plain = plainText(text); }
+        u.role = semantic(kind, u.plain);
+        // Each part and chapter gives its first citation of a source in full again.
+        seen = {};
+        units.push(u); cur = u;
+        if (kind === 'part') partOpen = u; else if (u.back) partOpen = null;
+        u.part = kind === 'part' ? null : partOpen;
+        return u;
+      }
+      function chapterLabel(n) {
+        if (B.numStyle === 'none') return '';
+        var num = B.numStyle === 'arabic' ? String(n) : B.numStyle === 'roman' ? roman(n) : numberWord(n);
+        return clean(B.chapterWord) ? clean(B.chapterWord) + ' ' + num : num;
+      }
+      function unitBlocks(md, back) {
+        blocks(md).forEach(function (b) {
+          if (b.t === 'h' && b.level === 1) {
+            var hk = headKind(b.text, back);
+            newUnit(hk.kind, hk.text, back);
+            return;
+          }
+          if (!cur || (back && !cur.back)) newUnit(back ? 'back' : 'plain', '', back);
+          var u = cur, o = u.out;
+          if (b.t === 'h') { o.push(b.level === 2 ? '<h3 class="bk-sec">' + inline(b.text, ctx, false) + '</h3>' : '<h4 class="minor">' + inline(b.text, ctx, false) + '</h4>'); return; }
+          if (b.t === 'p') { o.push('<p' + (!u.opened && B.openers && (u.kind === 'chapter' || u.kind === 'unnumbered' || u.kind === 'back') ? ' class="opener"' : '') + '>' + inline(b.text, ctx) + '</p>'); u.opened = true; return; }
+          u.opened = true;
+          if (b.t === 'quote') { o.push('<blockquote>' + inline(b.text, ctx) + '</blockquote>'); return; }
+          if (b.t === 'scene') { o.push('<p class="scene" role="separator">* * *</p>'); return; }
+          if (b.t === 'break') { o.push(epub ? '' : '<div class="pagebreak"></div>'); return; }
+          if (b.t === 'matter') { o.push('<aside class="matter"><p class="m-label">' + fmtText(clean(m.matterLabel) || 'Why it matters') + '</p>' + paras(b.text) + '</aside>'); return; }
+          if (b.t === 'key') { o.push('<p class="pull">' + inline(b.text, ctx) + '</p>'); return; }
+          if (b.t === 'side') { o.push('<p class="aside">' + inline(b.text, ctx) + '</p>'); return; }
+          if (b.t === 'visual') {
+            // In a book the caption follows the figure, in reading order.
+            // The rating key may run over a page, so its caption stays on top, where it cannot be left behind.
+            var vh = visualHtml(b.id, false, '');
+            o.push(/^<figure[^>]*\brating\b/.test(vh) ? vh : vh.replace(/^(<figure[^>]*>)(<figcaption[\s\S]*?<\/figcaption>)([\s\S]*)(<\/figure>)$/, '$1$3$2$4'));
+            return;
+          }
+          if (b.t === 'ul' || b.t === 'ol') { o.push('<' + b.t + (b.t === 'ol' && b.start !== 1 ? ' start="' + b.start + '"' : '') + '>' + b.items.map(function (x) { return '<li>' + inline(x, ctx) + '</li>'; }).join('') + '</' + b.t + '>'); return; }
+          if (b.t === 'labeled') { o.push('<div class="labeled">' + b.items.map(function (x) { return '<div class="li"><div class="ll">' + fmtText(x.label) + '</div><div class="lt">' + inline(x.text, ctx) + '</div></div>'; }).join('') + '</div>'); return; }
+        });
+      }
+      unitBlocks(doc.body, false);
+      var bodyCount = units.length;
+      if (clean(doc.appendix)) { cur = null; unitBlocks(doc.appendix, true); }
+      if (!clean(doc.body)) problem('fix', 'The book has no chapters yet. Start one under Chapters with a # heading.', 'body');
+      else if (!chap && !units.some(function (u) { return u.kind === 'unnumbered'; })) problem('check', 'No chapter headings yet. Start each chapter with a # heading so it is numbered and listed in the contents.', 'body');
+      doc.visuals.forEach(function (v) { if (!usedVis[v.id]) problem('note', 'The visual [[' + v.id + ']] is not placed in the text yet.', 'visuals'); });
+      // Sources cited only in a biography count as cited.
+      var aboutHtml = '';
+      var bios = authors.filter(function (a) { return clean(a.bio); });
+      if (B.aboutAuthors && bios.length) {
+        cur = { idx: 'ab', notes: [] }; seen = {};
+        aboutHtml = bios.map(function (a) { return '<div class="au"><h3 class="au-name">' + fmtText(clean(a.name)) + '</h3>' + paras(a.bio) + '</div>'; }).join('');
+        // Notes in a biography: at the foot of the page in print, otherwise right after the biographies.
+        if (cur.notes.length && (epub || B.notes === 'end')) aboutHtml += '<hr class="notes-rule"/>' + cur.notes.map(function (x) {
+          var id = 'ab-' + x.n;
+          return epub ? '<aside epub:type="footnote" role="doc-footnote" class="fnote" id="fn-' + id + '"><p><a class="nback" href="#fnr-' + id + '">' + x.n + '.</a> ' + x.html + '</p></aside>'
+            : '<p class="fnote" id="en-' + id + '"><a class="en-n" href="#enr-' + id + '">' + x.n + '.</a> ' + x.html + '</p>';
+        }).join('');
+      }
+      doc.sources.forEach(function (s) { if (!usedKeys[s.key]) problem('note', 'Source @' + s.key + ' is not cited.', 'sources'); });
+
+      // Front matter, shared by the PDF and the ePUB.
+      var series = clean(B.series) ? plainText(B.series) + (clean(B.seriesNo) ? ' · No. ' + clean(B.seriesNo) : '') : '';
+      var pub = clean(m.publisher), site = clean(m.site), url = safeUrl(m.url), year = (String(m.date).match(/\b(1[89]|20|21)\d\d\b/) || [String(new Date().getFullYear())])[0];
+      var faceNote = B.face === 'plex' ? 'Set in IBM Plex Serif and IBM Plex Sans Condensed.' : 'Set in EB Garamond and Cormorant Garamond.';
+      var titlePage = (series ? '<p class="tp-series">' + esc(series) + '</p>' : '')
+        + '<h1 class="tp-title">' + fmtText(clean(m.title) ? m.title : 'Untitled book') + '</h1>'
+        + (sub ? '<p class="tp-sub">' + fmtText(m.subtitle) + '</p>' : '')
+        + '<p class="tp-rule" aria-hidden="true"></p>'
+        + (names.length ? '<p class="tp-by">' + andList(names.map(function (x) { return fmtText(x); })) + '</p>' : '')
+        + '<div class="tp-foot">' + (pub ? '<p class="tp-pub">' + esc(pub) + '</p>' : '') + (site ? '<p class="tp-site">' + esc(site) + '</p>' : '') + '</div>';
+      var credits = lines(B.credits);
+      if (clean(m.coverCaption)) credits.push('Cover image: ' + clean(m.coverCaption).replace(/^cover( image)?:\s*/i, ''));
+      var copyPage = '<p class="cp-title"><i>' + fmtText(title) + '</i>' + (sub ? ': ' + fmtText(sub) : '') + '</p>'
+        + (clean(B.copyright) ? String(B.copyright).split(/\n\s*\n|\n/).map(clean).filter(Boolean).map(function (p) { return '<p>' + fmtText(p) + '</p>'; }).join('') : '')
+        + (clean(m.colophon) ? String(m.colophon).split(/\n\s*\n/).map(function (p) { return '<p>' + fmtText(p.replace(/\n/g, ' ')) + '</p>'; }).join('') : '')
+        + (clean(B.edition) ? '<p>' + fmtText(B.edition) + '</p>' : '')
+        + (clean(B.isbn) ? '<p>ISBN ' + esc(clean(B.isbn).replace(/^ISBN:?\s*/i, '')) + '</p>' : '')
+        + (clean(B.issn) ? '<p>ISSN ' + esc(clean(B.issn).replace(/^ISSN:?\s*/i, '')) + '</p>' : '')
+        + (credits.length ? '<p class="cp-credits">' + credits.map(fmtText).join('<br>') + '</p>' : '')
+        + (B.typeNote ? '<p>' + faceNote + '</p>' : '')
+        + (pub || site || url ? '<p class="cp-pub">' + [pub ? esc(pub) : '', url ? '<a href="' + esc(url) + '">' + esc(site || url) + '</a>' : site ? esc(site) : ''].filter(Boolean).join('<br>') + '</p>' : '');
+      var dedication = clean(B.dedication) ? String(B.dedication).split(/\n\s*\n/).map(function (p) { return '<p>' + fmtText(p.replace(/\n/g, ' ')) + '</p>'; }).join('') : '';
+      var epigraph = clean(B.epigraph) ? '<blockquote class="epi">' + String(B.epigraph).split(/\n\s*\n/).map(function (p) { return '<p>' + fmtText(p.replace(/\n/g, ' ')) + '</p>'; }).join('') + (clean(B.epigraphBy) ? '<p class="epi-by">— ' + fmtText(B.epigraphBy) + '</p>' : '') + '</blockquote>' : '';
+      var stats = { notes: totalNotes, words: words(doc.body) + words(doc.appendix), figures: figs.length, cited: Object.keys(usedKeys).length, chapters: chap, parts: part };
+
+      function unitHead(u, tag) {
+        if (u.kind === 'plain' || (u.back && !u.title)) return '';
+        var t = u.title || '';
+        return '<header class="ch-head">' + (u.label ? '<p class="ch-num">' + esc(u.label) + '</p>' : '')
+          + (t ? '<' + tag + ' class="ch-title" id="h-' + u.id + '"' + (epub ? '' : ' data-run="' + dataRun(u.plain) + '"') + '>' + t + '</' + tag + '>' : '') + '</header>';
+      }
+
+      if (epub) {
+        return {
+          problems: problems, stats: stats,
+          epub: {
+            title: title, sub: sub, names: names, authors: authors, series: clean(B.series) ? plainText(B.series) : '', seriesNo: clean(B.seriesNo), pub: pub, site: site, url: url, year: year,
+            accent: accent, titlePage: titlePage, copyPage: copyPage, dedication: dedication, epigraph: epigraph, about: aboutHtml, aboutCount: bios.length,
+            units: units.map(function (u) {
+              var notesHtml = u.notes.length ? '<hr class="notes-rule"/>' + u.notes.map(function (x) {
+                var id = u.idx + '-' + x.n;
+                return '<aside epub:type="footnote" role="doc-footnote" class="fnote" id="fn-' + id + '"><p><a class="nback" href="#fnr-' + id + '">' + x.n + '.</a> ' + x.html + '</p></aside>';
+              }).join('') : '';
+              return { id: u.id, file: u.file, kind: u.kind, back: u.back, label: u.label, plain: u.plain, role: u.role, part: u.part ? u.part.id : null, hasTitle: !!u.title,
+                html: unitHead(u, 'h1') + u.out.join('\n') + notesHtml };
+            })
+          }
+        };
+      }
+
+      // ---- print
+      var tocRows = [];
+      units.forEach(function (u) {
+        if (!u.title && !u.label) return;
+        tocRows.push('<li class="t-' + u.kind + (u.part && u.kind !== 'part' ? ' in-part' : '') + '">' + (u.label && u.kind === 'part' ? '<span class="lab">' + esc(u.label) + '</span>' : '')
+          + '<a href="#' + u.id + '">' + (u.kind === 'chapter' && u.label ? '<span class="lab">' + esc(u.label) + '</span>' : '') + '<span class="tt">' + esc(u.plain || u.label) + '</span></a></li>');
+      });
+      var hasEnd = B.notes === 'end' && units.some(function (u) { return u.notes.length; });
+      if (hasEnd) tocRows.push('<li class="t-back"><a href="#notes"><span class="tt">Notes</span></a></li>');
+      if (aboutHtml) tocRows.push('<li class="t-back"><a href="#about"><span class="tt">About the ' + (bios.length > 1 ? 'authors' : 'author') + '</span></a></li>');
+
+      var svg = coverSvg(doc, { measure: opts.measure || MEASURE, title: 'Cover' });
+      var front = '<section class="bk-cover">' + svg + '</section>'
+        + (B.halfTitle ? '<section class="fm bk-half"><p class="ht">' + fmtText(clean(m.title) ? m.title : 'Untitled book') + '</p></section>' : '')
+        + '<section class="fm bk-titlepage">' + titlePage + '</section>'
+        + '<section class="fm bk-copy"><div class="cp">' + copyPage + '</div></section>'
+        + (dedication ? '<section class="fm bk-ded"><div class="ded">' + dedication + '</div></section>' : '')
+        + (epigraph ? '<section class="fm bk-epi">' + epigraph + '</section>' : '')
+        + (tocRows.length ? '<section class="fm bk-toc" id="contents"><h2 class="fm-h">Contents</h2><ol class="ktoc">' + tocRows.join('') + '</ol></section>' : '');
+      var body = units.map(function (u) {
+        var head = unitHead(u, 'h2');
+        var cls = 'bk-unit k-' + u.kind + (u.back ? ' back' : '') + (u.kind === 'plain' && u === units[0] ? '' : '');
+        return '<section class="' + cls + '" id="' + u.id + '">' + head + u.out.join('\n') + '</section>';
+      }).join('\n');
+      var endHtml = hasEnd ? '<section class="bk-unit k-back bk-notes" id="notes"><header class="ch-head"><h2 class="ch-title" data-run="Notes">Notes</h2></header>' + units.filter(function (u) { return u.notes.length; }).map(function (u) {
+        return '<h3 class="nt-h">' + esc(u.label && u.plain ? u.label + ': ' + u.plain : u.label || u.plain || 'Opening') + '</h3><ol class="enotes">' + u.notes.map(function (x) {
+          var id = u.idx + '-' + x.n;
+          return '<li id="en-' + id + '"><a class="en-n" href="#enr-' + id + '">' + x.n + '.</a> ' + x.html + '</li>';
+        }).join('') + '</ol>';
+      }).join('') + '</section>' : '';
+      var about = aboutHtml ? '<section class="bk-unit k-back bk-about" id="about"><header class="ch-head"><h2 class="ch-title" data-run="About the ' + (bios.length > 1 ? 'authors' : 'author') + '">About the ' + (bios.length > 1 ? 'authors' : 'author') + '</h2></header>' + aboutHtml + '</section>' : '';
+
+      var px = function (n) { return Math.round(n) + 'px'; };
+      var Wp = Math.round(T.w * 96), Hp = Math.round(T.h * 96), M = T.m;
+      var plex = B.face === 'plex';
+      var fs = plex ? T.fs - 1 : T.fs, lh = T.lh;
+      var vars = ':root{--wp-accent:' + accent + ';--bk-fs:' + fs + 'px;--bk-lh:' + lh + 'px;--bk-w:' + Wp + 'px;--bk-h:' + Hp + 'px;--bk-ch:' + (Hp - M[0] - M[2] - 4) + 'px;}';
+      var runBox = 'font-family:' + (plex ? '"Plex Sans Cond",sans-serif;font-weight:600;font-size:10px;letter-spacing:0.12em;' : '"Garamond Body",Garamond,serif;font-size:10.5px;letter-spacing:0.16em;') + 'text-transform:uppercase;color:#5A554D;line-height:14px;';
+      var folio = 'font-family:' + (plex ? '"Plex Mono",monospace;font-size:10.5px;' : '"Garamond Body",Garamond,serif;font-size:12px;') + 'color:#2C2A27;line-height:14px;';
+      var none = '@top-left{content:none}@top-center{content:none}@top-right{content:none}@bottom-left{content:none}@bottom-center{content:none}@bottom-right{content:none}';
+      var shortT = clean(m.shortTitle) ? plainText(m.shortTitle) : title;
+      var running = '@page{size:' + T.w + 'in ' + T.h + 'in;margin:' + px(M[0]) + ' ' + px(M[1]) + ' ' + px(M[2]) + ' ' + px(M[3]) + ';}'
+        + '@page :left{margin-left:' + px(M[1]) + ';margin-right:' + px(M[3]) + ';@top-center{content:"' + cssStr(shortT) + '";' + runBox + 'vertical-align:bottom;padding-bottom:' + Math.round(M[0] * 0.35) + 'px;}@bottom-left{content:counter(page);' + folio + 'vertical-align:top;padding-top:' + Math.round(M[2] * 0.3) + 'px;}}'
+        + '@page :right{margin-left:' + px(M[3]) + ';margin-right:' + px(M[1]) + ';@top-center{content:string(chapter);' + runBox + 'vertical-align:bottom;padding-bottom:' + Math.round(M[0] * 0.35) + 'px;}@bottom-right{content:counter(page);' + folio + 'vertical-align:top;padding-top:' + Math.round(M[2] * 0.3) + 'px;}}'
+        + '@page :first{margin:0;' + none + '}'
+        + '@page front{' + none + '}@page part{' + none + '}@page :blank{' + none + '}'
+        + '@page chapter:first{@top-left{content:none}@top-center{content:none}@top-right{content:none}}'
+        // Notes move to the foot of the page, out of the book's own styles, so their face is set here.
+        + (plex ? '.fn{font-family:"Plex Serif",Georgia,serif;font-size:10.5px;line-height:15px;}.fn .fn-n{font-family:"Plex Mono",monospace;font-weight:500;}' : '');
+      return {
+        html: '<div class="bk face-' + B.face + ' para-' + B.para + (B.recto ? ' recto' : '') + '">' + front + '<div class="bk-main">' + body + endHtml + about + '</div></div>',
+        vars: vars + running, problems: problems, stats: stats,
+        runningLeft: shortT, shortTitle: shortT, size: { w: Wp, h: Hp }
+      };
+    }
     var html = '<div class="wp">' + cover + contents + sumHtml + '<section class="wp-body">' + bodyHtml + '</section>' + (appHtml ? '<section class="wp-appendix">' + appHtml + '</section>' : '') + backHtml + '</div>';
     return {
       html: html, vars: vars + running, problems: problems,
@@ -773,6 +1033,368 @@ var WP = (function () {
     return w.length > 1 ? w[w.length - 1] + ', ' + w.slice(0, -1).join(' ') : n;
   }
 
+  // ------------------------------------------------------------------ eBook helpers
+  var ONES = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+  var TENS = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+  function numberWord(n) { if (n < 20) return ONES[n]; if (n < 100) return TENS[Math.floor(n / 10)] + (n % 10 ? '-' + ONES[n % 10] : ''); return String(n); }
+  function roman(n) {
+    var v = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1], s = ['M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I'], out = '';
+    for (var i = 0; i < v.length; i++) while (n >= v[i]) { out += s[i]; n -= v[i]; }
+    return out;
+  }
+  // The ePUB structural role of a part, chapter, or back-matter page, from its kind and title.
+  var ROLE_WORDS = [[/^preface\b/, 'preface'], [/^foreword\b/, 'foreword'], [/^introduction\b/, 'introduction'], [/^prologue\b/, 'prologue'], [/^epilogue\b/, 'epilogue'],
+    [/^afterword\b/, 'afterword'], [/^acknowledge?ments?\b/, 'acknowledgments'], [/^appendix\b/, 'appendix'], [/^glossary\b/, 'glossary'], [/^(bibliography|works cited|further reading)\b/, 'bibliography'], [/^conclusion\b/, 'conclusion']];
+  function semantic(kind, plain) {
+    if (kind === 'part') return 'part';
+    if (kind === 'chapter') return 'chapter';
+    var t = clean(plain).toLowerCase();
+    for (var i = 0; i < ROLE_WORDS.length; i++) if (ROLE_WORDS[i][0].test(t)) return ROLE_WORDS[i][1];
+    return kind === 'back' ? '' : 'chapter';
+  }
+  // Text measurement for fitting the cover title. The page sets this to a canvas measure
+  // once the fonts load; without it, widths are estimated from the face's average letter.
+  var MEASURE = null;
+  function setMeasure(fn) { MEASURE = typeof fn === 'function' ? fn : null; }
+
+  // ------------------------------------------------------------------ the cover, as one SVG
+  // 1600 px wide, as tall as the trim size asks. The same picture is the PDF's first page,
+  // the preview under Cover, and (drawn to a canvas by the page) the ePUB's cover image.
+  function coverSvg(input, o) {
+    o = o || {};
+    var doc = normalize(input), m = doc.meta, B = doc.book, C = B.cover, T = TRIMS[B.trim];
+    var W = 1600, H = Math.round(W * T.h / T.w), accent = /^#[0-9a-f]{6}$/i.test(m.accent) ? m.accent : BOOK_ACCENT;
+    var measure = o.measure || MEASURE, F = COVER_FONTS[C.font], small = F.small, id = o.idPrefix || 'cv';
+    var img = safeImage(m.coverImage), layout = C.layout;
+    if (layout === 'art' && !img) layout = 'type';
+    var mx = Math.round(W * 0.1), maxW = W - 2 * mx, ink = C.ink, defs = [], out = [];
+    function width(text, size, fam, weight, italic, ls) {
+      var w = null;
+      if (measure) { try { w = measure(text, (italic ? 'italic ' : '') + weight + ' ' + size + 'px "' + fam + '"'); } catch (e) { w = null; } }
+      if (w === null || !isFinite(w)) w = text.length * size * (fam === F.family ? F.cw : SMALL_CW[fam] || 0.5) * (fam !== 'Plex Mono' && text === text.toUpperCase() && /[A-Z]/.test(text) ? 1.25 : 1);
+      return w + Math.max(0, text.length - 1) * (ls || 0) * size;
+    }
+    function wrap(text, size, fam, weight, italic, ls, max) {
+      var ws = clean(text).split(' '), ls2 = [], line = '';
+      ws.forEach(function (w) { var t = line ? line + ' ' + w : w; if (line && width(t, size, fam, weight, italic, ls) > max) { ls2.push(line); line = w; } else line = t; });
+      if (line) ls2.push(line);
+      return ls2;
+    }
+    // The fewest lines at this size, then the narrowest measure that keeps that many, so lines balance.
+    function balanced(text, size, fam, weight, italic, ls, max) {
+      var first = wrap(text, size, fam, weight, italic, ls, max), lo = max * 0.45, hi = max;
+      if (first.length < 2) return first;
+      for (var k = 0; k < 12; k++) { var mid = (lo + hi) / 2; if (wrap(text, size, fam, weight, italic, ls, mid).length <= first.length) hi = mid; else lo = mid; }
+      return wrap(text, size, fam, weight, italic, ls, hi);
+    }
+    var title = clean(m.title) ? plainText(m.title) : 'Untitled book';
+    if (C.upper) title = title.toUpperCase();
+    var sub = C.showSub && clean(m.subtitle) ? plainText(m.subtitle) : '';
+    var names = doc.authors.filter(function (a) { return clean(a.name); }).map(function (a) { return clean(a.name); });
+    var who = C.showAuthor && names.length ? andList(names).toUpperCase() : '';
+    var pub = C.showPub && clean(m.publisher) ? plainText(m.publisher).toUpperCase() : '';
+    var kicker = clean(C.kicker) ? plainText(C.kicker).toUpperCase() : '';
+    var smallW = small === 'Plex Mono' ? 500 : 600, italicSub = small === 'Garamond Body';
+    // Fit the title: the largest size at which it takes no more lines than the layout allows.
+    var maxLines = layout === 'band' ? 3 : 4, tSize = Math.round(W * 0.118 * C.scale / 100), tLines;
+    for (; tSize > 44; tSize = Math.round(tSize * 0.95)) {
+      tLines = wrap(title, tSize, F.family, F.weight, false, C.upper ? 0.04 : 0, maxW);
+      if (tLines.length <= maxLines && tLines.every(function (l) { return width(l, tSize, F.family, F.weight, false, C.upper ? 0.04 : 0) <= maxW; })) break;
+    }
+    tLines = balanced(title, tSize, F.family, F.weight, false, C.upper ? 0.04 : 0, maxW);
+    // Each piece of text as a block: its lines, size, line height, face, and the space above it.
+    function blk(lines2, size, lh, fam, css, weight, italic, ls, fill, opacity, gap) { return { lines: lines2, size: size, lh: lh, fam: fam, css: css, weight: weight, italic: italic, ls: ls, fill: fill, opacity: opacity, gap: gap }; }
+    var smallCss = SMALL_CSS[small];
+    var kick = kicker ? blk(wrap(kicker, 34, small, smallW, false, 0.28, maxW), 34, 48, small, smallCss, smallW, false, 0.28, ink, 0.85, 0) : null;
+    var tb = blk(tLines, tSize, Math.round(tSize * F.lh), F.family, F.css, F.weight, false, C.upper ? 0.04 : 0, ink, 1, kick ? 40 : 0);
+    var rule = { rule: true, gap: 54, h: 6 };
+    var sb = sub ? blk(balanced(sub, 52, small, italicSub ? 400 : 500, italicSub, 0, maxW * 0.92), 52, 68, small, smallCss, italicSub ? 400 : 500, italicSub, 0, ink, 0.92, 48) : null;
+    var wb = who ? blk(wrap(who, 42, small, smallW, false, 0.16, maxW), 42, 58, small, smallCss, smallW, false, 0.16, ink, 1, sub ? 56 : 56) : null;
+    var pb = pub ? blk([pub], 28, 36, small, smallCss, smallW, false, 0.26, ink, 0.82, 0) : null;
+    function height(list) { return list.reduce(function (h, b, i) { return h + (i ? b.gap : 0) + (b.rule ? b.h : b.lines.length * b.lh); }, 0); }
+    var tx = C.align === 'left' ? mx : W / 2, anchor = C.align === 'left' ? 'start' : 'middle';
+    function draw(list, top) {
+      var y = top;
+      list.forEach(function (b, i) {
+        if (i) y += b.gap;
+        if (b.rule) { var rw = 150; out.push('<rect x="' + (C.align === 'left' ? mx : W / 2 - rw / 2) + '" y="' + y + '" width="' + rw + '" height="' + b.h + '" fill="' + accent + '"/>'); y += b.h; return; }
+        b.lines.forEach(function (l) {
+          var base = y + (b.lh - b.size) / 2 + b.size * 0.8;
+          out.push('<text x="' + tx + '" y="' + base.toFixed(1) + '" text-anchor="' + anchor + '" font-family="' + esc(b.css) + '" font-size="' + b.size + '" font-weight="' + b.weight + '"'
+            + (b.italic ? ' font-style="italic"' : '') + (b.ls ? ' letter-spacing="' + (b.ls * b.size).toFixed(1) + '"' : '') + ' fill="' + b.fill + '"' + (b.opacity < 1 ? ' fill-opacity="' + b.opacity + '"' : '') + '>' + esc(l) + '</text>');
+          y += b.lh;
+        });
+      });
+      return y;
+    }
+    function picture(x, y, w, h, n) {
+      var cid = id + '-clip' + n, href = ' href="' + img + '" xlink:href="' + img + '"';
+      defs.push('<clipPath id="' + cid + '"><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '"/></clipPath>');
+      if (C.imgW > 0 && C.imgH > 0) {
+        var s = Math.max(w / C.imgW, h / C.imgH) * C.zoom / 100, dw = C.imgW * s, dh = C.imgH * s;
+        var ix = x + (w - dw) * C.focusX / 100, iy = y + (h - dh) * C.focusY / 100;
+        return '<image clip-path="url(#' + cid + ')" x="' + ix.toFixed(1) + '" y="' + iy.toFixed(1) + '" width="' + dw.toFixed(1) + '" height="' + dh.toFixed(1) + '" preserveAspectRatio="none"' + href + '/>';
+      }
+      return '<image clip-path="url(#' + cid + ')" x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" preserveAspectRatio="xMidYMid slice"' + href + '/>';
+    }
+    var shade = C.shade / 100, main = [kick, tb, rule, sb, wb].filter(Boolean), top, bottomPad = Math.round(H * 0.075);
+    out.push('<rect width="' + W + '" height="' + H + '" fill="' + C.bg + '"/>');
+    if (layout === 'art') {
+      out.push(picture(0, 0, W, H, 1));
+    } else if (layout === 'band') {
+      var bandY = Math.round(H * 0.56);
+      if (img) out.push(picture(0, 0, W, bandY, 1));
+      else { defs.push('<linearGradient id="' + id + '-ph" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.10"/><stop offset="1" stop-color="#000000" stop-opacity="0.25"/></linearGradient>'); out.push('<rect width="' + W + '" height="' + bandY + '" fill="url(#' + id + '-ph)"/>'); }
+      out.push('<rect y="' + (bandY - 7) + '" width="' + W + '" height="14" fill="' + accent + '"/>');
+      var room = H - bandY - (pb ? pb.lh + bottomPad : bottomPad) - 30, hb = height(main);
+      top = bandY + 30 + Math.max(40, (room - hb) / 2);
+      draw(main, Math.round(top));
+      if (pb) draw([pb], H - bottomPad - pb.lh);
+    } else if (layout === 'framed') {
+      var upper = [kick, tb, rule, sb].filter(Boolean), lower = [wb, pb].filter(Boolean);
+      if (pb && wb) pb.gap = 30;
+      var y1 = draw(upper, Math.round(H * 0.075));
+      var lh2 = height(lower), y2 = H - bottomPad - lh2;
+      var fy = y1 + 70, fh = Math.max(Math.round(H * 0.18), y2 - 70 - fy), fx = mx, fw = W - 2 * mx;
+      if (img) out.push(picture(fx, fy, fw, fh, 1));
+      else out.push('<rect x="' + fx + '" y="' + fy + '" width="' + fw + '" height="' + fh + '" fill="' + ink + '" fill-opacity="0.08"/>');
+      out.push('<rect x="' + fx + '" y="' + fy + '" width="' + fw + '" height="' + fh + '" fill="none" stroke="' + accent + '" stroke-width="5"/>');
+      if (lower.length) draw(lower, y2);
+    } else {
+      if (layout === 'photo') {
+        if (img) out.push(picture(0, 0, W, H, 1));
+        else { defs.push('<linearGradient id="' + id + '-ph" x1="0" y1="0" x2="0.6" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.12"/><stop offset="1" stop-color="#000000" stop-opacity="0.35"/></linearGradient>'); out.push('<rect width="' + W + '" height="' + H + '" fill="url(#' + id + '-ph)"/>'); }
+      } else {
+        out.push('<rect x="' + mx + '" y="' + Math.round(H * 0.045) + '" width="' + (W - 2 * mx) + '" height="4" fill="' + accent + '"/>');
+        out.push('<rect x="' + mx + '" y="' + (H - Math.round(H * 0.045) - 4) + '" width="' + (W - 2 * mx) + '" height="4" fill="' + accent + '"/>');
+      }
+      var hMain = height(main), reserve = pb ? pb.lh + 50 : 0;
+      top = C.valign === 'top' ? Math.round(H * 0.09) : C.valign === 'middle' ? Math.round((H - hMain) / 2) : H - bottomPad - reserve - hMain;
+      if (layout === 'photo' && img && shade > 0) {
+        var gid = id + '-shade';
+        if (C.valign === 'middle') out.push('<rect width="' + W + '" height="' + H + '" fill="#0C0C0B" fill-opacity="' + (shade * 0.55).toFixed(2) + '"/>');
+        else {
+          var bottomSide = C.valign === 'bottom', s0 = bottomSide ? Math.max(0, top - Math.round(H * 0.2)) : 0, s1 = bottomSide ? H : Math.min(H, top + hMain + Math.round(H * 0.2));
+          defs.push('<linearGradient id="' + gid + '" x1="0" y1="0" x2="0" y2="1">' + (bottomSide
+            ? '<stop offset="0" stop-color="#0C0C0B" stop-opacity="0"/><stop offset="0.45" stop-color="#0C0C0B" stop-opacity="' + (shade * 0.75).toFixed(2) + '"/><stop offset="1" stop-color="#0C0C0B" stop-opacity="' + shade.toFixed(2) + '"/>'
+            : '<stop offset="0" stop-color="#0C0C0B" stop-opacity="' + shade.toFixed(2) + '"/><stop offset="0.55" stop-color="#0C0C0B" stop-opacity="' + (shade * 0.75).toFixed(2) + '"/><stop offset="1" stop-color="#0C0C0B" stop-opacity="0"/>') + '</linearGradient>');
+          out.push('<rect y="' + s0 + '" width="' + W + '" height="' + (s1 - s0) + '" fill="url(#' + gid + ')"/>');
+        }
+      }
+      draw(main, top);
+      if (pb) draw([pb], H - bottomPad - pb.lh);
+    }
+    var size = o.standalone ? ' width="' + W + '" height="' + H + '"' : '';
+    return '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="cover-svg" viewBox="0 0 ' + W + ' ' + H + '"' + size + ' preserveAspectRatio="xMidYMid slice" role="img" aria-label="' + esc('Cover: ' + clean(m.title ? plainText(m.title) : 'Untitled book')) + '">'
+      + (o.fontCss || defs.length ? '<defs>' + (o.fontCss ? '<style>' + o.fontCss + '<\/style>' : '') + defs.join('') + '</defs>' : '') + out.join('') + '</svg>';
+  }
+  function coverSize(input) { var T = TRIMS[normalize(input).book.trim]; return { w: 1600, h: Math.round(1600 * T.h / T.w) }; }
+  // The faces a cover uses, so the page can embed just those when it draws the cover as an image.
+  function coverFamilies(input) { var F = COVER_FONTS[normalize(input).book.cover.font]; return F.family === F.small ? [F.family] : [F.family, F.small]; }
+
+  // ------------------------------------------------------------------ the ePUB
+  // An EPUB 3 package, built from the same text as the PDF: one file per part and chapter,
+  // notes at the end of each chapter as pop-up footnotes, figures and charts kept with the
+  // text, the cover as an image, and the contents for the reading app.
+  var CRC_T = null;
+  function crc32(b) {
+    var n, k, c, i, crc = 0xFFFFFFFF;
+    if (!CRC_T) { CRC_T = []; for (n = 0; n < 256; n++) { c = n; for (k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1); CRC_T[n] = c >>> 0; } }
+    for (i = 0; i < b.length; i++) crc = CRC_T[(crc ^ b[i]) & 0xFF] ^ (crc >>> 8);
+    return (crc ^ 0xFFFFFFFF) >>> 0;
+  }
+  function utf8(s) { return new TextEncoder().encode(s); }
+  // A zip with every file stored, not compressed: the EPUB format requires that of the
+  // first file (mimetype) and allows it of the rest.
+  function zipStore(files) {
+    var parts = [], central = [], offset = 0, cdSize = 0, total = 0, pos = 0, out;
+    function u16(n) { return [n & 255, (n >>> 8) & 255]; }
+    function u32(n) { return [n & 255, (n >>> 8) & 255, (n >>> 16) & 255, (n >>> 24) & 255]; }
+    files.forEach(function (f) {
+      var name = utf8(f.name), data = typeof f.data === 'string' ? utf8(f.data) : f.data, crc = crc32(data), size = data.length;
+      var local = [].concat(u32(0x04034b50), u16(20), u16(0x0800), u16(0), u16(0), u16(0x21), u32(crc), u32(size), u32(size), u16(name.length), u16(0));
+      parts.push(new Uint8Array(local), name, data);
+      central.push([new Uint8Array([].concat(u32(0x02014b50), u16(20), u16(20), u16(0x0800), u16(0), u16(0), u16(0x21), u32(crc), u32(size), u32(size), u16(name.length), u16(0), u16(0), u16(0), u16(0), u32(0), u32(offset))), name]);
+      offset += local.length + name.length + size;
+    });
+    central.forEach(function (c) { parts.push(c[0], c[1]); cdSize += c[0].length + c[1].length; });
+    parts.push(new Uint8Array([].concat(u32(0x06054b50), u16(0), u16(0), u16(files.length), u16(files.length), u32(cdSize), u32(offset), u16(0))));
+    parts.forEach(function (p) { total += p.length; });
+    out = new Uint8Array(total);
+    parts.forEach(function (p) { out.set(p, pos); pos += p.length; });
+    return out;
+  }
+  function b64bytes(s) {
+    if (typeof atob === 'function') { var bin = atob(s), out = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i); return out; }
+    return new Uint8Array(Buffer.from(s, 'base64'));
+  }
+  // HTML as written for the PDF, made well-formed XHTML: empty elements closed, SVG given its namespace.
+  function xhtml(h) {
+    return String(h).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '')
+      .replace(/<(img|br|hr|col|wbr|input|source)\b([^>]*?)\s*\/?>/g, '<$1$2/>')
+      .replace(/<svg\b(?![^>]*\bxmlns=)/g, '<svg xmlns="http://www.w3.org/2000/svg"');
+  }
+  function w3cDate(s) {
+    var t = clean(s), mm;
+    if ((mm = t.match(/^(\d{4})(-\d\d(-\d\d)?)?$/))) return t;
+    if ((mm = t.match(/^(?:(\d{1,2})\s+)?([A-Za-z]{3,9})\.?\s+(?:(\d{1,2}),?\s+)?(\d{4})$/))) {
+      var mi = MONTHS.map(function (x) { return x.slice(0, 3).toLowerCase(); }).indexOf(mm[2].slice(0, 3).toLowerCase());
+      if (mi !== -1) { var day = mm[1] || mm[3]; return mm[4] + '-' + pad2(mi + 1) + (day ? '-' + pad2(+day) : ''); }
+    }
+    if ((mm = t.match(/\b(1[5-9]\d\d|20\d\d|21\d\d)\b/))) return mm[1];
+    return '';
+  }
+  function isoNow(d) { return (d || new Date()).toISOString().replace(/\.\d+Z$/, 'Z'); }
+  // A stable identifier for a book with no ISBN and no saved id: a UUID shape from the title and authors.
+  function pseudoUuid(s) {
+    var h = [crc32(utf8('a' + s)), crc32(utf8('b' + s)), crc32(utf8('c' + s)), crc32(utf8('d' + s))].map(function (n) { return ('00000000' + n.toString(16)).slice(-8); }).join('');
+    return h.slice(0, 8) + '-' + h.slice(8, 12) + '-4' + h.slice(13, 16) + '-a' + h.slice(17, 20) + '-' + h.slice(20, 32);
+  }
+  function fileAs(name) { return invertName(name); }
+  var DPUB_ROLES = { chapter: 1, part: 1, preface: 1, foreword: 1, introduction: 1, prologue: 1, epilogue: 1, afterword: 1, acknowledgments: 1, appendix: 1, glossary: 1, bibliography: 1, conclusion: 1 };
+
+  function epubFiles(input, o) {
+    o = o || {};
+    var doc = normalize(input);
+    doc.meta.kind = 'book';
+    var B = doc.book, r = render(doc, { target: 'epub', measure: o.measure }), E = r.epub;
+    var lang = clean(B.lang) || 'en', files = [], items = [], spine = [], imgN = 0, seenImg = {};
+    var langAttr = ' xml:lang="' + esc(lang) + '" lang="' + esc(lang) + '"';
+    function add(name, data, type, id, props, linear) {
+      files.push({ name: 'EPUB/' + name, data: data });
+      items.push('<item id="' + id + '" href="' + name + '" media-type="' + type + '"' + (props ? ' properties="' + props + '"' : '') + '/>');
+      if (linear !== undefined) spine.push('<itemref idref="' + id + '"' + (linear ? '' : ' linear="no"') + '/>');
+    }
+    function images(html) {
+      return html.replace(/(<img\b[^>]*?\ssrc=")data:image\/(png|jpe?g|gif|webp|svg\+xml);base64,([A-Za-z0-9+\/=]+)(")/g, function (all, pre, kind, data, post) {
+        var key = data.length + ':' + data.slice(0, 64) + data.slice(-64);
+        if (!seenImg[key]) {
+          var ext = kind === 'jpeg' ? 'jpg' : kind === 'svg+xml' ? 'svg' : kind, name = 'images/fig-' + (++imgN) + '.' + ext;
+          add(name, b64bytes(data), 'image/' + (kind === 'jpg' ? 'jpeg' : kind), 'img' + imgN);
+          seenImg[key] = name;
+        }
+        return pre + '../' + seenImg[key] + post;
+      });
+    }
+    function page(titleText, body, bodyType) {
+      return '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops"' + langAttr + '>\n<head>\n<meta charset="UTF-8"/>\n<title>' + esc(titleText) + '</title>\n<link rel="stylesheet" type="text/css" href="../css/book.css"/>\n</head>\n'
+        + '<body' + (bodyType ? ' epub:type="' + bodyType + '"' : '') + ' class="' + 'face-' + B.face + ' para-' + B.para + '">\n' + xhtml(body) + '\n</body>\n</html>\n';
+    }
+    function textFile(name, id, titleText, body, bodyType) {
+      var x = page(titleText, images(body), bodyType);
+      add('text/' + name, x, 'application/xhtml+xml', id, /<svg\b/.test(x) ? 'svg' : '', true);
+    }
+
+    files.push({ name: 'mimetype', data: 'application/epub+zip' });
+    files.push({ name: 'META-INF/container.xml', data: '<?xml version="1.0" encoding="UTF-8"?>\n<container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">\n<rootfiles>\n<rootfile full-path="EPUB/package.opf" media-type="application/oebps-package+xml"/>\n</rootfiles>\n</container>\n' });
+
+    // Styles, with the book's accent and, when the page supplies them, its typefaces.
+    var fontCss = '';
+    (o.fonts || []).forEach(function (f, i) {
+      var name = 'fonts/' + slug(f.family) + '-' + f.weight + (f.style === 'italic' ? 'i' : '') + '-' + (i + 1) + '.woff2';
+      add(name, f.data, 'font/woff2', 'font' + (i + 1));
+      fontCss += '@font-face{font-family:"' + f.family + '";font-style:' + f.style + ';font-weight:' + f.weight + ';src:url(../' + name + ') format("woff2");' + (f.range ? 'unicode-range:' + f.range + ';' : '') + '}\n';
+    });
+    add('css/book.css', fontCss + String(o.css || 'body{font-family:serif;}').replace(/--ACCENT--/g, E.accent), 'text/css', 'css');
+
+    // The cover: the page's drawing of it when given, otherwise the SVG itself.
+    var coverName;
+    if (o.cover && o.cover.data) { coverName = 'images/cover.' + (o.cover.type === 'image/png' ? 'png' : 'jpg'); add(coverName, o.cover.data, o.cover.type === 'image/png' ? 'image/png' : 'image/jpeg', 'cover-image', 'cover-image'); }
+    else { coverName = 'images/cover.svg'; add(coverName, '<?xml version="1.0" encoding="UTF-8"?>\n' + coverSvg(doc, { standalone: true, measure: o.measure }), 'image/svg+xml', 'cover-image', 'cover-image'); }
+    var cs = coverSize(doc);
+    textFile('cover.xhtml', 'cover', 'Cover', '<section epub:type="cover" class="cover-page"><img role="doc-cover" src="../' + coverName + '" alt="' + esc('Cover of ' + E.title) + '" width="' + cs.w + '" height="' + cs.h + '"/></section>', 'cover');
+    textFile('title.xhtml', 'titlepage', E.title, '<section epub:type="titlepage" class="titlepage">' + E.titlePage + '</section>', 'frontmatter');
+    textFile('copyright.xhtml', 'copyright', 'Copyright', '<section epub:type="copyright-page" class="copyright">' + E.copyPage + '</section>', 'frontmatter');
+    if (E.dedication) textFile('dedication.xhtml', 'dedication', 'Dedication', '<section epub:type="dedication" role="doc-dedication" class="dedication">' + E.dedication + '</section>', 'frontmatter');
+    if (E.epigraph) textFile('epigraph.xhtml', 'epigraph', 'Epigraph', '<section epub:type="epigraph" role="doc-epigraph" class="epigraph">' + E.epigraph + '</section>', 'frontmatter');
+
+    // Contents: parts hold their chapters.
+    var listed = E.units.filter(function (u) { return u.hasTitle || u.label; });
+    function navText(u) { return u.label && u.plain ? u.label + ': ' + u.plain : u.label || u.plain; }
+    var tree = [], partNode = {};
+    listed.forEach(function (u) {
+      var node = { u: u, kids: [] };
+      if (u.kind === 'part') { partNode[u.id] = node; tree.push(node); }
+      else if (u.part && partNode[u.part]) partNode[u.part].kids.push(node);
+      else tree.push(node);
+    });
+    function navLi(n) { return '<li><a href="text/' + n.u.file + '">' + esc(navText(n.u)) + '</a>' + (n.kids.length ? '<ol>' + n.kids.map(navLi).join('') + '</ol>' : '') + '</li>'; }
+    var navRows = tree.map(navLi).join('') +(E.about ? '<li><a href="text/about.xhtml">About the ' + (E.aboutCount > 1 ? 'Authors' : 'Author') + '</a></li>' : '');
+    var firstBody = E.units.filter(function (u) { return !u.back; })[0];
+    var nav = '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops"' + langAttr + '>\n<head>\n<meta charset="UTF-8"/>\n<title>Contents</title>\n<link rel="stylesheet" type="text/css" href="css/book.css"/>\n</head>\n<body epub:type="frontmatter" class="face-' + B.face + '">\n'
+      + '<nav epub:type="toc" role="doc-toc" id="toc" class="contents"><h1 class="fm-h">Contents</h1>\n<ol>' + navRows + '</ol></nav>\n'
+      + '<nav epub:type="landmarks" id="landmarks" hidden=""><h2>Landmarks</h2><ol><li><a epub:type="cover" href="text/cover.xhtml">Cover</a></li><li><a epub:type="titlepage" href="text/title.xhtml">Title page</a></li><li><a epub:type="toc" href="nav.xhtml#toc">Contents</a></li>'
+      + (firstBody ? '<li><a epub:type="bodymatter" href="text/' + firstBody.file + '">Start reading</a></li>' : '') + '</ol></nav>\n</body>\n</html>\n';
+    add('nav.xhtml', nav, 'application/xhtml+xml', 'nav', 'nav', true);
+
+    E.units.forEach(function (u) {
+      var role = u.role, sem = role ? ' epub:type="' + role + '"' + (DPUB_ROLES[role] ? ' role="doc-' + role + '"' : '') : '';
+      var label = u.hasTitle ? ' aria-labelledby="h-' + u.id + '"' : '';
+      textFile(u.file, u.id, navText(u) || E.title, '<section' + sem + label + ' class="unit k-' + u.kind + '" id="' + u.id + '">' + u.html + '</section>', u.back ? 'backmatter' : 'bodymatter');
+    });
+    if (E.about) textFile('about.xhtml', 'about', 'About the ' + (E.aboutCount > 1 ? 'Authors' : 'Author'), '<section class="unit k-back about" aria-labelledby="h-about"><header class="ch-head"><h1 class="ch-title" id="h-about">About the ' + (E.aboutCount > 1 ? 'Authors' : 'Author') + '</h1></header>' + E.about + '</section>', 'backmatter');
+
+    // The older table of contents, for reading apps that still look for one.
+    var isbn = clean(B.isbn).replace(/[^0-9Xx]/g, ''), ident = isbn.length === 13 || isbn.length === 10 ? 'urn:isbn:' + isbn : 'urn:uuid:' + (/^[0-9a-f-]{36}$/i.test(clean(B.bookId)) ? clean(B.bookId).toLowerCase() : pseudoUuid(E.title + '|' + E.names.join('|')));
+    var playN = 0, ncxRows = listed.map(function (u) { playN++; return '<navPoint id="np' + playN + '" playOrder="' + playN + '"><navLabel><text>' + esc(navText(u)) + '</text></navLabel><content src="text/' + u.file + '"/></navPoint>'; }).join('\n');
+    add('toc.ncx', '<?xml version="1.0" encoding="UTF-8"?>\n<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1"' + ' xml:lang="' + esc(lang) + '">\n<head><meta name="dtb:uid" content="' + esc(ident) + '"/><meta name="dtb:depth" content="1"/><meta name="dtb:totalPageCount" content="0"/><meta name="dtb:maxPageNumber" content="0"/></head>\n<docTitle><text>' + esc(E.title) + '</text></docTitle>\n<navMap>\n' + ncxRows + '\n</navMap>\n</ncx>\n', 'application/x-dtbncx+xml', 'ncx');
+
+    // The package: what the book is, what it holds, and the reading order.
+    var meta = ['<dc:identifier id="bookid">' + esc(ident) + '</dc:identifier>', '<dc:title id="title">' + esc(E.title) + '</dc:title>', '<meta refines="#title" property="title-type">main</meta>'];
+    if (E.sub) meta.push('<dc:title id="subtitle">' + esc(E.sub) + '</dc:title>', '<meta refines="#subtitle" property="title-type">subtitle</meta>');
+    E.authors.forEach(function (a, i) {
+      meta.push('<dc:creator id="creator' + (i + 1) + '">' + esc(clean(a.name)) + '</dc:creator>', '<meta refines="#creator' + (i + 1) + '" property="role" scheme="marc:relators">aut</meta>',
+        '<meta refines="#creator' + (i + 1) + '" property="file-as">' + esc(a.org ? clean(a.name) : fileAs(a.name)) + '</meta>', '<meta refines="#creator' + (i + 1) + '" property="display-seq">' + (i + 1) + '</meta>');
+    });
+    meta.push('<dc:language>' + esc(lang) + '</dc:language>');
+    if (E.pub) meta.push('<dc:publisher>' + esc(E.pub) + '</dc:publisher>');
+    var dd = w3cDate(doc.meta.date); if (dd) meta.push('<dc:date>' + dd + '</dc:date>');
+    if (clean(B.copyright)) meta.push('<dc:rights>' + esc(lines(B.copyright).join(' ')) + '</dc:rights>');
+    if (clean(B.description)) meta.push('<dc:description>' + esc(plainText(String(B.description).replace(/\n+/g, ' '))) + '</dc:description>');
+    String(B.subjects || '').split(/[,;\n]/).map(clean).filter(Boolean).forEach(function (s) { meta.push('<dc:subject>' + esc(s) + '</dc:subject>'); });
+    if (isbn && ident.indexOf('urn:isbn') === 0 && clean(B.bookId)) meta.push('<dc:identifier id="uuid">urn:uuid:' + esc(clean(B.bookId).toLowerCase()) + '</dc:identifier>');
+    if (E.series) {
+      meta.push('<meta property="belongs-to-collection" id="series">' + esc(E.series) + '</meta>', '<meta refines="#series" property="collection-type">series</meta>');
+      if (/^\d+(\.\d+)?$/.test(E.seriesNo)) meta.push('<meta refines="#series" property="group-position">' + (+E.seriesNo) + '</meta>');
+    }
+    meta.push('<meta property="dcterms:modified">' + isoNow(o.now) + '</meta>', '<meta name="cover" content="cover-image"/>',
+      '<meta property="schema:accessMode">textual</meta>', '<meta property="schema:accessMode">visual</meta>', '<meta property="schema:accessModeSufficient">textual</meta>',
+      '<meta property="schema:accessibilityFeature">structuralNavigation</meta>', '<meta property="schema:accessibilityFeature">tableOfContents</meta>', '<meta property="schema:accessibilityFeature">readingOrder</meta>',
+      '<meta property="schema:accessibilityHazard">none</meta>', '<meta property="schema:accessibilitySummary">Headings, a table of contents, and linked notes. Charts carry their titles and sources in text.</meta>');
+    var opf = '<?xml version="1.0" encoding="UTF-8"?>\n<package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="bookid" xml:lang="' + esc(lang) + '" prefix="schema: http://schema.org/">\n<metadata xmlns:dc="http://purl.org/dc/elements/1.1/">\n' + meta.join('\n') + '\n</metadata>\n<manifest>\n' + items.join('\n') + '\n</manifest>\n<spine toc="ncx">\n' + spine.join('\n') + '\n</spine>\n</package>\n';
+    files.push({ name: 'EPUB/package.opf', data: opf });
+    return { files: files.map(function (f) { return { name: f.name, data: typeof f.data === 'string' ? utf8(f.data) : f.data }; }), problems: r.problems, stats: r.stats };
+  }
+  function epub(input, o) { return zipStore(epubFiles(input, o).files); }
+
+  // ------------------------------------------------------------------ editing OSINT sources inside the builder
+  // The OSINT Citation Generator's source types: their labels, how a title is set, what the
+  // location field holds, and its suggested descriptions (version 3.2.1).
+  var OSINT_TYPE_INFO = {"book":{"label":"Book","style":"italics","loc":"Series, if the book belongs to one","picks":["Monograph","Trade Book","Edited Volume","Textbook","Memoir","Official History"]},"journal":{"label":"Journal article","style":"quotes","loc":"Journal","picks":["Peer-Reviewed Article","Journal Article","Review Article","Law Review Article","Preprint Paper","Working Paper","Conference Paper"]},"news":{"label":"News or magazine","style":"quotes","loc":"Outlet","picks":["News Article","News Analysis","Feature Article","Wire Service Report","Investigative Report","Magazine Article","Editorial / Op-Ed","Explainer","State Media Report"]},"chapter":{"label":"Chapter or section","style":"quotes","loc":"Containing volume","picks":["Book Section","Handbook Chapter","Long-Form Publication by Think Tank","Reference Work Entry","Encyclopedia Article"]},"web":{"label":"Website or think tank","style":"quotes","loc":"Site","picks":["Defense Analysis Article","Policy Analysis","Policy Brief","Think Tank Report","Expert Commentary","Blog Post","Web Page","Corporate Press Release"]},"report":{"label":"Report or government document","style":"italics","loc":"Site or series","picks":["Government Report","CRS Report","Think Tank Report","Defense White Paper","National Strategy Document","GAO Report","Whitepaper","Research Report"]},"social":{"label":"Social media post","style":"quotes","loc":"Platform","picks":["Social Media Post","Thread","Channel Post","Video Post","Short-Form Video","Forum Post","Deleted Post (Archived)","Screenshot (Provenance Unverified)"]},"video":{"label":"Video or podcast","style":"quotes","loc":"Platform","picks":["Video","Podcast","Recorded Interview","Lecture (Recorded)","Combat Footage","Livestream Archive"]},"archival":{"label":"Primary or archival","style":"quotes","loc":"Archive","picks":["Archival Material","Primary Source","Declassified Document","Historical Document","FOIA-Released Document","Oral History","Personal Papers"]},"live":{"label":"Live list or tracker","style":"quotes","loc":"Site","picks":["Sanctions List","Flight Tracking Data","Ship Tracking (AIS)","Business Registry Record","Government Dataset","Data Dashboard","Patent Filing"]},"imagery":{"label":"Satellite imagery","style":"quotes","loc":"Platform","picks":["Commercial Satellite Imagery","Synthetic Aperture Radar Imagery","Government Satellite Release","Annotated Satellite Imagery","Drone Footage","Geotagged Photo","CCTV Footage"]},"ai":{"label":"AI model output","style":"quotes","loc":"Platform","picks":["AI Model Output"]}};
+  function blankOsint(type) {
+    var st = {}; OSINT_KEYS.forEach(function (k) { st[k] = ''; });
+    st.type = OSINT_TYPES.indexOf(type) !== -1 ? type : 'web';
+    st.titleStyle = OSINT_TYPE_INFO && OSINT_TYPE_INFO[st.type] ? OSINT_TYPE_INFO[st.type].style : 'quotes';
+    st.access = []; st.quals = []; st.shortUseTitle = true;
+    return st;
+  }
+  // The full note, the short form, and the generator's own checks for one source as it stands.
+  function osintPreview(st) {
+    if (!CITER) return { full: '', short: '', checks: [], empty: true };
+    var b = CITER.build(Object.assign({}, st, { locator: '' }));
+    if (b.empty) return { full: '', short: '', checks: [], empty: true };
+    return { full: linkUrls(smartHtml(CITER.toHTML(b.seg))), short: smartHtml(CITER.toHTML(CITER.shortForms(Object.assign({}, st, { locator: '' })).short)), checks: b.checks || [], empty: false };
+  }
+  function newOsintSource(st, existing) {
+    var taken = {}; (existing || []).forEach(function (s) { taken[s.key] = 1; });
+    return { key: keyFor(st, taken), kind: 'osint', osintId: 'wpb-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1e6).toString(36), st: st };
+  }
+  // The builder's OSINT sources as a list file the OSINT Citation Generator can open again.
+  function osintListFile(sources, name) {
+    if (!CITER) return '';
+    return CITER.listFile(name || '', (sources || []).filter(function (s) { return s.kind === 'osint'; }).map(function (s) { return { id: s.osintId || 'wpb-' + s.key, st: s.st }; }));
+  }
+
   // ------------------------------------------------------------------ project files
   function projectFile(doc) { return JSON.stringify({ app: 'White Paper Builder', format: 1, savedAt: new Date().toISOString(), paper: normalize(doc) }, null, 1) + '\n'; }
   function parseProject(text) {
@@ -786,7 +1408,10 @@ var WP = (function () {
   return {
     useCiter: useCiter, defaults: defaults, normalize: normalize, render: render, blocks: blocks, inline: inline, parseData: parseData, parseNumber: parseNumber,
     chartSvg: chartSvg, plainText: plainText, splitLead: splitLead, importOsintList: importOsintList, keyFor: keyFor, sourceLabel: sourceLabel, projectFile: projectFile, parseProject: parseProject,
-    andList: andList, citeNames: citeNames, VISUAL_KINDS: VISUAL_KINDS, MONTHS: MONTHS, PAPER_ACCENT: PAPER_ACCENT, BRIEF_ACCENT: BRIEF_ACCENT, SOURCES_NOTE: SOURCES_NOTE, slug: slug, words: words, invertName: invertName
+    andList: andList, citeNames: citeNames, VISUAL_KINDS: VISUAL_KINDS, MONTHS: MONTHS, PAPER_ACCENT: PAPER_ACCENT, BRIEF_ACCENT: BRIEF_ACCENT, SOURCES_NOTE: SOURCES_NOTE, slug: slug, words: words, invertName: invertName,
+    BOOK_ACCENT: BOOK_ACCENT, TRIMS: TRIMS, COVER_LAYOUTS: COVER_LAYOUTS, COVER_FONTS: COVER_FONTS, numberWord: numberWord, roman: roman, setMeasure: setMeasure,
+    coverSvg: coverSvg, coverSize: coverSize, coverFamilies: coverFamilies, epubFiles: epubFiles, epub: epub, zipStore: zipStore, xhtml: xhtml, w3cDate: w3cDate,
+    OSINT_TYPES: OSINT_TYPES, OSINT_KEYS: OSINT_KEYS, OSINT_TYPE_INFO: OSINT_TYPE_INFO, blankOsint: blankOsint, osintPreview: osintPreview, newOsintSource: newOsintSource, osintListFile: osintListFile, sourceKeyFor: keyFor
   };
 })();
 if (typeof module !== 'undefined') module.exports = WP;

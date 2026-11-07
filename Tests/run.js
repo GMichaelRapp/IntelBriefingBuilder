@@ -171,5 +171,89 @@ eq(WP.plainText('A story [ORIGINAL STORY: @typed]') + '|' + strip(WP.inline('[Ma
 eq(WP.keyFor({ authors: 'The Economist Staff', title: "Russia's grey-zone attacks" }, {}), 'economist-russias', 'sources: a leading article is skipped and apostrophes dropped in keys');
 eq(/font-family="Plex Mono, monospace"/.test(WP.chartSvg({ kind: 'bar', data: 'a,1\nb,2' }, '#C42A14')), true, 'chart: labels use the embedded Plex fonts');
 
+// ---- 8. The eBook ----
+eq(WP.blocks('* * *\n\n***').map((b) => b.t).join(' '), 'scene scene', 'blocks: three asterisks are a scene break, not a list');
+eq([WP.numberWord(1), WP.numberWord(12), WP.numberWord(21), WP.roman(14)].join(','), 'One,Twelve,Twenty-One,XIV', 'book: chapter numbers in words and roman');
+function book(over, bookOver) {
+  const d = paper(over);
+  d.meta.kind = 'book'; d.meta.subtitle = 'A Subtitle'; d.meta.colophon = 'An official product of Example Press.';
+  d.authors = [{ name: 'Jane Doe', bio: 'Writes books. See [@typed].', org: false }];
+  Object.assign(d.book, { copyright: '© 2026 Example Press. All rights reserved.', isbn: '978-0-00-000000-2', edition: 'First edition', description: 'About the book.', bookId: '0b7c2a8e-1f7d-4c3a-9a51-2a3c4d5e6f70', series: 'Global Warning Books', seriesNo: '3' }, bookOver || {});
+  d.appendix = '# Acknowledgments\n\nThanks.';
+  return d;
+}
+const bookBody = 'Opening.\n\n# Preface {-}\n\nWhy.^[A note.]\n\n# The Rise {part}\n\n# First\n\nClaim [@beckley-unrivaled, 25]. Again [@beckley-unrivaled, 30].\n\nSecond paragraph.\n\n* * *\n\nAfter.\n\n# Second\n\nOnce more [@beckley-unrivaled, 40].\n\n!> Pull.\n\n?> Box.';
+r = WP.render(book({ body: bookBody }));
+eq(/class="bk-cover"><svg/.test(r.html) && /class="fm bk-titlepage"/.test(r.html) && /class="fm bk-copy"/.test(r.html) && /class="fm bk-toc"/.test(r.html), true, 'book: cover, title page, copyright page, and contents');
+eq((r.html.match(/<p class="ch-num">([^<]+)<\/p>/g) || []).map(strip).join(','), 'Part One,Chapter One,Chapter Two', 'book: parts and chapters numbered in words; {-} leaves a chapter unnumbered');
+eq(/<li class="t-chapter in-part"><a href="#u4"><span class="lab">Chapter One<\/span><span class="tt">First<\/span><\/a><\/li>/.test(r.html), true, 'book: the contents lists chapters under their part, linked for page numbers');
+const bn = notesOf(r.html);
+eq(bn.join(' | '), '1 A note. | 1 Michael Beckley, Unrivaled: Why America Will Remain the World’s Sole Superpower [Monograph] (Cornell University Press: 2018): p. 25. | 2 Beckley, Unrivaled, p. 30. | 1 Michael Beckley, Unrivaled: Why America Will Remain the World’s Sole Superpower [Monograph] (Cornell University Press: 2018): p. 40. | 1 Example Agency, Annual Report (2024).',
+  'book: notes numbered afresh in each chapter, each chapter citing a source in full first');
+eq(/<p class="opener">Claim/.test(r.html) && /<p class="scene" role="separator">/.test(r.html) && /<p class="pull">Pull\.<\/p>/.test(r.html) && /<aside class="matter">/.test(r.html), true, 'book: opener, scene break, pull quote, and box');
+eq(/ISBN 978-0-00-000000-2/.test(r.html) && /© 2026 Example Press/.test(r.html) && /An official product of Example Press\./.test(r.html) && /Set in EB Garamond/.test(r.html), true, 'book: copyright page carries the copyright line, colophon, ISBN, and type note');
+eq(/@page\{size:6in 9in;/.test(r.vars) && /@top-center\{content:string\(chapter\)/.test(r.vars) && /@page front\{@top-left\{content:none\}/.test(r.vars), true, 'book: 6 x 9 pages, the chapter title as the running head, none on front matter');
+eq(/size:8\.5in 11in/.test(WP.render(book({ body: bookBody }, { trim: 'letter' })).vars), true, 'book: page size follows the trim');
+eq(/class="bk-unit k-back back" id="u6"><header class="ch-head"><h2 class="ch-title" id="h-u6" data-run="Acknowledgments">Acknowledgments<\/h2>/.test(r.html) && /id="about"/.test(r.html), true, 'book: back matter and the About the author page');
+eq(r.stats.chapters + ':' + r.stats.parts, '2:1', 'book: stats count chapters and parts');
+const endR = WP.render(book({ body: bookBody }, { notes: 'end' }));
+eq(/<section class="bk-unit k-back bk-notes" id="notes">/.test(endR.html) && /<h3 class="nt-h">Chapter One: First<\/h3>/.test(endR.html) && /<sup class="en-call"><a id="enr-4-1" href="#en-4-1">1<\/a><\/sup>/.test(endR.html) && !/<span class="fn">/.test(endR.html.replace(/bk-about[\s\S]*$/, '')), true, 'book: notes can go at the back, grouped by chapter and linked both ways');
+eq(WP.render(book({ body: '' })).problems.some((p) => p.level === 'fix' && /no chapters/.test(p.msg)), true, 'book checks: an empty book is flagged');
+eq(WP.normalize({ meta: { kind: 'book' }, book: { trim: 'huge', cover: { layout: 'odd', zoom: '250', bg: 'red' } } }).book.trim + ':' + WP.normalize({ book: { cover: { layout: 'odd', zoom: '250', bg: 'red' } } }).book.cover.layout + ':' + WP.normalize({ book: { cover: { zoom: '250' } } }).book.cover.zoom + ':' + WP.normalize({ book: { cover: { bg: 'red' } } }).book.cover.bg,
+  '6x9:photo:250:#1F2124', 'project file: book settings are checked when opened');
+eq(WP.parseProject(WP.projectFile(book({ body: bookBody }))).doc.book.isbn, '978-0-00-000000-2', 'project file: a book reopens with its details');
+
+// The cover.
+const cv = WP.coverSvg(book({ body: bookBody }));
+eq(/^<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg"[^>]*viewBox="0 0 1600 2400"/.test(cv) && />TEST PAPER<|>Test Paper</.test(cv) && />JANE DOE</.test(cv) && />EXAMPLE PRESS</.test(cv), true, 'cover: one SVG at the trim\'s proportions, with title, author, and publisher');
+['photo', 'band', 'framed', 'type', 'art'].forEach((L) => {
+  const d = book({ body: bookBody }); d.book.cover.layout = L; d.meta.coverImage = 'data:image/png;base64,iVBORw0KGgo='; d.book.cover.imgW = 2400; d.book.cover.imgH = 1600;
+  const s = WP.coverSvg(d);
+  eq(L === 'type' ? !/<image /.test(s) && />Test Paper</.test(s) : /<image /.test(s) && (L === 'art' ? !/<text/.test(s) : />Test Paper</.test(s)), true, 'cover: the ' + L + ' layout ' + (L === 'type' ? 'sets type alone' : 'draws the image' + (L === 'art' ? ' alone' : ' and the text')));
+});
+const longT = book({ body: '' }); longT.meta.title = 'A Very Long Title That Has To Wrap Across Several Lines On The Cover';
+eq((WP.coverSvg(longT).match(/font-size="(\d+)"/) || [])[1] < 188 && (WP.coverSvg(longT).match(/<text/g) || []).length > 4, true, 'cover: a long title shrinks and wraps');
+
+// The ePUB.
+const td = new TextDecoder();
+const epB = book({ body: bookBody, visuals: [{ id: 'img', kind: 'image', title: 'A map', image: 'data:image/png;base64,iVBORw0KGgo=' }, { id: 'ch', kind: 'bar', title: 'Up', source: 'Data', data: 'a,1\nb,2' }] });
+epB.body += '\n\n[[img]]\n\n[[ch]]';
+const ef = WP.epubFiles(epB, { css: 'body{color:--ACCENT--}', now: new Date('2026-11-06T12:00:00Z') });
+const fileOf = (n) => { const f = ef.files.find((x) => x.name === n); return f ? td.decode(f.data) : null; };
+eq(ef.files[0].name + ':' + fileOf('mimetype'), 'mimetype:application/epub+zip', 'epub: mimetype comes first');
+const zip = WP.zipStore(ef.files);
+eq(td.decode(zip.slice(30, 38)) + ':' + (zip[8] | (zip[9] << 8)), 'mimetype:0', 'epub: the zip stores mimetype first, uncompressed');
+const opf = fileOf('EPUB/package.opf');
+eq(/<dc:identifier id="bookid">urn:isbn:9780000000002<\/dc:identifier>/.test(opf) && /<dc:title id="subtitle">A Subtitle<\/dc:title>/.test(opf) && /<dc:creator id="creator1">Jane Doe<\/dc:creator>/.test(opf) && /property="file-as">Doe, Jane</.test(opf), true, 'epub: identifier from the ISBN, title, subtitle, and author');
+eq(/<meta property="dcterms:modified">2026-11-06T12:00:00Z<\/meta>/.test(opf) && /<dc:date>2026-10<\/dc:date>/.test(opf) && /group-position">3</.test(opf) && /<dc:description>About the book\.<\/dc:description>/.test(opf), true, 'epub: modified date, publication date, series, and description');
+const manifestHrefs = (opf.match(/href="([^"]+)"/g) || []).map((h) => 'EPUB/' + h.slice(6, -1));
+eq(manifestHrefs.every((h) => ef.files.some((f) => f.name === h)) && ef.files.filter((f) => /^EPUB\/(?!package\.opf)/.test(f.name)).every((f) => manifestHrefs.indexOf(f.name) !== -1), true, 'epub: every file is in the manifest, and every manifest entry exists');
+eq(/<item id="cover-image" href="images\/cover\.svg" media-type="image\/svg\+xml" properties="cover-image"\/>/.test(opf) && /<item id="nav" href="nav\.xhtml"[^>]*properties="nav"/.test(opf), true, 'epub: a cover image (SVG when the page gives no JPEG) and the navigation document');
+eq(/id="img1" href="images\/fig-1\.png"/.test(opf) && /src="\.\.\/images\/fig-1\.png"/.test(fileOf('EPUB/text/u05.xhtml')), true, 'epub: pictures are moved out of the text into image files');
+eq(/properties="svg"/.test((opf.match(/<item id="u5"[^>]*>/) || [''])[0]) && /<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg" class="chart"/.test(fileOf('EPUB/text/u05.xhtml')), true, 'epub: a chapter with a chart is marked as holding SVG, with its namespace');
+const ch1 = fileOf('EPUB/text/u04.xhtml');
+eq(/<section epub:type="chapter" role="doc-chapter" aria-labelledby="h-u4" class="unit k-chapter" id="u4">/.test(ch1) && /<a epub:type="noteref" role="doc-noteref" id="fnr-4-1" href="#fn-4-1">1<\/a>/.test(ch1) && /<aside epub:type="footnote" role="doc-footnote" class="fnote" id="fn-4-1">/.test(ch1), true, 'epub: chapters marked up as chapters, with pop-up notes at the end');
+eq(/epub:type="preface" role="doc-preface"/.test(fileOf('EPUB/text/u02.xhtml')) && /epub:type="part" role="doc-part"/.test(fileOf('EPUB/text/u03.xhtml')) && /epub:type="acknowledgments"/.test(fileOf('EPUB/text/u06.xhtml')), true, 'epub: preface, part, and acknowledgments carry their roles');
+const nav = fileOf('EPUB/nav.xhtml');
+eq(/<li><a href="text\/u03\.xhtml">Part One: The Rise<\/a><ol><li><a href="text\/u04\.xhtml">Chapter One: First<\/a><\/li><li><a href="text\/u05\.xhtml">Chapter Two: Second<\/a><\/li><\/ol><\/li>/.test(nav) && /epub:type="landmarks"/.test(nav), true, 'epub: contents nest chapters under their part, with landmarks');
+eq(fileOf('EPUB/css/book.css').indexOf('color:#9E3B22') !== -1, true, 'epub: the stylesheet takes the book\'s accent');
+// Every XHTML file is well formed: tags open and close in order.
+function wellFormed(x) {
+  const body = x.replace(/<\?xml[^>]*\?>|<!DOCTYPE[^>]*>|<!--[\s\S]*?-->/g, ''), stack = [], re = /<(\/?)([A-Za-z][\w:.-]*)\b[^>]*?(\/?)>/g; let mm;
+  while ((mm = re.exec(body))) { if (mm[3]) continue; if (mm[1]) { if (stack.pop() !== mm[2]) return false; } else stack.push(mm[2]); }
+  return stack.length === 0 && !/&(?!amp;|lt;|gt;|quot;|apos;|#\d+;|#x[0-9a-f]+;)/i.test(body);
+}
+eq(ef.files.filter((f) => /\.(xhtml|opf|ncx|xml)$/.test(f.name)).every((f) => wellFormed(td.decode(f.data))), true, 'epub: every XHTML and XML file is well formed');
+eq(WP.w3cDate('November 6, 2026') + ',' + WP.w3cDate('6 November 2026') + ',' + WP.w3cDate('2026') + ',' + WP.w3cDate('Fall 2026'), '2026-11-06,2026-11-06,2026,2026', 'epub: dates become W3C dates');
+
+// Editing sources inside the builder.
+const st = WP.blankOsint('news');
+Object.assign(st, { authors: 'Jane Doe', title: 'Drones Over the Eastern Front', location: 'Example Times', date: '2024-05-01' });
+const pv = WP.osintPreview(st);
+eq(strip(pv.full) + ' | ' + strip(pv.short), 'Jane Doe, “Drones Over the Eastern Front,” Example Times (01 May 2024). | Doe, “Drones Over the Eastern Front.”', 'sources: an edited source previews its full and short notes');
+eq(WP.newOsintSource(st, imp.sources).key, 'doe-drones-2', 'sources: a new source gets a key that is not taken');
+const lf = JSON.parse(WP.osintListFile(imp.sources.concat([{ key: 'typed', kind: 'typed', full: 'X' }]), 'Mine'));
+eq(lf.app + ':' + lf.sources.length + ':' + WP.importOsintList(JSON.stringify(lf), []).sources.length, 'OSINT Citation Generator:2:2', 'sources: OSINT sources save as a list file the generator and this page can open');
+
 console.log(failed ? `\n${failed} failed, ${passed} passed` : `All ${passed} checks passed.`);
 process.exit(failed ? 1 : 0);

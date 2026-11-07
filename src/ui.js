@@ -3,8 +3,17 @@
   function $(id) { return document.getElementById(id); }
   function has(o, k) { return Object.prototype.hasOwnProperty.call(o, k); }
   WP.useCiter(OSINT);
-  var PAPER_CSS = $('paper-css').textContent, BRIEF_CSS = $('brief-css').textContent;
-  var K_DOC = 'wpb-paper-v1', K_THEME = 'wpb-theme-v1', K_TAB = 'wpb-tab-v1';
+  var PAPER_CSS = $('paper-css').textContent, BRIEF_CSS = $('brief-css').textContent, BOOK_CSS = $('book-css').textContent, EPUB_CSS = $('epub-css').textContent;
+  // Kept apart from the White Paper and Intel Briefing builders, which may share this site's storage.
+  var K_DOC = 'ebb-doc-v1', K_THEME = 'ebb-theme-v1', K_TAB = 'ebb-tab-v1';
+  var ACCENTS = { paper: WP.PAPER_ACCENT, brief: WP.BRIEF_ACCENT, book: WP.BOOK_ACCENT };
+  function uuid() {
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    var b = new Uint8Array(16); (window.crypto || {}).getRandomValues ? crypto.getRandomValues(b) : b.forEach(function (x, i) { b[i] = Math.floor(Math.random() * 256); });
+    b[6] = (b[6] & 15) | 64; b[8] = (b[8] & 63) | 128;
+    var h = Array.prototype.map.call(b, function (x) { return (x < 16 ? '0' : '') + x.toString(16); }).join('');
+    return h.slice(0, 8) + '-' + h.slice(8, 12) + '-' + h.slice(12, 16) + '-' + h.slice(16, 20) + '-' + h.slice(20);
+  }
 
   // ------------------------------------------------------------------ a new paper: the template, with its guidance in square brackets
   function monthYear() { var d = new Date(); return WP.MONTHS[d.getMonth()] + ' ' + d.getFullYear(); }
@@ -83,7 +92,44 @@
     d.back.include = false;
     return d;
   }
-  function starterOf(kind) { return kind === 'brief' ? briefStarter() : starter(); }
+  // A new eBook: front matter filled with guidance, an unnumbered introduction, a part, and
+  // chapters that show each kind of block.
+  function bookStarter() {
+    var d = WP.defaults(), y = new Date().getFullYear();
+    Object.assign(d.meta, { kind: 'book', title: '[Book title]', subtitle: '[Subtitle: what the book is about, in one line]', date: monthYear(), accent: WP.BOOK_ACCENT,
+      publisher: '[Publisher]', site: '[Website]', colophon: '[Colophon: who publishes the book and for whom. For example: This eBook is an official product of [Publisher], made for paid subscribers of [Publication].]' });
+    d.authors = [{ name: '[Author name]', bio: '[Two or three sentences: background, and what qualifies the author to write this book.]', org: false }];
+    Object.assign(d.book, { copyright: '\u00A9 ' + y + ' [Publisher]. All rights reserved.', edition: 'First edition, ' + monthYear(),
+      dedication: '[Dedication: for whom the book is written. Delete it if you do not want one.]', epigraph: '[An epigraph: a short quotation that sets up the book. Delete it if you do not want one.]', epigraphBy: '[Who said it, and where]',
+      description: '[Two or three sentences on what the book covers, for reading apps and store listings.]', bookId: uuid() });
+    d.book.cover.kicker = '';
+    d.body = [
+      '# Introduction {-}', '',
+      '[An unnumbered chapter: an introduction, preface, or foreword. Put {-} after a heading to leave it unnumbered. Notes go where they belong.^[A note is written where it belongs: a caret and the note in square brackets. Notes are numbered afresh in each chapter.] To cite a source from your OSINT list, write its key in square brackets with an at sign, as Sources explains.]', '',
+      '[Paragraphs are indented after the first, as in a printed book. Leave a blank line between paragraphs.]', '',
+      '# [Title of the first part] {part}', '',
+      '[A part gets a page of its own, numbered Part One. Leave parts out if the book does not need them.]', '',
+      '# [Chapter title]', '',
+      '[Each # heading starts a numbered chapter on a new page: Chapter One, Two, Three. The chapter title runs at the top of its pages.]', '',
+      '## [A section heading inside the chapter]', '',
+      '[Text.]', '',
+      '* * *', '',
+      '[A line of three asterisks is a scene break, for a shift in time or place.]', '',
+      '[[fig-trend]]', '',
+      '# [Second chapter title]', '',
+      '[Chapter text.]', '',
+      '!> [A pull quote: the sentence a reader would underline.]', '',
+      '> [A block quotation, in the source\'s own words.]', '',
+      '?> [A boxed aside. Its heading is set under Book, Layout.]'
+    ].join('\n');
+    d.appendix = ['# Acknowledgments', '', '[Thanks to the people who helped.]', '', '# A note on sources', '', '[How the research was done, and how the sources are rated.]', '', '[[rating-key]]'].join('\n');
+    d.visuals = [
+      { id: 'fig-trend', kind: 'bar', title: '[Chart title: state the finding, not the variable]', subtitle: '[Unit of measure, date range]', source: '[Source: dataset, publisher, year.]', note: 'Placeholder numbers. Replace them under Visuals.', data: 'Year,Value\n2019,28\n2020,34\n2021,31\n2022,46\n2023,58\n2024,82\n2025,71', highlight: '2024', image: '', wide: false }
+    ];
+    d.back.include = false;
+    return d;
+  }
+  function starterOf(kind) { return kind === 'brief' ? briefStarter() : kind === 'book' ? bookStarter() : starter(); }
 
   // ------------------------------------------------------------------ state
   var doc = null, saveTimer = null, renderTimer = null, rendering = false, renderAgain = false, lastTarget = null, statusTimer = null;
@@ -109,27 +155,34 @@
     Array.prototype.forEach.call(document.querySelectorAll('[data-k]'), function (el) {
       var v = get(el.getAttribute('data-k'));
       if (el.type === 'checkbox') el.checked = !!v;
-      else if (el.type === 'color') el.value = /^#[0-9a-f]{6}$/i.test(v || '') ? v : doc.meta.kind === 'brief' ? WP.BRIEF_ACCENT : WP.PAPER_ACCENT;
+      else if (el.type === 'color') el.value = /^#[0-9a-f]{6}$/i.test(v || '') ? v : ACCENTS[doc.meta.kind] || WP.PAPER_ACCENT;
       else el.value = v == null ? '' : v;
     });
     $('coverInfo').textContent = doc.meta.coverImage ? 'Image chosen.' : 'No image.';
     $('bcoverInfo').textContent = doc.meta.coverImage ? 'Photo chosen.' : 'No photo yet.';
+    $('ccoverInfo').textContent = doc.meta.coverImage ? 'Image chosen.' : 'No image yet.';
     applyKind();
-    renderAuthors(); renderVisualList(); renderSources();
+    renderAuthors(); renderVisualList(); renderSources(); paintCover();
   }
   Array.prototype.forEach.call(document.querySelectorAll('[data-k]'), function (el) {
     el.addEventListener(el.type === 'checkbox' || el.tagName === 'SELECT' || el.type === 'color' ? 'change' : 'input', function () {
-      put(el.getAttribute('data-k'), el.type === 'checkbox' ? el.checked : el.value);
+      put(el.getAttribute('data-k'), el.type === 'checkbox' ? el.checked : el.type === 'range' ? +el.value : el.value);
+      // Duplicate fields (the same value under two kinds) stay in step.
+      Array.prototype.forEach.call(document.querySelectorAll('[data-k="' + el.getAttribute('data-k') + '"]'), function (o) { if (o !== el && o.type !== 'checkbox') o.value = el.value; });
+      if (/^book\.cover\.|^meta\.(title|subtitle|publisher|accent|coverImage)$|^book\.trim$/.test(el.getAttribute('data-k'))) paintCover();
       changed(el.type === 'checkbox' || el.tagName === 'SELECT' || el.type === 'color');
     });
     if (el.hasAttribute('data-cite')) el.addEventListener('focus', function () { lastTarget = el; });
   });
+
+  Object.keys(WP.TRIMS).forEach(function (k) { var o = document.createElement('option'); o.value = k; o.textContent = WP.TRIMS[k].label; $('b-trim').appendChild(o); });
 
   // ------------------------------------------------------------------ tabs
   function showTab(name) {
     Array.prototype.forEach.call(document.querySelectorAll('#tabs [data-tab]'), function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-tab') === name)); });
     Array.prototype.forEach.call(document.querySelectorAll('#panes [data-pane]'), function (p) { p.hidden = p.getAttribute('data-pane') !== name; });
     store(K_TAB, name);
+    if (name === 'cover') paintCover();
   }
   $('tabs').addEventListener('click', function (e) { var b = e.target.closest('[data-tab]'); if (b) showTab(b.getAttribute('data-tab')); });
 
@@ -185,11 +238,28 @@
     ['Visual', function (ta) { var ids = doc.visuals.map(function (v) { return v.id; }); lineStart(ta, '[[', ids[0] || 'name'); insert(ta, '', ']]'); }, 'Place a chart, table, or image'],
     ['Page break', function (ta) { lineStart(ta, '---', ''); insert(ta, '\n\n', ''); }, 'Start a new page']
   ];
+  var BOOK_TOOLS = [
+    ['Chapter', function (ta) { lineStart(ta, '# ', 'Chapter title'); }, '# starts a numbered chapter on a new page'],
+    ['Unnumbered', function (ta) { lineStart(ta, '# ', 'Introduction'); insert(ta, '', ' {-}'); }, '# Title {-}: an unnumbered chapter, such as a preface or introduction'],
+    ['Part', function (ta) { lineStart(ta, '# ', 'Part title'); insert(ta, '', ' {part}'); }, '# Title {part}: a part, on a page of its own'],
+    ['Section', function (ta) { lineStart(ta, '## ', 'Section heading'); }, '## a section heading inside a chapter'],
+    ['Scene break', function (ta) { lineStart(ta, '* * *', ''); insert(ta, '\n\n', ''); }, 'Three asterisks: a break for a shift in time or place'],
+    ['Note', function (ta) { insert(ta, '^[', ']', 'note text'); }, 'A footnote at the cursor'],
+    ['Cite', function (ta) { lastTarget = ta; showTab('sources'); setStatus('Pick a source and click Cite. It goes where your cursor was.'); }, 'Cite a source from your list'],
+    ['Bold', function (ta) { insert(ta, '**', '**', 'bold text'); }, 'Bold: **text**'],
+    ['Italic', function (ta) { insert(ta, '*', '*', 'italic text'); }, 'Italic: *text*'],
+    ['Quote', function (ta) { lineStart(ta, '> ', 'Quoted text'); }, 'A block quotation'],
+    ['Pull quote', function (ta) { lineStart(ta, '!> ', 'The sentence a reader would underline.'); }, 'A pull quote, set large between rules'],
+    ['Box', function (ta) { lineStart(ta, '?> ', 'An aside in a box.'); }, 'A boxed aside, with the heading set under Book'],
+    ['List', function (ta) { lineStart(ta, '- ', 'Item'); }, 'A bulleted list'],
+    ['Visual', function (ta) { var ids = doc.visuals.map(function (v) { return v.id; }); lineStart(ta, '[[', ids[0] || 'name'); insert(ta, '', ']]'); }, 'Place a chart, table, or image'],
+    ['Page break', function (ta) { lineStart(ta, '---', ''); insert(ta, '\n\n', ''); }, 'Start a new page in the PDF']
+  ];
   function buildToolbars(kind) {
   Array.prototype.forEach.call(document.querySelectorAll('.toolbar'), function (bar) {
     var ta = $('t-' + bar.getAttribute('data-for'));
     bar.textContent = '';
-    (kind === 'brief' ? BRIEF_TOOLS : TOOLS).forEach(function (t) {
+    (kind === 'brief' ? BRIEF_TOOLS : kind === 'book' ? BOOK_TOOLS : TOOLS).forEach(function (t) {
       var b = document.createElement('button'); b.type = 'button'; b.className = 'btn'; b.textContent = t[0]; b.title = t[2];
       b.addEventListener('mousedown', function (e) { e.preventDefault(); });
       b.addEventListener('click', function () { t[1](ta); });
@@ -232,48 +302,75 @@
     ['[[name]]', 'Places the chart, table, or image with that name from Visuals.'],
     ['---', 'Starts a new page.']
   ];
+  var BOOK_HELP = [
+    ['# Title', 'A numbered chapter: Chapter One, Two, Three. Each starts a new page and is listed in the contents.'],
+    ['# Title {-}', 'An unnumbered chapter: an introduction, preface, foreword, prologue, or epilogue.'],
+    ['# Title {part}', 'A part, on a page of its own: Part One. The chapters after it belong to it.'],
+    ['## Title', 'A section heading inside a chapter.'],
+    ['### Title', 'A small heading, in italics.'],
+    ['(blank line)', 'Starts a new paragraph. Paragraphs after the first are indented, unless you choose spaced paragraphs under Book.'],
+    ['* * *', 'A scene break.'],
+    ['*italic*  **bold**', 'Italic and bold. [text](https://...) makes a link.'],
+    ['^[note text]', 'A note. In the PDF it prints at the foot of the page or at the back of the book; in the ePUB, at the end of the chapter. Numbered afresh in each chapter.'],
+    ['[@key, p. 45]', 'Cites a source from Sources in a note. The first citation of a source in each chapter prints in full, later ones in short form. [@a; @b, p. 3] cites two in one note.'],
+    ['> text', 'A block quotation.'],
+    ['!> text', 'A pull quote, set large between rules.'],
+    ['?> text', 'A boxed aside, with the heading set under Book. A line with only ?> starts a new paragraph inside it.'],
+    ['>> text', 'A short aside in italics, with a rule beside it.'],
+    ['- item  /  1. item', 'Bulleted and numbered lists.'],
+    ['{Label} text', 'A row with a label, for terms, dates, or recommendations.'],
+    ['[[name]]', 'Places the chart, table, or image with that name from Visuals.'],
+    ['---', 'Starts a new page in the PDF. The ePUB ignores it.']
+  ];
   function paintHelp(kind) {
-    $('helpTitle').textContent = kind === 'brief' ? 'How to write the stories' : 'How to write the body';
-    $('helpTable').innerHTML = (kind === 'brief' ? BRIEF_HELP : HELP).map(function (h) { return '<tr><td>' + esc(h[0]) + '</td><td>' + esc(h[1]) + '</td></tr>'; }).join('');
+    $('helpTitle').textContent = kind === 'brief' ? 'How to write the stories' : kind === 'book' ? 'How to write the chapters' : 'How to write the body';
+    $('helpTable').innerHTML = (kind === 'brief' ? BRIEF_HELP : kind === 'book' ? BOOK_HELP : HELP).map(function (h) { return '<tr><td>' + esc(h[0]) + '</td><td>' + esc(h[1]) + '</td></tr>'; }).join('');
   }
 
   // ------------------------------------------------------------------ white paper or brief
   var shownKind = null;
+  var NAMES = { paper: 'paper', brief: 'brief', book: 'book' };
   function applyKind() {
-    var k = doc.meta.kind === 'brief' ? 'brief' : 'paper';
-    $(k === 'brief' ? 'kindBrief' : 'kindPaper').checked = true;
-    Array.prototype.forEach.call(document.querySelectorAll('[data-only]'), function (el) { el.hidden = el.getAttribute('data-only') !== k; });
-    $('tabs').querySelector('[data-tab="paper"]').textContent = k === 'brief' ? 'Brief' : 'Paper';
-    $('tabs').querySelector('[data-tab="body"]').textContent = k === 'brief' ? 'Stories' : 'Body';
-    $('t-body').setAttribute('aria-label', k === 'brief' ? 'Stories' : 'Body text');
-    if (!newArmed) $('newBtn').textContent = k === 'brief' ? 'New brief' : 'New paper';
+    var k = NAMES[doc.meta.kind] || 'paper';
+    $({ paper: 'kindPaper', brief: 'kindBrief', book: 'kindBook' }[k]).checked = true;
+    Array.prototype.forEach.call(document.querySelectorAll('[data-only]'), function (el) { el.hidden = el.getAttribute('data-only').split(' ').indexOf(k) === -1; });
+    var tabs = $('tabs');
+    tabs.querySelector('[data-tab="paper"]').textContent = { paper: 'Paper', brief: 'Brief', book: 'Book' }[k];
+    tabs.querySelector('[data-tab="body"]').textContent = { paper: 'Body', brief: 'Stories', book: 'Chapters' }[k];
+    tabs.querySelector('[data-tab="appendix"]').textContent = k === 'book' ? 'Back matter' : 'Appendix';
+    $('t-body').setAttribute('aria-label', { paper: 'Body text', brief: 'Stories', book: 'Chapters' }[k]);
+    $('t-appendix').setAttribute('aria-label', k === 'book' ? 'Back matter' : 'Appendix text');
+    if (!newArmed) $('newBtn').textContent = 'New ' + k;
     if (shownKind !== k) { shownKind = k; buildToolbars(k); paintHelp(k); }
     var cur = document.querySelector('#tabs [aria-selected="true"]');
     if (cur && cur.hidden) showTab('paper');
   }
-  ['kindPaper', 'kindBrief'].forEach(function (id) {
+  ['kindPaper', 'kindBrief', 'kindBook'].forEach(function (id) {
     $(id).addEventListener('change', function () {
-      var k = $(id).value;
-      if (!$(id).checked || doc.meta.kind === k) return;
-      var other = k === 'brief' ? 'paper' : 'brief';
+      var k = $(id).value, from = doc.meta.kind;
+      if (!$(id).checked || from === k) return;
       // The untouched template of one becomes the template of the other.
-      var fresh = starterOf(other);
+      var fresh = starterOf(from);
       if (doc.body === fresh.body) {
         var next = starterOf(k);
         doc.body = next.body; doc.visuals = next.visuals;
-        Object.keys(next.meta).forEach(function (f) { if (doc.meta[f] === '' || doc.meta[f] === fresh.meta[f] && /^\[/.test(String(fresh.meta[f]))) doc.meta[f] = next.meta[f]; });
+        Object.keys(next.meta).forEach(function (f) { if (f !== 'kind' && (doc.meta[f] === '' || doc.meta[f] === fresh.meta[f] && /^\[/.test(String(fresh.meta[f])))) doc.meta[f] = next.meta[f]; });
+        if (!doc.appendix.trim() || doc.appendix === fresh.appendix) doc.appendix = next.appendix;
         if (k === 'paper') {
           Object.keys(next.summary).forEach(function (f) { if (!doc.summary[f].trim()) doc.summary[f] = next.summary[f]; });
-          ['appendix', 'aboutSeries'].forEach(function (f) { if (!doc[f].trim()) doc[f] = next[f]; });
+          if (!doc.aboutSeries.trim()) doc.aboutSeries = next.aboutSeries;
           Object.keys(next.back).forEach(function (f) { if (doc.back[f] === '' || f === 'include') doc.back[f] = next.back[f]; });
-          if (!doc.authors.length) doc.authors = next.authors;
         }
+        if (k === 'book') Object.keys(next.book).forEach(function (f) { if (f !== 'cover' && doc.book[f] === '') doc.book[f] = next.book[f]; });
+        if (!doc.authors.length && next.authors.length) doc.authors = next.authors;
+        if (k === 'brief' && doc.authors.length === 1 && doc.authors[0].name === fresh.authors[0].name) doc.authors = [];
       }
+      if (k === 'book' && !doc.book.bookId) doc.book.bookId = uuid();
       var was = String(doc.meta.accent || '').toUpperCase();
-      if (was === (k === 'brief' ? WP.PAPER_ACCENT : WP.BRIEF_ACCENT).toUpperCase() || !/^#[0-9A-F]{6}$/.test(was)) doc.meta.accent = k === 'brief' ? WP.BRIEF_ACCENT : WP.PAPER_ACCENT;
+      if (was === String(ACCENTS[from]).toUpperCase() || !/^#[0-9A-F]{6}$/.test(was)) doc.meta.accent = ACCENTS[k];
       doc.meta.kind = k;
       fillFields(); changed(true);
-      setStatus(k === 'brief' ? 'Now building an intelligence brief.' : 'Now building a white paper.');
+      setStatus({ paper: 'Now building a white paper.', brief: 'Now building an intelligence brief.', book: 'Now building an eBook.' }[k]);
     });
   });
   function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
@@ -300,8 +397,70 @@
     rd.readAsDataURL(file);
   }
   $('coverPick').addEventListener('click', function () { $('coverFile').click(); });
-  $('coverFile').addEventListener('change', function () { readImage($('coverFile').files[0], function (u) { doc.meta.coverImage = u; $('coverFile').value = ''; $('coverInfo').textContent = 'Image chosen.'; $('bcoverInfo').textContent = 'Photo chosen.'; changed(true); }); });
-  $('coverClear').addEventListener('click', function () { doc.meta.coverImage = ''; $('coverInfo').textContent = 'No image.'; changed(true); });
+  // The cover designer needs the image's shape to place it; a new image starts centered.
+  $('coverFile').addEventListener('change', function () {
+    readImage($('coverFile').files[0], function (u) {
+      doc.meta.coverImage = u; $('coverFile').value = '';
+      $('coverInfo').textContent = 'Image chosen.'; $('bcoverInfo').textContent = 'Photo chosen.'; $('ccoverInfo').textContent = 'Image chosen.';
+      var im = new Image();
+      im.onload = function () { Object.assign(doc.book.cover, { imgW: im.naturalWidth, imgH: im.naturalHeight, focusX: 50, focusY: 50, zoom: 100 }); fillFields(); changed(true); };
+      im.onerror = function () { doc.book.cover.imgW = doc.book.cover.imgH = 0; fillFields(); changed(true); };
+      im.src = u;
+    });
+  });
+  function clearCover() { doc.meta.coverImage = ''; doc.book.cover.imgW = doc.book.cover.imgH = 0; $('coverInfo').textContent = 'No image.'; $('bcoverInfo').textContent = 'No photo yet.'; $('ccoverInfo').textContent = 'No image yet.'; paintCover(); changed(true); }
+  $('coverClear').addEventListener('click', clearCover);
+  $('ccoverPick').addEventListener('click', function () { $('coverFile').click(); });
+  $('ccoverClear').addEventListener('click', clearCover);
+
+  // ------------------------------------------------------------------ the eBook cover
+  var measureCtx = document.createElement('canvas').getContext('2d');
+  function measure(text, font) { measureCtx.font = font; return measureCtx.measureText(text).width; }
+  function paintCover() {
+    if (!doc || doc.meta.kind !== 'book') return;
+    var box = $('coverPreview'); if (!box) return;
+    box.innerHTML = WP.coverSvg(doc, { idPrefix: 'cvp', measure: measure });
+    var art = doc.book.cover.layout === 'art';
+    Array.prototype.forEach.call(document.querySelectorAll('.sliders input'), function (r) { r.disabled = !doc.meta.coverImage && r.getAttribute('data-k') !== 'book.cover.shade'; });
+    $('coverHint').textContent = art ? 'The image is used as it is, with no text over it: make sure it carries the title. An upright image about 1600 × ' + WP.coverSize(doc).h + ' pixels fits this page size exactly.'
+      : 'Drag the sliders to place the image. For a finished cover made elsewhere, choose the last layout. An upright image about 1600 × ' + WP.coverSize(doc).h + ' pixels fits this page size best.';
+  }
+  // The page's own font files, as @font-face rules and as bytes, for the cover image and the ePUB.
+  function fontRules(families) {
+    var css = $('fonts').textContent, out = [], re = /@font-face\{font-family:'([^']+)';font-style:(\w+);font-weight:(\d+);[^}]*?base64,([A-Za-z0-9+\/=]+)\)[^}]*?unicode-range:([^}]*)\}/g, mm;
+    while ((mm = re.exec(css))) if (families.indexOf(mm[1]) !== -1) out.push({ family: mm[1], style: mm[2], weight: +mm[3], b64: mm[4], range: mm[5], css: mm[0] });
+    return out;
+  }
+  function b64bytes(b64) { var bin = atob(b64), a = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) a[i] = bin.charCodeAt(i); return a; }
+  // Draws the cover to a canvas: a JPEG for the ePUB and for saving. Resolves to null if the
+  // browser will not allow it, and the ePUB then carries the cover as a drawing (SVG).
+  function coverJpeg() {
+    var css = fontRules(WP.coverFamilies(doc)).map(function (r) { return r.css; }).join('');
+    var size = WP.coverSize(doc), svg = WP.coverSvg(doc, { standalone: true, fontCss: css, idPrefix: 'cvx', measure: measure });
+    return new Promise(function (resolve) {
+      var img = new Image();
+      img.onload = function () {
+        // Fonts inside an SVG image can take a moment to be ready; draw once they have had it.
+        setTimeout(function () {
+          try {
+            var c = document.createElement('canvas'); c.width = size.w; c.height = size.h;
+            var g = c.getContext('2d'); g.fillStyle = doc.book.cover.bg; g.fillRect(0, 0, size.w, size.h); g.drawImage(img, 0, 0, size.w, size.h);
+            c.toBlob(function (b) { if (!b) { resolve(null); return; } b.arrayBuffer().then(function (buf) { resolve(new Uint8Array(buf)); }, function () { resolve(null); }); }, 'image/jpeg', 0.9);
+          } catch (e) { resolve(null); }
+        }, 150);
+      };
+      img.onerror = function () { resolve(null); };
+      img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    });
+  }
+  $('coverSave').addEventListener('click', function () {
+    setStatus('Drawing the cover…');
+    coverJpeg().then(function (bytes) {
+      if (!bytes) { setStatus('This browser would not draw the cover as an image. Try Chrome or Edge.', true); return; }
+      var name = (WP.slug(String(doc.meta.title || 'book').replace(/[\[\]]/g, '')).slice(0, 60) || 'book') + '-cover.jpg';
+      giveFile(name, bytes, 'image/jpeg').then(function (ok) { setStatus(ok ? 'Saved ' + name + '.' : 'The file could not be saved from this view.', !ok); });
+    });
+  });
   $('bcoverPick').addEventListener('click', function () { $('coverFile').click(); });
   $('bcoverClear').addEventListener('click', function () { doc.meta.coverImage = ''; $('bcoverInfo').textContent = 'No photo yet.'; changed(true); });
 
@@ -333,7 +492,7 @@
       var orgL = document.createElement('label'); orgL.className = 'check';
       var org = document.createElement('input'); org.type = 'checkbox'; org.checked = !!a.org;
       org.addEventListener('change', function () { a.org = org.checked; changed(true); });
-      var orgS = document.createElement('span'); orgS.textContent = 'An organization: keep the name as written in "Cite as"';
+      var orgS = document.createElement('span'); orgS.textContent = 'An organization, not a person: keep the name as written';
       orgL.appendChild(org); orgL.appendChild(orgS);
       card.appendChild(top); card.appendChild(bio); card.appendChild(orgL);
       box.appendChild(card);
@@ -402,7 +561,7 @@
       var grow = document.createElement('span'); grow.className = 'grow';
       var place = document.createElement('button'); place.type = 'button'; place.className = 'btn small'; place.textContent = 'Place in body';
       place.title = 'Adds [[' + v.id + ']] at the cursor in the body';
-      place.textContent = doc.meta.kind === 'brief' ? 'Place in stories' : 'Place in body';
+      place.textContent = { brief: 'Place in stories', book: 'Place in chapters' }[doc.meta.kind] || 'Place in body';
       place.addEventListener('click', function () { showTab('body'); var ta = $('t-body'); lineStart(ta, '[[' + v.id + ']]', ''); });
       var del = document.createElement('button'); del.type = 'button'; del.className = 'btn small quiet danger'; del.textContent = 'Delete';
       var armed = false;
@@ -428,14 +587,14 @@
       }
       if (/^(bar|hbar|line|table)$/.test(v.kind)) vfield(card, v, 'highlight', v.kind === 'table' ? 'Row to highlight (its first cell)' : 'Label to highlight in the accent color');
       vfield(card, v, 'source', 'Source', 'text', { placeholder: 'Source: dataset or document, publisher, year.' });
-      if (v.kind !== 'stats') vfield(card, v, 'note', doc.meta.kind === 'brief' ? 'Reading note (under the figure, optional)' : 'Reading note (in the margin, optional)');
+      if (v.kind !== 'stats') vfield(card, v, 'note', doc.meta.kind === 'paper' ? 'Reading note (in the margin, optional)' : 'Reading note (under the figure, optional)');
       if (v.kind === 'table') {
         var hw = document.createElement('label'); hw.className = 'check';
         var hb = document.createElement('input'); hb.type = 'checkbox'; hb.checked = !v.noHeader;
         hb.addEventListener('change', function () { v.noHeader = !hb.checked; changed(true); });
         hw.appendChild(hb); var hs = document.createElement('span'); hs.textContent = 'The first row is the header'; hw.appendChild(hs); card.appendChild(hw);
       }
-      if ((v.kind === 'image' || v.kind === 'table') && doc.meta.kind !== 'brief') {
+      if ((v.kind === 'image' || v.kind === 'table') && doc.meta.kind === 'paper') {
         var w = document.createElement('label'); w.className = 'check';
         var cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = !!v.wide;
         cb.addEventListener('change', function () { v.wide = cb.checked; changed(true); });
@@ -463,6 +622,9 @@
         s.key = nk; fillFields(); changed();
       });
       var acts = document.createElement('div'); acts.className = 'acts';
+      var edit = document.createElement('button'); edit.type = 'button'; edit.className = 'btn small'; edit.textContent = editing === s ? 'Close' : 'Edit';
+      edit.title = 'Correct this source here. Every note that cites it follows.';
+      edit.addEventListener('click', function () { editing = editing === s ? null : s; renderSources(); if (editing) { var f = $('srcList').querySelector('.sedit input, .sedit select'); if (f) f.focus(); } });
       var cite = document.createElement('button'); cite.type = 'button'; cite.className = 'btn small primary'; cite.textContent = 'Cite';
       cite.title = 'Insert [@' + s.key + '] where your cursor was';
       cite.addEventListener('click', function () {
@@ -477,12 +639,129 @@
         if (!armedDel) { armedDel = true; del.textContent = 'Click again to remove'; setTimeout(function () { armedDel = false; del.textContent = 'Remove'; }, 3000); return; }
         doc.sources.splice(doc.sources.indexOf(s), 1); renderSources(); changed();
       });
-      acts.appendChild(cite); acts.appendChild(del);
-      var txt = document.createElement('div'); txt.className = 'txt'; txt.textContent = WP.sourceLabel(s);
+      acts.appendChild(edit); acts.appendChild(cite); acts.appendChild(del);
+      var txt = document.createElement('div'); txt.className = 'txt'; txt.textContent = WP.sourceLabel(s) || '(empty: fill it in below)';
       row.appendChild(key); row.appendChild(acts); row.appendChild(txt);
+      if (editing === s) row.classList.add('editing');
       box.appendChild(row);
+      if (editing === s) box.appendChild(sourceEditor(s, txt));
     });
   }
+
+  // ---- Editing a source inside the builder. The fields are the OSINT Citation Generator's;
+  // the full note, the short form, and the generator's checks update as you type.
+  var editing = null, snapshot = null;
+  var ACCESS = [['paywalled', 'Paywalled'], ['metered paywall', 'Metered paywall'], ['free registration required', 'Free registration required'], ['institutional access', 'Institutional access'], ['region-restricted', 'Region-restricted'], ['app only', 'App only']];
+  function sourceEditor(s, txt) {
+    var card = document.createElement('div'); card.className = 'sedit';
+    if (snapshot === null || snapshot.src !== s) snapshot = { src: s, data: JSON.stringify(s) };
+    function field(label, el, hint) {
+      var f = document.createElement('div'); f.className = 'field';
+      var id = 'se-' + Math.random().toString(36).slice(2); el.id = id;
+      var l = document.createElement('label'); l.htmlFor = id; l.textContent = label; f.appendChild(l); f.appendChild(el);
+      if (hint) { var h = document.createElement('p'); h.className = 'hint'; h.textContent = hint; f.appendChild(h); }
+      return f;
+    }
+    function input(obj, k, ph, rows) {
+      var el = rows ? document.createElement('textarea') : document.createElement('input');
+      if (rows) el.rows = rows; else el.type = 'text';
+      el.value = obj[k] || ''; if (ph) el.placeholder = ph;
+      el.addEventListener('input', function () { obj[k] = el.value; update(); });
+      return el;
+    }
+    function select(obj, k, opts) {
+      var el = document.createElement('select');
+      opts.forEach(function (o) { var op = document.createElement('option'); op.value = o[0]; op.textContent = o[1]; el.appendChild(op); });
+      el.value = obj[k] || ''; el.addEventListener('change', function () { obj[k] = el.value; update(); });
+      return el;
+    }
+    function row() { var r = document.createElement('div'); r.className = 'row'; Array.prototype.slice.call(arguments).forEach(function (x) { r.appendChild(x); }); return r; }
+    var pvFull = document.createElement('div'), pvShort = document.createElement('div'), checks = document.createElement('ul');
+    pvFull.className = pvShort.className = 'pv'; checks.className = 'gchecks';
+    function update() {
+      if (s.kind === 'osint') {
+        var p = WP.osintPreview(s.st);
+        pvFull.innerHTML = '<span class="k">First citation</span>' + (p.empty ? '<i>Fill in the fields to build the note.</i>' : p.full);
+        pvShort.innerHTML = '<span class="k">Later citations</span>' + (p.empty ? '' : p.short);
+        checks.innerHTML = p.checks.filter(function (c) { return c.level !== 'note'; }).map(function (c) { return '<li>' + esc(c.msg) + '</li>'; }).join('');
+      } else {
+        pvFull.innerHTML = '<span class="k">First citation</span>' + esc(s.full);
+        pvShort.innerHTML = '<span class="k">Later citations</span>' + esc(s.short || s.full);
+      }
+      txt.textContent = WP.sourceLabel(s) || '(empty: fill it in below)';
+      changed();
+    }
+    if (s.kind === 'typed') {
+      card.appendChild(field('Full citation, as the first note should read', input(s, 'full', '', 3), 'Use *asterisks* for italics.'));
+      card.appendChild(field('Short form, for later notes', input(s, 'short', 'Beckley, *Unrivaled*.')));
+    } else {
+      var st = s.st, info = WP.OSINT_TYPE_INFO[st.type] || WP.OSINT_TYPE_INFO.web;
+      var type = select(st, 'type', WP.OSINT_TYPES.map(function (t) { return [t, WP.OSINT_TYPE_INFO[t].label]; }));
+      type.addEventListener('change', function () { st.titleStyle = WP.OSINT_TYPE_INFO[st.type].style; renderSources(); });
+      card.appendChild(field('Kind of source', type));
+      card.appendChild(field('Authors, one per line', input(st, 'authors', 'First name then surname. No named author: the organization, or the outlet plus Staff.', 2)));
+      var style = select(st, 'titleStyle', [['quotes', '"Quotes" (short work)'], ['italics', 'Italics (larger work)'], ['plain', 'Plain (no title)']]);
+      var tr = row(field('Title', input(st, 'title', 'As the source gives it')), field('Set as', style)); tr.style.gridTemplateColumns = 'minmax(0, 2fr) minmax(0, 1fr)';
+      card.appendChild(tr);
+      card.appendChild(field(info.loc, input(st, 'location', '')));
+      var desc = input(st, 'descType', 'Choose or type'); desc.setAttribute('list', 'descPicks');
+      $('descPicks').innerHTML = info.picks.map(function (x) { return '<option value="' + esc(x) + '">'; }).join('');
+      card.appendChild(row(field('Description, in the square brackets', desc), field('Details (volume, issue, report number)', input(st, 'descDetails', ''))));
+      var rel = select({ v: (st.rating || '').charAt(0) }, 'v', [['', 'Not rated']].concat('ABCDEF'.split('').map(function (x) { return [x, x]; })));
+      var cred = select({ v: (st.rating || '').charAt(1) }, 'v', [['', '\u2013']].concat('123456'.split('').map(function (x) { return [x, x]; })));
+      var setRating = function () { st.rating = rel.value && cred.value ? rel.value + cred.value : ''; update(); };
+      rel.addEventListener('change', setRating); cred.addEventListener('change', setRating);
+      card.appendChild(row(field('Reliability of the source', rel), field('Credibility of the information', cred), field('Publisher', input(st, 'publisher', ''))));
+      var dk = select(st, 'dateKind', [['', 'Published'], ['updated', 'Last updated'], ['captured', 'Captured (imagery)']]);
+      card.appendChild(row(field('Date', input(st, 'date', '2/12/2026, Feb 12 2026, or 2018')), field('This date is when it was', dk), field('Accessed', input(st, 'accessed', ''))));
+      card.appendChild(field('Web address or DOI', input(st, 'url', 'https://')));
+      card.appendChild(row(field('Page or place cited, by default', input(st, 'locator', '25-27')), field('Commentary (optional)', input(st, 'note', ''))));
+      var more = document.createElement('details'), sum = document.createElement('summary'), inner = document.createElement('div');
+      sum.textContent = 'More: editors, translation, access, archive, short form'; inner.className = 'inner';
+      more.appendChild(sum); more.appendChild(inner);
+      inner.appendChild(row(field('Editors, one per line', input(st, 'editors', '', 2)), field('Translators, one per line', input(st, 'translators', '', 2)), field('Contributors, one per line', input(st, 'contributors', '', 2))));
+      inner.appendChild(row(field('Title in English', input(st, 'transTitle', '')), field('Original language', input(st, 'origLang', ''))));
+      var acc = document.createElement('div'); acc.className = 'access';
+      ACCESS.forEach(function (a) {
+        var l = document.createElement('label'); l.className = 'check'; var c = document.createElement('input'); c.type = 'checkbox'; c.checked = st.access.indexOf(a[0]) !== -1;
+        c.addEventListener('change', function () { st.access = st.access.filter(function (x) { return x !== a[0]; }); if (c.checked) st.access.push(a[0]); update(); });
+        var sp = document.createElement('span'); sp.textContent = a[1]; l.appendChild(c); l.appendChild(sp); acc.appendChild(l);
+      });
+      var af = document.createElement('div'); af.className = 'field'; var al = document.createElement('span'); al.className = 'label'; al.textContent = 'Access'; af.appendChild(al); af.appendChild(acc); inner.appendChild(af);
+      var quals = document.createElement('input'); quals.type = 'text'; quals.value = st.quals.join(', '); quals.placeholder = 'peer-reviewed, preprint, leaked';
+      quals.addEventListener('input', function () { st.quals = quals.value.split(',').map(function (x) { return x.trim(); }).filter(Boolean); update(); });
+      inner.appendChild(field('Qualifiers, separated by commas', quals));
+      inner.appendChild(row(field('Archive link', input(st, 'archiveUrl', 'https://web.archive.org/...')), field('Archive captured', input(st, 'archiveDate', ''))));
+      inner.appendChild(row(field('Short name, for later notes', input(st, 'shortName', 'Worked out from the authors')), field('Short title', input(st, 'shortTitle', 'Worked out from the title'))));
+      card.appendChild(more);
+    }
+    card.appendChild(pvFull); card.appendChild(pvShort); card.appendChild(checks);
+    var bar = document.createElement('div'); bar.className = 'row'; bar.style.gridTemplateColumns = 'auto auto 1fr';
+    var done = document.createElement('button'); done.type = 'button'; done.className = 'btn small primary'; done.textContent = 'Done';
+    done.addEventListener('click', function () {
+      // A new source gets its key from what was filled in, until it is cited.
+      if (s.fresh) { delete s.fresh; var cited = new RegExp('@' + s.key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b').test(doc.body + doc.appendix); if (!cited && s.kind === 'osint') { var others = doc.sources.filter(function (x) { return x !== s; }); s.key = WP.newOsintSource(s.st, others).key; } }
+      editing = null; snapshot = null; renderSources(); changed();
+    });
+    var undo = document.createElement('button'); undo.type = 'button'; undo.className = 'btn small quiet'; undo.textContent = 'Undo these changes';
+    undo.addEventListener('click', function () { var old = JSON.parse(snapshot.data); Object.keys(old).forEach(function (k) { s[k] = old[k]; }); renderSources(); changed(true); setStatus('Changes to @' + s.key + ' undone.'); });
+    bar.appendChild(done); bar.appendChild(undo); bar.appendChild(document.createElement('span'));
+    card.appendChild(bar);
+    update();
+    return card;
+  }
+  $('srcNew').addEventListener('click', function () {
+    var s = WP.newOsintSource(WP.blankOsint('web'), doc.sources); s.fresh = true;
+    doc.sources.unshift(s); editing = s; renderSources(); changed();
+    var f = $('srcList').querySelector('.sedit select'); if (f) f.focus();
+  });
+  $('srcExport').addEventListener('click', function () {
+    var n = doc.sources.filter(function (x) { return x.kind === 'osint'; }).length;
+    if (!n) { srcSay('There are no OSINT sources to save. Sources added by hand have no fields to save.', true); return; }
+    var title = String(doc.meta.title || doc.meta.briefName || 'sources').replace(/[\[\]]/g, '');
+    var name = 'sources-' + (WP.slug(title).slice(0, 50) || 'list') + '.json';
+    giveFile(name, WP.osintListFile(doc.sources, title)).then(function (ok) { srcSay(ok ? 'Saved ' + n + ' source' + (n === 1 ? '' : 's') + ' to ' + name + '.' : 'The file could not be saved from this view.', !ok); });
+  });
   function srcSay(msg, bad) { var e = $('srcMsg'); e.textContent = msg; e.className = 'filemsg' + (bad ? ' bad' : ''); }
   $('srcOpen').addEventListener('click', function () { $('srcPick').click(); });
   $('srcPick').addEventListener('change', function () {
@@ -510,7 +789,7 @@
   });
 
   // ------------------------------------------------------------------ layout with Paged.js
-  var lastResult = null, pageCount = 0;
+  var lastResult = null, pageCount = 0, pageWidth = 816;
   function whenIdle() {
     return new Promise(function (resolve) { (function poll() { if (rendering) setTimeout(poll, 80); else resolve(); })(); });
   }
@@ -519,23 +798,32 @@
     if (rendering) { renderAgain = true; return Promise.resolve(); }
     rendering = true; $('busy').hidden = false;
     var r;
-    try { r = WP.render(doc); } catch (e) { rendering = false; $('busy').hidden = true; setStatus('Something went wrong building the paper: ' + e.message, true); return Promise.resolve(); }
+    try { r = WP.render(doc, { measure: measure }); } catch (e) { rendering = false; $('busy').hidden = true; setStatus('Something went wrong building the paper: ' + e.message, true); return Promise.resolve(); }
     lastResult = r;
     paintChecks(r.problems);
     Array.prototype.forEach.call(document.querySelectorAll('style[data-pagedjs-inserted-styles]'), function (s) { s.remove(); });
     var stage = $('stage'); stage.textContent = '';
     var previewer = new PagedModule.Previewer();
-    var isBrief = doc.meta.kind === 'brief';
-    return previewer.preview(r.html, [{ 'paper.css': (isBrief ? BRIEF_CSS : PAPER_CSS) + '\n' + r.vars }], stage).then(function (flow) {
+    var isBrief = doc.meta.kind === 'brief', isBook = doc.meta.kind === 'book';
+    pageWidth = r.size ? r.size.w : 816;
+    return previewer.preview(r.html, [{ 'paper.css': (isBrief ? BRIEF_CSS : isBook ? BOOK_CSS : PAPER_CSS) + '\n' + r.vars }], stage).then(function (flow) {
       pageCount = flow.total;
       Array.prototype.forEach.call(stage.querySelectorAll('.cover-length'), function (el) { el.textContent = String(flow.total); });
       var pages = $('pages'); pages.textContent = '';
       var holder = stage.querySelector('.pagedjs_pages');
+      // Paged.js can leave a filler page (before a chapter that starts on a right-hand page) unmarked;
+      // marked blank, it loses its running head and page number, as a blank page should.
+      if (isBook && holder) Array.prototype.forEach.call(holder.querySelectorAll('.pagedjs_page'), function (pg) {
+        var c = pg.querySelector('.pagedjs_page_content');
+        if (c && !c.textContent.trim() && !c.querySelector('img, svg, table, hr')) pg.classList.add('pagedjs_blank_page');
+      });
       if (holder) pages.appendChild(holder);
       fit();
       var sumPages = Array.prototype.filter.call(pages.querySelectorAll('.pagedjs_page'), function (pg) { var sec = pg.querySelector('section.summary'); return sec && sec.textContent.trim(); }).length;
       if (sumPages > 1) paintChecks(r.problems.concat([{ level: 'check', msg: 'The executive summary runs to ' + sumPages + ' pages. The template keeps it to one.', where: 'summary' }]));
-      $('viewStats').innerHTML = isBrief
+      $('viewStats').innerHTML = isBook
+        ? '<b>' + flow.total + '</b> pages · <b>' + r.stats.chapters + '</b> ' + (r.stats.chapters === 1 ? 'chapter' : 'chapters') + ' · <b>' + r.stats.words.toLocaleString() + '</b> words · <b>' + r.stats.notes + '</b> ' + (r.stats.notes === 1 ? 'note' : 'notes') + ' · <b>' + r.stats.cited + '</b> ' + (r.stats.cited === 1 ? 'source' : 'sources')
+        : isBrief
         ? '<b>' + flow.total + '</b> pages · <b>' + r.stats.stories + '</b> ' + (r.stats.stories === 1 ? 'story' : 'stories') + ' · <b>' + r.stats.words.toLocaleString() + '</b> words · <b>' + r.stats.cited + '</b> sources'
         : '<b>' + flow.total + '</b> pages · <b>' + r.stats.words.toLocaleString() + '</b> words · <b>' + r.stats.notes + '</b> notes · <b>' + r.stats.figures + '</b> figures and tables';
     }).catch(function (e) { setStatus('The pages could not be laid out: ' + (e && e.message ? e.message : e), true); }).then(function () {
@@ -545,11 +833,11 @@
     });
   }
   function fit() {
-    var w = $('scroller').clientWidth - 40, z = Math.min(1, Math.max(0.3, w / 816));
+    var w = $('scroller').clientWidth - 40, z = Math.min(1, Math.max(0.3, w / pageWidth));
     $('pages').style.zoom = String(z);
   }
   window.addEventListener('resize', function () { fit(); });
-  var WHERE = { paper: 'paper', summary: 'summary', body: 'body', visuals: 'visuals', sources: 'sources', back: 'back' };
+  var WHERE = { paper: 'paper', summary: 'summary', body: 'body', visuals: 'visuals', sources: 'sources', back: 'back', cover: 'cover', appendix: 'appendix' };
   function paintChecks(list) {
     var ul = $('checks'); ul.textContent = '';
     list.forEach(function (x) {
@@ -563,13 +851,14 @@
   // ------------------------------------------------------------------ files and printing
   var inViewer = !!(window.claude && typeof window.claude.use === 'function'), dl = Promise.resolve(null);
   if (inViewer) { try { dl = Promise.resolve(window.claude.use('downloads')).catch(function () { return null; }); } catch (e) {} }
-  function giveFile(name, text) {
-    var blob = new Blob([text], { type: 'application/json' });
+  function giveFile(name, data, type) {
+    var blob = new Blob([data], { type: type || 'application/json' });
     if (inViewer) return dl.then(function (d) { return d ? d.save({ filename: name, data: blob }).then(function () { return true; }, function () { return false; }) : false; });
     try { var u = URL.createObjectURL(blob), a = document.createElement('a'); a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(u); }, 4000); return Promise.resolve(true); }
     catch (e) { return Promise.resolve(false); }
   }
   function fileName() {
+    if (doc.meta.kind === 'book') return (WP.slug(String(doc.meta.title || 'book').replace(/[\[\]]/g, '')).slice(0, 60) || 'book') + '.json';
     if (doc.meta.kind === 'brief') return (WP.slug('brief-' + (doc.meta.number || '') + '-' + String(doc.meta.briefName || '').replace(/[\[\]]/g, '')).slice(0, 60) || 'brief') + '.json';
     var base = WP.slug((doc.meta.number ? 'wp-' + doc.meta.number + '-' : '') + (doc.meta.shortTitle || doc.meta.title || 'white-paper').replace(/[\[\]]/g, '')).slice(0, 60) || 'white-paper';
     return base + '.json';
@@ -592,16 +881,36 @@
   });
   var newArmed = false;
   $('newBtn').addEventListener('click', function () {
-    var b = $('newBtn'), k = doc.meta.kind === 'brief' ? 'brief' : 'paper', label = k === 'brief' ? 'New brief' : 'New paper';
-    if (!newArmed) { newArmed = true; b.textContent = 'Click again: this clears the current ' + (k === 'brief' ? 'brief' : 'paper'); setTimeout(function () { newArmed = false; $('newBtn').textContent = doc.meta.kind === 'brief' ? 'New brief' : 'New paper'; }, 4000); return; }
-    newArmed = false; b.textContent = label;
-    doc = starterOf(k); fillFields(); changed(true); showTab('paper'); setStatus('Started a new ' + (k === 'brief' ? 'brief' : 'paper') + ' from the template. Save a project file first if you need the old one.');
+    var b = $('newBtn'), k = doc.meta.kind;
+    if (!newArmed) { newArmed = true; b.textContent = 'Click again: this clears the current ' + k; setTimeout(function () { newArmed = false; $('newBtn').textContent = 'New ' + doc.meta.kind; }, 4000); return; }
+    newArmed = false; b.textContent = 'New ' + k;
+    editing = null; doc = starterOf(k); fillFields(); changed(true); showTab('paper'); setStatus('Started a new ' + k + ' from the template. Save a project file first if you need the old one.');
+  });
+  // The ePUB: the cover drawn as a JPEG, the book's typefaces, and every chapter as its own file.
+  var EPUB_FACES = { garamond: ['Garamond Body', 'Garamond Display'], plex: ['Plex Serif', 'Plex Sans Cond', 'Plex Mono'] };
+  $('epubBtn').addEventListener('click', function () {
+    if (doc.meta.kind !== 'book') return;
+    if (!doc.book.bookId) { doc.book.bookId = uuid(); changed(); }
+    setStatus('Building the ePUB…');
+    coverJpeg().then(function (jpeg) {
+      var fonts = fontRules(EPUB_FACES[doc.book.face]).map(function (f) { return { family: f.family, style: f.style, weight: f.weight, range: f.range, data: b64bytes(f.b64) }; });
+      var bytes;
+      try { bytes = WP.epub(doc, { cover: jpeg ? { data: jpeg, type: 'image/jpeg' } : null, fonts: fonts, css: EPUB_CSS, measure: measure }); }
+      catch (e) { setStatus('The ePUB could not be built: ' + e.message, true); return; }
+      var name = fileName().replace(/\.json$/, '.epub');
+      giveFile(name, bytes, 'application/epub+zip').then(function (ok) {
+        setStatus(ok ? 'Saved ' + name + (jpeg ? '.' : '. The cover went in as a drawing, since this browser would not make it an image.') : 'The file could not be saved from this view.', !ok);
+      });
+    });
   });
   $('printBtn').addEventListener('click', function () {
     clearTimeout(renderTimer);
     var go = function () {
       if (!pageCount) { setStatus('The pages are not ready yet.', true); return; }
       setStatus('In the print dialog, choose Save as PDF, and turn on Background graphics if the page color is missing.');
+      // The PDF takes its file name from the page title.
+      var was = document.title, t = String(doc.meta.kind === 'brief' ? (doc.meta.briefName + ' ' + doc.meta.number) : doc.meta.title || '').replace(/[\[\]*]/g, '').replace(/[\\/:?"<>|]+/g, ' ').trim();
+      if (t) { document.title = t; setTimeout(function () { document.title = was; }, 1500); }
       try { window.print(); } catch (e) { setStatus('Printing is blocked in this view. Open the page in its own browser tab and try again.', true); }
     };
     whenIdle().then(function () { return layout(); }).then(go);
@@ -617,10 +926,11 @@
 
   // ------------------------------------------------------------------ boot
   var saved = load(K_DOC);
-  doc = saved ? WP.normalize(saved) : starter();
+  doc = saved ? WP.normalize(saved) : bookStarter();
+  if (doc.meta.kind === 'book' && !doc.book.bookId) doc.book.bookId = uuid();
   fillFields();
   var tab = load(K_TAB); showTab(typeof tab === 'string' && document.querySelector('[data-pane="' + tab + '"]') ? tab : 'paper');
   lastTarget = $('t-body');
-  var fontsReady = document.fonts && document.fonts.load ? Promise.all(['400 16px "Plex Serif"', 'italic 400 16px "Plex Serif"', '600 16px "Plex Serif"', '700 40px "Plex Sans Cond"', '600 22px "Plex Sans Cond"', '400 12px "Plex Mono"', '700 12px "Plex Mono"', '400 16px "Garamond Body"', 'italic 400 16px "Garamond Body"', '600 16px "Garamond Body"', '600 30px "Garamond Display"', '500 60px "Garamond Display"'].map(function (f) { return document.fonts.load(f); })) : Promise.resolve();
-  fontsReady.then(function () { layout(); }, function () { layout(); });
+  var fontsReady = document.fonts && document.fonts.load ? Promise.all(['400 16px "Plex Serif"', 'italic 400 16px "Plex Serif"', '600 16px "Plex Serif"', '700 40px "Plex Sans Cond"', '600 22px "Plex Sans Cond"', '400 12px "Plex Mono"', '700 12px "Plex Mono"', '400 16px "Garamond Body"', 'italic 400 16px "Garamond Body"', '600 16px "Garamond Body"', '600 30px "Garamond Display"', '500 60px "Garamond Display"', '500 16px "Plex Sans Cond"', '500 12px "Plex Mono"'].map(function (f) { return document.fonts.load(f); })) : Promise.resolve();
+  fontsReady.then(function () { paintCover(); layout(); }, function () { layout(); });
 })();

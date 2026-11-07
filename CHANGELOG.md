@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.0 — November 2026: eBook Builder
+
+- **eBooks.** A third choice at the top, beside white paper and brief. A book has a cover, half title, title page, copyright page with the colophon, dedication, epigraph, contents with page numbers, parts and chapters, back matter, notes, and an "About the author" page.
+  - `# Title` starts a numbered chapter, `# Title {-}` an unnumbered one, `# Title {part}` a part. `* * *` is a scene break, `!>` a pull quote, `?>` a boxed aside.
+  - Page sizes: 6 × 9 in, 5.5 × 8.5 in, A5, and US Letter. Typefaces: EB Garamond with Cormorant Garamond, or IBM Plex. Indented or spaced paragraphs; chapter numbers in words, figures, or roman; small capitals to open a chapter; chapters on right-hand pages if wanted.
+  - Running heads: the book's short title on left-hand pages, the chapter's title on right-hand pages. None on front matter, part pages, chapter openings, or blank pages.
+  - Notes are numbered afresh in each chapter, and each chapter cites a source in full the first time. In the PDF, notes go at the foot of the page or at the back of the book.
+- **Save ePUB.** An EPUB 3 package that passes EPUBCheck 5.2: a cover image, one file per chapter with pop-up notes, nested contents, landmarks, embedded fonts, charts as SVG, images as files, and full metadata (ISBN or a kept ID, series, description, subjects, accessibility).
+- **Cover designer.** Five layouts (photo to every edge, photo above a band, framed photo, type only, finished artwork), with the image moved and zoomed by sliders, the fade's darkness, title face and size, capitals, position, alignment, colors, a line above the title, and which details show. The title is fitted and its lines balanced. **Save the cover as an image** gives a JPEG.
+- **Edit sources here.** Every source has an Edit button with the OSINT Citation Generator's fields, a live preview of the full and short notes, and the generator's checks. **New OSINT source** adds one from scratch. **Save these sources as an OSINT list file** sends edits back to the generator. This works in white papers and briefs too.
+- The PDF is named after the title when you save it.
+- The project is kept in the browser under its own name, apart from the White Paper and Intel Briefing builders.
+- Fixed: the "An organization" box for an author now reads the same for every kind of publication.
+
 ## 1.3 — October 2026
 
 - **Several authors.** Under Paper, each author now has a name and a biography of their own, in an order you set with the arrows.
