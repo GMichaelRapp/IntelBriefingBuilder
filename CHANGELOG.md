@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.0.1 — 25 November 2026
+
+- **About this tool.** The version number beside the name opens a box with a quick start, what’s new in the last three versions, and where the tool comes from. It opens by itself on a first visit and once after each update.
+- Published by [Zero History](https://zerohistory.net/), and also served at [zerohistory.net/tools/ebook](https://zerohistory.net/tools/ebook/). The GitHub Pages address keeps working.
+- The README opens with a quick start and a screenshot.
+- The tests now run on GitHub whenever a change is pushed.
+
 ## 2.0 — November 2026: eBook Builder
 
 - **eBooks.** A third choice at the top, beside white paper and brief. A book has a cover, half title, title page, copyright page with the colophon, dedication, epigraph, contents with page numbers, parts and chapters, back matter, notes, and an "About the author" page.

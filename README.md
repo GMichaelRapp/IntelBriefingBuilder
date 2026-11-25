@@ -6,6 +6,25 @@ The switch at the top chooses what you are making: **eBook**, **White paper**, o
 
 It is one web page. There is nothing to install, no account, and nothing is sent anywhere.
 
+**Open it:** [zerohistory.net/tools/ebook](https://zerohistory.net/tools/ebook/), or the copy on [GitHub Pages](https://gmichaelrapp.github.io/IntelBriefingBuilder/). Published by [Zero History](https://zerohistory.net/), a publisher of free, open-source research and writing tools.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshot-dark.png">
+  <img src="docs/screenshot.png" width="1440" height="900" alt="The eBook Builder">
+</picture>
+
+## Quick start
+
+1. **Choose what you are making.** The switch at the top: **eBook**, **White paper** or **Intelligence brief**. All three share sources, notes, visuals and markup.
+2. **Fill in the details.** Title, authors and the rest on the first tab. The pages on the right update as you type.
+3. **Write the text.** Under **Chapters** (or **Body**): `# Title` starts a chapter or section, `[@key, p. 45]` cites a source, `?>` makes a boxed aside, `!>` a pull quote.
+4. **Add your sources.** Under **Sources**, open an OSINT Citation Generator list file or add sources here with **New OSINT source**. Each has an Edit button with the generator’s fields and checks.
+5. **Save it.** **Print or save as PDF** opens the print dialog: choose *Save as PDF*. **Save ePUB** makes the reading-app version. **Save project** keeps your working copy as a file.
+
+Your work is kept in this browser between visits, but a saved project file is the copy to trust.
+
+In the app, press the version number beside the name for this quick start, what’s new in each version, and where the tool comes from. It opens by itself the first time you visit, and once after each update.
+
 ## eBooks
 
 A finished eBook has these parts, in this order:
@@ -121,7 +140,7 @@ It is one web page. There is nothing to install, no account, and nothing is sent
 
 ## Using it
 
-Open `index.html` in Chrome or Edge, or use the hosted copy linked in this repository's About box. Other browsers work for writing, but Chrome and Edge print the pages most faithfully.
+Open `index.html` in Chrome or Edge, or use the hosted copy linked at the top of this page. Other browsers work for writing, but Chrome and Edge print the pages most faithfully.
 
 The tabs on the left hold the paper. The pages on the right update as you type.
 
@@ -283,6 +302,10 @@ node Tests/run.js
 Both need nothing beyond Python 3 and Node 18 or later. To check an ePUB against the standard, run the W3C's EPUBCheck on it: `java -jar epubcheck.jar book.epub`. The tests also run on GitHub whenever a change is pushed.
 
 To pick up a newer OSINT Citation Generator, copy the contents of its `<script id="core">` block into `src/vendor/osint-core.js`, rebuild, and run the tests.
+
+## The About box
+
+The version button and the box it opens (quick start, what’s new, about) are shared with Zero History’s other tools. In `src/page.html`, `<style id="zh-about-css">` and `<script id="zh-about">` hold the shared code, refreshed from [`tools/about/`](https://github.com/gmichaelrapp/zerohistory/tree/main/tools/about) in the zerohistory repository; `<script id="zh-about-cfg">` holds this tool’s own words. When you release, raise the version there, add the release to its `news` (keep the last three), and add it to `CHANGELOG.md`. The box never appears in published pages.
 
 ## License
 
