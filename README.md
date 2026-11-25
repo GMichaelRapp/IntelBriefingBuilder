@@ -10,7 +10,7 @@ It is one web page. There is nothing to install, no account, and nothing is sent
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshot-dark.png">
-  <img src="docs/screenshot.png" width="1440" height="900" alt="The eBook Builder">
+  <img src="docs/screenshot.png" alt="The eBook Builder">
 </picture>
 
 ## Quick start
